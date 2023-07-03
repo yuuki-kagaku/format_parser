@@ -20,4 +20,14 @@
       <ProjectReference Include="..\FormatParser.ELF\FormatParser.ELF.csproj" />
     </ItemGroup>
 
+
+    <ItemGroup>
+      <None Update="Data\linux_amd64\vlc">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\linux_amd64\vlc">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>
