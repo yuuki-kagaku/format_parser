@@ -38,10 +38,17 @@ public class Deserializer
         return defaultBuffer[0];
     }
 
+    public Task SkipUlong() => SkipLong();
+
     public async Task SkipLong() => await ReadInternalAsync(sizeof(long));
 
+    public Task SkipUInt() => SkipInt();
     public async Task SkipInt() => await ReadInternalAsync(sizeof(int));
+
+    public Task SkipUShort() => SkipShort();
     public async Task SkipShort() => await ReadInternalAsync(sizeof(short));
+    public void SkipBytes(int count) => Offset += count;
+    public void SkipBytes(uint count) => Offset += count;
 
     public async Task<string> ReadNulTerminatingStringAsync(int size)
     {
@@ -163,13 +170,21 @@ public class Deserializer
         (defaultBuffer[3], defaultBuffer[4]) = (defaultBuffer[4], defaultBuffer[3]);
     }
     
+    public async Task<ulong> ReadPointer(Bitness bitness)
+    {
+        if (bitness == Bitness.Bitness32)
+            return await ReadUInt();
+
+        return await ReadULong();
+    }
+    
     public async Task SkipPointer(Bitness bitness)
     {
-        if (bitness == Bitness.Unknown)
-            throw new Exception();
-
         if (bitness == Bitness.Bitness32)
+        {
             await SkipInt();
+            return;
+        }
 
         await SkipLong();
     }
