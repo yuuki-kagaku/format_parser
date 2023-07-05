@@ -2,7 +2,7 @@
 
 public class PEParser
 {
-    public async Task<PEData> DeserializeAsync(Stream stream)
+    public async Task<IData> DeserializeAsync(Stream stream)
     {
         var deserializer = new Deserializer(stream);
         deserializer.SetEndianess(Endianess.LittleEndian);

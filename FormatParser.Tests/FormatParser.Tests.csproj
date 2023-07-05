@@ -19,6 +19,7 @@
     <ItemGroup>
       <ProjectReference Include="..\FormatParser.ELF\FormatParser.ELF.csproj" />
       <ProjectReference Include="..\FormatParser.MachO\FormatParser.MachO.csproj" />
+      <ProjectReference Include="..\FormatParser.PE\FormatParser.PE.csproj" />
     </ItemGroup>
 
 
@@ -30,6 +31,27 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="TestData\mac\VLC">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\pe\managed\HelloWorld.Core.86.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\pe\managed\HelloWorld.Core.amd64.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\pe\managed\HelloWorld.Core.AnyCpu.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\pe\managed\HelloWorldCore.arm64.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\pe\windows\procdump.exe">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\pe\windows\procdump64.exe">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\pe\windows\procexp64a.exe">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>
