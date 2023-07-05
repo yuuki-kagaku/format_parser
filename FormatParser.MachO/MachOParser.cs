@@ -83,12 +83,12 @@ public class MachOParser
     private static async Task<(Architecture, ulong offset)> ReadFatArchs(Deserializer deserializer, Bitness bitness)
     {
         var architecture = ParseCPUType(await deserializer.ReadInt()); // cputype
-        await deserializer.SkipInt(); // cpusubtype
+        deserializer.SkipInt(); // cpusubtype
         var offset = await deserializer.ReadPointer(bitness); // offset
-        await deserializer.SkipPointer(bitness); // size
-        await deserializer.SkipPointer(bitness); // align
+        deserializer.SkipPointer(bitness); // size
+        deserializer.SkipPointer(bitness); // align
         if (bitness == Bitness.Bitness64)
-            await deserializer.SkipUInt(); // reserved
+            deserializer.SkipUInt(); // reserved
         
         return (architecture, (ulong)offset);
     }
@@ -96,14 +96,14 @@ public class MachOParser
     private static async Task<(uint NumberOfCommands, Architecture Architecture)> ReadNotFatHeaderAsync(Deserializer deserializer, Bitness bitness)
     {
         var architecture = ParseCPUType(await deserializer.ReadInt()); // cputype
-        await deserializer.SkipInt(); // cpusubtype
-        await deserializer.SkipUInt(); // filetype
+        deserializer.SkipInt(); // cpusubtype
+        deserializer.SkipUInt(); // filetype
         var numberOfCommands = await deserializer.ReadUInt(); // ncmds
-        await deserializer.SkipUInt(); // sizeofcmds
-        await deserializer.SkipUInt(); // flags
+        deserializer.SkipUInt(); // sizeofcmds
+        deserializer.SkipUInt(); // flags
         
         if (bitness == Bitness.Bitness64)
-            await deserializer.SkipUInt(); // reserved
+            deserializer.SkipUInt(); // reserved
 
         return (numberOfCommands, architecture);
     }
