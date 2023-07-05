@@ -38,15 +38,16 @@ public class Deserializer
         return defaultBuffer[0];
     }
 
-    public Task SkipUlong() => SkipLong();
+    public void SkipUlong() => SkipLong();
 
-    public async Task SkipLong() => await ReadInternalAsync(sizeof(long));
+    public void SkipLong() => Offset += sizeof(long);
 
-    public Task SkipUInt() => SkipInt();
-    public async Task SkipInt() => await ReadInternalAsync(sizeof(int));
+    public void SkipUInt() => SkipInt();
+    public void SkipInt() => Offset += sizeof(int);
 
-    public Task SkipUShort() => SkipShort();
-    public async Task SkipShort() => await ReadInternalAsync(sizeof(short));
+    public void SkipUShort() => SkipShort();
+    public void SkipShort() => Offset += sizeof(short);
+    public void SkipByte() => Offset += 1;
     public void SkipBytes(int count) => Offset += count;
     public void SkipBytes(uint count) => Offset += count;
 
@@ -178,15 +179,15 @@ public class Deserializer
         return await ReadULong();
     }
     
-    public async Task SkipPointer(Bitness bitness)
+    public void SkipPointer(Bitness bitness)
     {
         if (bitness == Bitness.Bitness32)
         {
-            await SkipInt();
+            SkipInt();
             return;
         }
 
-        await SkipLong();
+        SkipLong();
     }
 
     private Task ReadInternalAsync(int count) => ReadInternalAsync(count, defaultBuffer);

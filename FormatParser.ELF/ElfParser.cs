@@ -15,19 +15,19 @@ public class ElfParser {
         var endianess = ParseEndianess(header[5]);
         deserializer.SetEndianess(endianess);
         
-        await deserializer.SkipShort(); // e_type
+        deserializer.SkipShort(); // e_type
         var architecture = ParseArhitecture (await deserializer.ReadUShort()); // e_machine
-        await deserializer.SkipInt(); // e_version
-        await deserializer.SkipPointer(bitness); // e_entry
-        await deserializer.SkipPointer(bitness); // e_phoff
-        await deserializer.SkipPointer(bitness); // e_shoff
-        await deserializer.SkipInt(); // e_flags
-        await deserializer.SkipShort(); // e_ehsize
-        await deserializer.SkipShort(); // e_phentsize
+        deserializer.SkipInt(); // e_version
+        deserializer.SkipPointer(bitness); // e_entry
+        deserializer.SkipPointer(bitness); // e_phoff
+        deserializer.SkipPointer(bitness); // e_shoff
+        deserializer.SkipInt(); // e_flags
+        deserializer.SkipShort(); // e_ehsize
+        deserializer.SkipShort(); // e_phentsize
         var programHeadersNumber = await deserializer.ReadShort(); // e_phnum
-        await deserializer.SkipShort(); // e_shentsize
-        await deserializer.SkipShort(); // e_shnum
-        await deserializer.SkipShort(); // e_shstrndx
+        deserializer.SkipShort(); // e_shentsize
+        deserializer.SkipShort(); // e_shnum
+        deserializer.SkipShort(); // e_shstrndx
 
         const int PT_INTERP = 3;
         for (var i = 0; i < programHeadersNumber; i++)
