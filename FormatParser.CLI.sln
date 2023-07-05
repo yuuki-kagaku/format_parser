@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.Tests", "Forma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.MachO", "FormatParser.MachO\FormatParser.MachO.csproj", "{024DBBDD-04BD-430C-9805-8BF49E4F9575}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.PE", "FormatParser.PE\FormatParser.PE.csproj", "{5039F189-1602-48F8-8B86-34F1E0D3D40E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{024DBBDD-04BD-430C-9805-8BF49E4F9575}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{024DBBDD-04BD-430C-9805-8BF49E4F9575}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{024DBBDD-04BD-430C-9805-8BF49E4F9575}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5039F189-1602-48F8-8B86-34F1E0D3D40E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5039F189-1602-48F8-8B86-34F1E0D3D40E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5039F189-1602-48F8-8B86-34F1E0D3D40E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5039F189-1602-48F8-8B86-34F1E0D3D40E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
