@@ -4,8 +4,8 @@ namespace FormatParser;
 
 public class Deserializer
 {
-    private Stream stream;
-    private byte[] defaultBuffer = GC.AllocateArray<byte>(16, true);
+    private readonly Stream stream;
+    private readonly byte[] defaultBuffer = GC.AllocateArray<byte>(16, true);
     private Endianess endianess = Endianess.LittleEndian;
     private static readonly Endianess runningCpuEndianess = BitConverter.IsLittleEndian ? Endianess.LittleEndian : Endianess.BigEndian;
 
