@@ -1,6 +1,6 @@
 ﻿namespace FormatParser.Text;
 
-public class Utf16Decoder
+public class Utf16Decoder : IUtfDecoder
 {
     private readonly TextChecker textChecker;
     private readonly CodepointConverter codepointConverter;
