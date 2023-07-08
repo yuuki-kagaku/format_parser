@@ -10,10 +10,12 @@ public class MacParser_Tests
     [Test]
     public async Task MachOParser_ShouldParseMacExecutable()
     {
-        var macParser = new MachOParser();
+        var macParser = new MachODecoder();
         
         var stream = new FileStream(@"./TestData/mac/VLC", FileMode.Open);
-        var data = (await macParser.DeserializeAsync(stream)) as MachOData;
+        var deserializer = new Deserializer(stream);
+        
+        var data = (await macParser.TryDecodeAsync(deserializer)) as MachOData;
 
         data.Should().NotBeNull();
         data!.Bitness.Should().Be(Bitness.Bitness64);

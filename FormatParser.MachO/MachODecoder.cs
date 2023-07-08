@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace FormatParser.MachO;
 
-public class MachOParser
+public class MachODecoder : IBinaryFormatDecoder
 {
     private static readonly ImmutableDictionary<byte[], (Bitness bitness, Endianess Endianess, bool IsFat)> MagicNumbersNonFat =
             new Dictionary<byte[], (Bitness bitness, Endianess Endianess, bool IsFat)>(ArrayComparer<byte>.Instance)
@@ -24,9 +24,9 @@ public class MachOParser
     
 
 
-    public async Task<IData> DeserializeAsync(Stream stream)
+    public async Task<IData?> TryDecodeAsync(Deserializer deserializer)
     {
-        var deserializer = new Deserializer(stream);
+        deserializer.Offset = 0;
         var header = await deserializer.ReadBytes(4);
         
         if (!MagicNumbers.TryGetValue(header, out var tuple))

@@ -1,6 +1,6 @@
 ﻿namespace FormatParser.PE;
 
-public class PEDecoder : IFormatDecoder
+public class PEDecoder : IBinaryFormatDecoder
 {
     public async Task<IData?> TryDecodeAsync(Deserializer deserializer)
     {

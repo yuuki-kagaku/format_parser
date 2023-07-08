@@ -1,6 +1,6 @@
 ﻿namespace FormatParser;
 
-public interface IFormatDecoder
+public interface IBinaryFormatDecoder
 {
     Task<IData?> TryDecodeAsync(Deserializer deserializer);
 }
