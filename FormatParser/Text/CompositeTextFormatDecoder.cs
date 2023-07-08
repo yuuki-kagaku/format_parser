@@ -27,7 +27,7 @@ public class CompositeTextFormatDecoder
         stringBuilder = new StringBuilder(settings.SampleSize);
     }
     
-    public async Task<IData?> DecodeAsync(InMemoryDeserializer deserializer)
+    public IData? TryDecodeAsync(InMemoryDeserializer deserializer)
     {
         if (TryFindBom(deserializer, out var encoding, out var bom))
         {
