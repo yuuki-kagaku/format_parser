@@ -1,9 +1,10 @@
 namespace FormatParser.Text;
 
-public enum UtfEncoding
+public enum Encoding
 {
-    Unknown,
+    Unknown = default,
     
+    ASCII = 1,
     Utf8BOM,
     Utf8NoBOM,
     

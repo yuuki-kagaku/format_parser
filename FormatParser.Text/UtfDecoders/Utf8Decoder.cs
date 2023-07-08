@@ -13,18 +13,23 @@ public class Utf8Decoder : IUtfDecoder
         this.settings = settings;
     }
     
-    public bool TryDecode(InMemoryDeserializer deserializer, List<char> buffer, out UtfEncoding encoding)
+    public bool TryDecode(InMemoryDeserializer deserializer, List<char> buffer, out Encoding encoding)
     {
         buffer.Clear();
         var processedChars = 0;
+
+        var onlyAsciiSymbols = true;
         try
         {
             deserializer.Offset = 0;
             while (TryGetNextCodepoint(deserializer, out var codepoint))
             {
+                if (codepoint > 128)
+                    onlyAsciiSymbols = false;
+                
                 if (!textChecker.IsValidCodepoint(codepoint))
                 {
-                    encoding = UtfEncoding.Unknown;
+                    encoding = Encoding.Unknown;
                     return false;
                 }
 
@@ -35,18 +40,18 @@ public class Utf8Decoder : IUtfDecoder
                 }
             }
 
-            encoding = UtfEncoding.Utf8NoBOM;
+            encoding = onlyAsciiSymbols ? Encoding.ASCII : Encoding.Utf8NoBOM;
             return true;
         }
         catch (Exception e)
         {
-            encoding = UtfEncoding.Unknown;
+            encoding = Encoding.Unknown;
             return false;
         }
     }
     
-    public bool MatchEncoding(UtfEncoding encoding) 
-        => encoding is UtfEncoding.Utf8NoBOM or UtfEncoding.Utf8BOM;
+    public bool MatchEncoding(Encoding encoding) 
+        => encoding is Encoding.Utf8NoBOM or Encoding.Utf8BOM;
 
     private bool TryGetNextCodepoint(InMemoryDeserializer deserializer, out uint result)
     {

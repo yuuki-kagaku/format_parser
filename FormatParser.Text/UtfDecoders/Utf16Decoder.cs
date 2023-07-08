@@ -13,26 +13,26 @@ public class Utf16Decoder : IUtfDecoder
         this.settings = settings;
     }
 
-    public bool TryDecode(InMemoryDeserializer deserializer, List<char> buffer, out UtfEncoding encoding)
+    public bool TryDecode(InMemoryDeserializer deserializer, List<char> buffer, out Encoding encoding)
     {
         if (TryParseInternal(deserializer, buffer, Endianess.BigEndian))
         {
-            encoding = UtfEncoding.UTF16BeNoBom;
+            encoding = Encoding.UTF16BeNoBom;
             return true;
         }
         
         if (TryParseInternal(deserializer, buffer, Endianess.LittleEndian))
         {
-            encoding = UtfEncoding.UTF16LeNoBom;
+            encoding = Encoding.UTF16LeNoBom;
             return true;
         }
 
-        encoding = UtfEncoding.Unknown;
+        encoding = Encoding.Unknown;
         return false;
     }
 
-    public bool MatchEncoding(UtfEncoding encoding) 
-        => encoding is UtfEncoding.UTF16BeBom or UtfEncoding.UTF16LeBom or UtfEncoding.UTF16BeNoBom or UtfEncoding.UTF16LeNoBom;
+    public bool MatchEncoding(Encoding encoding) 
+        => encoding is Encoding.UTF16BeBom or Encoding.UTF16LeBom or Encoding.UTF16BeNoBom or Encoding.UTF16LeNoBom;
 
     private bool TryParseInternal(InMemoryDeserializer deserializer, List<char> buffer, Endianess endianess)
     {
