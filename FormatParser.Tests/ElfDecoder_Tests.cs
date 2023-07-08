@@ -10,8 +10,8 @@ public class ElfDecoder_Tests
     public async Task ElfDecoder_ShouldParseAmd64LinuxExecutable()
     {
         var elfDecoder = new ElfDecoder();
-        
-        var stream = new FileStream(@"./TestData/linux_amd64/vlc", FileMode.Open, FileAccess.Read);
+
+        await using var stream = new FileStream(@"./TestData/linux_amd64/vlc", FileMode.Open, FileAccess.Read);
         var deserializer = new Deserializer(stream);
 
         var data = await elfDecoder.TryDecodeAsync(deserializer) as ElfData;

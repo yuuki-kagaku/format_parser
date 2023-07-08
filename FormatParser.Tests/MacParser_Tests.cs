@@ -12,7 +12,7 @@ public class MacParser_Tests
     {
         var macParser = new MachODecoder();
         
-        var stream = new FileStream(@"./TestData/mac/VLC", FileMode.Open, FileAccess.Read);
+        await using var stream = new FileStream(@"./TestData/mac/VLC", FileMode.Open, FileAccess.Read);
         var deserializer = new Deserializer(stream);
         
         var data = (await macParser.TryDecodeAsync(deserializer)) as MachOData;
