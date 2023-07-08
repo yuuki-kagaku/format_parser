@@ -44,6 +44,9 @@ public class Utf8Decoder : IUtfDecoder
             return false;
         }
     }
+    
+    public bool MatchEncoding(UtfEncoding encoding) 
+        => encoding is UtfEncoding.Utf8NoBOM or UtfEncoding.Utf8BOM;
 
     private bool TryGetNextCodepoint(InMemoryDeserializer deserializer, out uint result)
     {

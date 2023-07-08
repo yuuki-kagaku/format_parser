@@ -30,7 +30,10 @@ public class Utf16Decoder : IUtfDecoder
         encoding = UtfEncoding.Unknown;
         return false;
     }
-    
+
+    public bool MatchEncoding(UtfEncoding encoding) 
+        => encoding is UtfEncoding.UTF16BeBom or UtfEncoding.UTF16LeBom or UtfEncoding.UTF16BeNoBom or UtfEncoding.UTF16LeNoBom;
+
     private bool TryParseInternal(InMemoryDeserializer deserializer, List<char> buffer, Endianess endianess)
     {
         deserializer.Offset = 0;
