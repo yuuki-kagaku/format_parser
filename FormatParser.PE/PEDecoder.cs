@@ -1,14 +1,17 @@
 ﻿namespace FormatParser.PE;
 
-public class PEParser
+public class PEDecoder : IFormatDecoder
 {
-    public async Task<IData> DeserializeAsync(Stream stream)
+    public async Task<IData?> TryDecodeAsync(Deserializer deserializer)
     {
-        var deserializer = new Deserializer(stream);
+        deserializer.Offset = 0;
         deserializer.SetEndianess(Endianess.LittleEndian);
-        var exeOffset = await ParseHeader(deserializer);
+        var dosHeader = await TryParseHeader(deserializer);
 
-        deserializer.Offset = exeOffset;
+        if (dosHeader == null)
+            return null;
+
+        deserializer.Offset = dosHeader.Value.ExeOffset;
 
         var (architecture, bitness, sizeOfOptionalHeader) = await ReadImageFileHeaderAsync(deserializer);
         var isDotNet = await ReadOptionalHeader(deserializer, sizeOfOptionalHeader, bitness);
@@ -110,11 +113,7 @@ public class PEParser
 
     private static readonly byte[] DosMagicNumbers = {0x4D, 0x5A};
 
-    private static void EnsureDosHeaderMagicNumber(byte[] magicNumbers)
-    {
-        if (!DosMagicNumbers.SequenceEqual(magicNumbers))
-            throw new ParsingException("Missing Dos magic numbers.");
-    }
+    private static bool CheckDosHeaderMagicNumber(byte[] magicNumbers) => DosMagicNumbers.SequenceEqual(magicNumbers);
 
     private async Task<(uint VirtualAddress, uint Size)> ReadDataDirectoryAsync(Deserializer deserializer) 
         => (await deserializer.ReadUInt(), await deserializer.ReadUInt());
@@ -140,10 +139,13 @@ public class PEParser
         };
     }
 
-    private static async Task<uint> ParseHeader(Deserializer deserializer)
+    private static async Task<DosHeaderInfo?> TryParseHeader(Deserializer deserializer)
     {
         var magicNumbers = await deserializer.ReadBytes(2);
-        EnsureDosHeaderMagicNumber(magicNumbers);
+
+        if (!CheckDosHeaderMagicNumber(magicNumbers))
+            return null;
+        
         deserializer.SkipUShort(); // e_cblp
         deserializer.SkipUShort(); // e_cp
         deserializer.SkipUShort(); // e_crlc
@@ -163,6 +165,11 @@ public class PEParser
         deserializer.SkipBytes(sizeof(ushort) * 10); // e_res2
         var exeOffset = await deserializer.ReadUInt();
 
-        return exeOffset;
+        return new DosHeaderInfo {ExeOffset = exeOffset};
+    }
+
+    private struct DosHeaderInfo
+    {
+        public uint ExeOffset { get; init; }
     }
 }
