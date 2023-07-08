@@ -17,7 +17,7 @@ public class PEParser_Tests
     [Test]
     public async Task PEParser_ShouldParse_Amd64Exe()
     {
-        var stream = new FileStream(@"./TestData/pe/windows/procdump64.exe", FileMode.Open);
+        var stream = new FileStream(@"./TestData/pe/windows/procdump64.exe", FileMode.Open, FileAccess.Read);
         var deserializer = new Deserializer(stream);
         var data = (await peDecoder.TryDecodeAsync(deserializer)) as PEData;
 
@@ -30,7 +30,7 @@ public class PEParser_Tests
     [Test]
     public async Task PEParser_ShouldParse_i386Exe()
     {
-        var stream = new FileStream(@"./TestData/pe/windows/procdump.exe", FileMode.Open);
+        var stream = new FileStream(@"./TestData/pe/windows/procdump.exe", FileMode.Open, FileAccess.Read);
         var deserializer = new Deserializer(stream);
         var data = (await peDecoder.TryDecodeAsync(deserializer)) as PEData;
 
@@ -43,7 +43,7 @@ public class PEParser_Tests
     [Test]
     public async Task PEParser_ShouldParse_ArmExe()
     {
-        var stream = new FileStream(@"./TestData/pe/windows/procexp64a.exe", FileMode.Open);
+        var stream = new FileStream(@"./TestData/pe/windows/procexp64a.exe", FileMode.Open, FileAccess.Read);
         var deserializer = new Deserializer(stream);
         var data = (await peDecoder.TryDecodeAsync(deserializer)) as PEData;
 
@@ -56,7 +56,7 @@ public class PEParser_Tests
     [Test]
     public async Task PEParser_ShouldParse_Managed_AnyCPUDll()
     {
-        var stream = new FileStream(@"./TestData/pe/managed/HelloWorld.Core.AnyCpu.dll", FileMode.Open);
+        var stream = new FileStream(@"./TestData/pe/managed/HelloWorld.Core.AnyCpu.dll", FileMode.Open, FileAccess.Read);
         var deserializer = new Deserializer(stream);
         var data = (await peDecoder.TryDecodeAsync(deserializer)) as PEData;
 
@@ -69,7 +69,7 @@ public class PEParser_Tests
     [Test]
     public async Task PEParser_ShouldParse_Managed_amd64_Dll()
     {
-        var stream = new FileStream(@"./TestData/pe/managed/HelloWorld.Core.amd64.dll", FileMode.Open);
+        var stream = new FileStream(@"./TestData/pe/managed/HelloWorld.Core.amd64.dll", FileMode.Open, FileAccess.Read);
         var deserializer = new Deserializer(stream);
         var data = (await peDecoder.TryDecodeAsync(deserializer)) as PEData;
 
@@ -82,7 +82,7 @@ public class PEParser_Tests
     [Test]
     public async Task PEParser_ShouldParse_Managed_arm64_Dll()
     {
-        var stream = new FileStream(@"./TestData/pe/managed/HelloWorldCore.arm64.dll", FileMode.Open);
+        var stream = new FileStream(@"./TestData/pe/managed/HelloWorldCore.arm64.dll", FileMode.Open, FileAccess.Read);
         var deserializer = new Deserializer(stream);
         var data = (await peDecoder.TryDecodeAsync(deserializer)) as PEData;
 
@@ -95,7 +95,7 @@ public class PEParser_Tests
     [Test]
     public async Task PEParser_ShouldParse_Managed_x86_Dll()
     {
-        var stream = new FileStream(@"./TestData/pe/managed/HelloWorld.Core.86.dll", FileMode.Open);
+        var stream = new FileStream(@"./TestData/pe/managed/HelloWorld.Core.86.dll", FileMode.Open, FileAccess.Read);
         var deserializer = new Deserializer(stream);
         var data = (await peDecoder.TryDecodeAsync(deserializer)) as PEData;
 

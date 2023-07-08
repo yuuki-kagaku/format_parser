@@ -9,7 +9,7 @@ public class ElfParser_Tests
     [Test]
     public async Task ElfParser_ShouldParseAmd64LinuxExecutable()
     {
-        var stream = new FileStream(@"./TestData/linux_amd64/vlc", FileMode.Open);
+        var stream = new FileStream(@"./TestData/linux_amd64/vlc", FileMode.Open, FileAccess.Read);
         var data = await ElfParser.DeserializeAsync(stream);
 
         data.Result.Should().NotBeNull();
