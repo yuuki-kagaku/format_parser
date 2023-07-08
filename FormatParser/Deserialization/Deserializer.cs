@@ -28,8 +28,15 @@ public class Deserializer
     public async Task<byte[]> ReadBytes(int count)
     {
         var array = new byte[count];
-        await ReadInternalAsync(count, array);
+        await ReadInternalAsync(count, array, true);
         return array;
+    }
+    
+    public async Task<ArraySegment<byte>> TryReadBytes(int count)
+    {
+        var array = new byte[count];
+        var readBytes = await ReadInternalAsync(count, array, false);
+        return new ArraySegment<byte>(array, 0, readBytes);
     }
 
     public async Task<byte> ReadByte()
@@ -54,7 +61,7 @@ public class Deserializer
     public async Task<string> ReadNulTerminatingStringAsync(int size)
     {
         var array = new byte[size];
-        await ReadInternalAsync(size, array);
+        await ReadInternalAsync(size, array, true);
 
         if (array[^1] != 0)
             throw new Exception();
@@ -190,9 +197,9 @@ public class Deserializer
         SkipLong();
     }
 
-    private Task ReadInternalAsync(int count) => ReadInternalAsync(count, defaultBuffer);
+    private Task ReadInternalAsync(int count) => ReadInternalAsync(count, defaultBuffer, true);
 
-    private async Task ReadInternalAsync(int count, byte[] buffer)
+    private async Task<int> ReadInternalAsync(int count, byte[] buffer, bool ensureSize)
     {
         var totalBytesRead = 0;
 
@@ -201,10 +208,15 @@ public class Deserializer
             var bytesRead = await ReadInternalAsync(buffer, totalBytesRead, count - totalBytesRead);
 
             if (bytesRead == 0)
-                throw new Exception();
+                if (ensureSize)
+                    throw new DeserializerException("Not enough data in stream.");
+                else
+                    return bytesRead;
 
             totalBytesRead += bytesRead;
         }
+
+        return count;
     }
     
     private Task<int> ReadInternalAsync(byte[] dest, int offset, int count) => stream.ReadAsync(dest, offset, count);

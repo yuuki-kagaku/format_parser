@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 
 namespace FormatParser.MachO;
 
@@ -21,8 +20,6 @@ public class MachODecoder : IBinaryFormatDecoder
                 .Add(new byte[] { 0xBE, 0xBA, 0xFE, 0xCA }, (Bitness.Bitness32, Endianess.LittleEndian, true))
                 .Add(new byte[] { 0xCA, 0xFE, 0xBA, 0xBF }, (Bitness.Bitness64, Endianess.BigEndian, true))
                 .Add(new byte[] { 0xBF, 0xBA, 0xFE, 0xCA }, (Bitness.Bitness64, Endianess.LittleEndian, true));
-    
-
 
     public async Task<IData?> TryDecodeAsync(Deserializer deserializer)
     {

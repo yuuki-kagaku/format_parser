@@ -1,19 +1,24 @@
+using FormatParser.Helpers;
+
 namespace FormatParser.ELF;
 
-public class ElfParser {
+public class ElfDecoder : IBinaryFormatDecoder
+{
     private static byte[] ElfMagicBytes = {0x7F, (byte)'E', (byte)'L', (byte)'F'};
 
-    public static async Task<ParsingResult<ElfData>> DeserializeAsync(Stream stream)
+    public async Task<IData?> TryDecodeAsync(Deserializer deserializer)
     {
-        var deserializer = new Deserializer(stream);
-        var header = await deserializer.ReadBytes(16);
+        deserializer.Offset = 0;
+        var header = await deserializer.TryReadBytes(16);
+        if (header.Count < 16)
+            return null;
 
-        if (!ElfMagicBytes.SequenceEqual(new ArraySegment<byte>(header, 0, 4)))
-            return ParsingResult.Error<ElfData>("Wrong ELF magic bytes");
+        if (!ElfMagicBytes.SequenceEqual(header.GetSubSegment(4)))
+            return null;
 
         var bitness = ParseBitness(header[4]);
-        var endianess = ParseEndianess(header[5]);
-        deserializer.SetEndianess(endianess);
+        var endianness = ParseEndianess(header[5]);
+        deserializer.SetEndianess(endianness);
         
         deserializer.SkipShort(); // e_type
         var architecture = ParseArhitecture (await deserializer.ReadUShort()); // e_machine
@@ -37,11 +42,11 @@ public class ElfParser {
             {
                 deserializer.Offset = offset;
                 var interpreter = await deserializer.ReadNulTerminatingStringAsync((int) size);
-                return new ParsingResult<ElfData>(new ElfData(endianess, bitness, architecture , interpreter), null);
+                return new ElfData(endianness, bitness, architecture , interpreter);
             }
         }
 
-        return new ParsingResult<ElfData>(new ElfData(endianess, bitness, architecture, null), null);
+        return new ElfData(endianness, bitness, architecture, null);
     }
 
     private static Architecture ParseArhitecture(ushort architecture)
