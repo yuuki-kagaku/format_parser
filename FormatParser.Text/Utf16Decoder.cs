@@ -1,23 +1,27 @@
 ﻿namespace FormatParser.Text;
 
-public class Utf16Parser
+public class Utf16Decoder
 {
     private readonly TextChecker textChecker;
+    private readonly CodepointConverter codepointConverter;
+    private readonly TextParserSettings settings;
 
-    public Utf16Parser(TextChecker textChecker)
+    public Utf16Decoder(TextChecker textChecker, CodepointConverter codepointConverter, TextParserSettings settings)
     {
         this.textChecker = textChecker;
+        this.codepointConverter = codepointConverter;
+        this.settings = settings;
     }
 
-    public bool TryParse(InMemoryDeserializer deserializer, out UtfEncoding encoding)
+    public bool TryDecode(InMemoryDeserializer deserializer, List<char> buffer, out UtfEncoding encoding)
     {
-        if (TryParseInternal(deserializer, Endianess.BigEndian))
+        if (TryParseInternal(deserializer, buffer, Endianess.BigEndian))
         {
             encoding = UtfEncoding.UTF16BeNoBom;
             return true;
         }
         
-        if (TryParseInternal(deserializer, Endianess.LittleEndian))
+        if (TryParseInternal(deserializer, buffer, Endianess.LittleEndian))
         {
             encoding = UtfEncoding.UTF16LeNoBom;
             return true;
@@ -27,15 +31,26 @@ public class Utf16Parser
         return false;
     }
     
-    private bool TryParseInternal(InMemoryDeserializer deserializer, Endianess endianess)
+    private bool TryParseInternal(InMemoryDeserializer deserializer, List<char> buffer, Endianess endianess)
     {
         deserializer.Offset = 0;
         deserializer.SetEndianess(endianess);
         
+        buffer.Clear();
+        var processedChars = 0;
+        
         while (deserializer.CanRead(sizeof(ushort)))
         {
-            if (!textChecker.IsValidCodepoint(GetNextCodepoint(deserializer)))
+            var codepoint = GetNextCodepoint(deserializer);
+            
+            if (!textChecker.IsValidCodepoint(codepoint))
                 return false;
+            
+            if (processedChars < settings.SampleSize)
+            {
+                codepointConverter.Convert(codepoint, buffer);
+                processedChars++;
+            }
         }
 
         return true;

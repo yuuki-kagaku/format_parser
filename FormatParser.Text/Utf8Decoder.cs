@@ -1,28 +1,37 @@
 namespace FormatParser.Text;
 
-public class Utf8Parser
+public class Utf8Decoder
 {
     private readonly TextChecker textChecker;
-    private readonly bool crashAtSplitCharAtEnd;
+    private readonly CodepointConverter codepointConverter;
+    private readonly TextParserSettings settings;
 
-    public Utf8Parser(TextChecker textChecker, bool crashAtSplitCharAtEnd)
+    public Utf8Decoder(TextChecker textChecker, CodepointConverter codepointConverter, TextParserSettings settings)
     {
         this.textChecker = textChecker;
-        this.crashAtSplitCharAtEnd = crashAtSplitCharAtEnd;
+        this.codepointConverter = codepointConverter;
+        this.settings = settings;
     }
     
-    public bool TryParse(InMemoryDeserializer deserializer, out UtfEncoding encoding)
+    public bool TryDecode(InMemoryDeserializer deserializer, List<char> buffer, out UtfEncoding encoding)
     {
+        buffer.Clear();
+        var processedChars = 0;
         try
         {
             deserializer.Offset = 0;
-
             while (TryGetNextCodepoint(deserializer, out var codepoint))
             {
                 if (!textChecker.IsValidCodepoint(codepoint))
                 {
                     encoding = UtfEncoding.Unknown;
                     return false;
+                }
+
+                if (processedChars < settings.SampleSize)
+                {
+                    codepointConverter.Convert(codepoint, buffer);
+                    processedChars++;
                 }
             }
 
@@ -74,7 +83,7 @@ public class Utf8Parser
         for(var i = 1; i < size; i++)
         {
             if  (!deserializer.TryReadByte(out b))
-                if (crashAtSplitCharAtEnd)
+                if (settings.CrashAtSplitCharAtEnd)
                     throw new Exception();
                 else
                     return false;
