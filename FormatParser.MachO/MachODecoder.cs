@@ -21,7 +21,7 @@ public class MachODecoder : IBinaryFormatDecoder
         streamingBinaryReader.SetEndianness(endianness);
 
         if (!isFat)
-            return await ReadNonFatHeader(streamingBinaryReader, bitness, endianness);
+            return await ReadNonFatFormatInfo(streamingBinaryReader, bitness, endianness);
 
         return await ReadFatFormatInfo(streamingBinaryReader, endianness, bitness);
     }
@@ -33,7 +33,7 @@ public class MachODecoder : IBinaryFormatDecoder
         var headers = new List<(Architecture, ulong Offset)>(numberOfArchitectures);
         
         for (int i = 0; i < numberOfArchitectures; i++)
-            headers.Add(await ReadFatArchs(streamingBinaryReader, bitness));
+            headers.Add(await ReadArchitectures(streamingBinaryReader, bitness));
 
         var result = new List<MachOFileFormatInfo>(numberOfArchitectures);
         foreach (var (architecture, offset) in headers)
@@ -46,23 +46,22 @@ public class MachODecoder : IBinaryFormatDecoder
             streamingBinaryReader.SetEndianness(endianness);
             streamingBinaryReader.Offset = (long) offset;
             
-            result.Add(await ReadNonFatHeader(streamingBinaryReader, bitness, endianness));
+            result.Add(await ReadNonFatFormatInfo(streamingBinaryReader, bitness, endianness));
         }
 
         return new FatMachOFileFormatInfo(endianness, bitness, result.ToImmutableArray());
     }
 
-    private static async Task<MachOFileFormatInfo> ReadNonFatHeader(StreamingBinaryReader streamingBinaryReader, Bitness bitness, Endianness endianness)
+    private static async Task<MachOFileFormatInfo> ReadNonFatFormatInfo(StreamingBinaryReader streamingBinaryReader, Bitness bitness, Endianness endianness)
     {
-        var (numberOfCommands, architecture) = await ReadNotFatHeaderAsync(streamingBinaryReader, bitness);
-        const uint LC_CODE_SIGNATURE = 0x1d;
+        var (numberOfCommands, architecture) = await ReadSingleArchitectureOfFatFormatAsync(streamingBinaryReader, bitness);
         
         for (int i = 0; i < numberOfCommands; i++)
         {
             var command = await streamingBinaryReader.ReadUInt();
             var commandSize = await streamingBinaryReader.ReadUInt();
 
-            if (command != LC_CODE_SIGNATURE)
+            if (command != MachOConstants.LC_CODE_SIGNATURE)
                 streamingBinaryReader.SkipBytes(commandSize);
             else
                 return new MachOFileFormatInfo(endianness, bitness, architecture, true);
@@ -71,7 +70,7 @@ public class MachODecoder : IBinaryFormatDecoder
         return new MachOFileFormatInfo(endianness, bitness, architecture, false);
     }
 
-    private static async Task<(Architecture, ulong offset)> ReadFatArchs(StreamingBinaryReader streamingBinaryReader, Bitness bitness)
+    private static async Task<(Architecture, ulong Offset)> ReadArchitectures(StreamingBinaryReader streamingBinaryReader, Bitness bitness)
     {
         var architecture = ParseCPUType(await streamingBinaryReader.ReadInt()); // cputype
         streamingBinaryReader.SkipInt(); // cpusubtype
@@ -84,7 +83,7 @@ public class MachODecoder : IBinaryFormatDecoder
         return (architecture, offset);
     }
     
-    private static async Task<(uint NumberOfCommands, Architecture Architecture)> ReadNotFatHeaderAsync(StreamingBinaryReader streamingBinaryReader, Bitness bitness)
+    private static async Task<NonFatHeader> ReadSingleArchitectureOfFatFormatAsync(StreamingBinaryReader streamingBinaryReader, Bitness bitness)
     {
         var architecture = ParseCPUType(await streamingBinaryReader.ReadInt()); // cputype
         streamingBinaryReader.SkipInt(); // cpusubtype
@@ -96,20 +95,16 @@ public class MachODecoder : IBinaryFormatDecoder
         if (bitness == Bitness.Bitness64)
             streamingBinaryReader.SkipUInt(); // reserved
 
-        return (numberOfCommands, architecture);
+        return new (numberOfCommands, architecture);
     }
 
-    private static Architecture ParseCPUType(int type)
-    {
-        const int CPU_TYPE_I386 = 7;
-        const int CPU_ARCH_ABI64 = 0x1000000;
-        const int CPU_TYPE_X86_64 = CPU_TYPE_I386 | CPU_ARCH_ABI64;
-
-        return type switch
+    private static Architecture ParseCPUType(int type) =>
+        type switch
         {
-            CPU_TYPE_I386 => Architecture.i386,
-            CPU_TYPE_X86_64 => Architecture.Amd64,
+            MachOConstants.CPU_TYPE_I386 => Architecture.i386,
+            MachOConstants.CPU_TYPE_X86_64 => Architecture.Amd64,
             _ => Architecture.Unknown
         };
-    }
+
+    private record struct NonFatHeader(uint NumberOfCommands, Architecture Architecture);
 }
