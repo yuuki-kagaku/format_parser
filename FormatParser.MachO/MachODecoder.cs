@@ -5,23 +5,6 @@ namespace FormatParser.MachO;
 
 public class MachODecoder : IBinaryFormatDecoder
 {
-    private static readonly ImmutableDictionary<byte[], (Bitness bitness, Endianness Endianess, bool IsFat)> MagicNumbersNonFat =
-            new Dictionary<byte[], (Bitness bitness, Endianness Endianess, bool IsFat)>(ArrayComparer<byte>.Instance)
-                {
-                    { new byte[] { 0xFE, 0xED, 0xFA, 0xCE }, (Bitness.Bitness32, Endianness.BigEndian, false) },
-                    { new byte[] { 0xCE, 0xFA, 0xED, 0xFE }, (Bitness.Bitness32, Endianness.LittleEndian, false) },
-                    { new byte[] { 0xFE, 0xED, 0xFA, 0xCF }, (Bitness.Bitness64, Endianness.BigEndian, false) },
-                    { new byte[] { 0xCF, 0xFA, 0xED, 0xFE }, (Bitness.Bitness64, Endianness.LittleEndian, false) },
-                }.ToImmutableDictionary(ArrayComparer<byte>.Instance);
-
-    private static readonly ImmutableDictionary<byte[], (Bitness bitness, Endianness Endianess, bool IsFat)>
-        MagicNumbers = MagicNumbersNonFat
-            .ToImmutableDictionary(ArrayComparer<byte>.Instance)
-                .Add(new byte[] { 0xCA, 0xFE, 0xBA, 0xBE }, (Bitness.Bitness32, Endianness.BigEndian, true))
-                .Add(new byte[] { 0xBE, 0xBA, 0xFE, 0xCA }, (Bitness.Bitness32, Endianness.LittleEndian, true))
-                .Add(new byte[] { 0xCA, 0xFE, 0xBA, 0xBF }, (Bitness.Bitness64, Endianness.BigEndian, true))
-                .Add(new byte[] { 0xBF, 0xBA, 0xFE, 0xCA }, (Bitness.Bitness64, Endianness.LittleEndian, true));
-
     public async Task<IFileFormatInfo?> TryDecodeAsync(StreamingBinaryReader streamingBinaryReader)
     {
         streamingBinaryReader.Offset = 0;
@@ -31,7 +14,7 @@ public class MachODecoder : IBinaryFormatDecoder
         
         var header = await streamingBinaryReader.ReadBytesAsync(4);
         
-        if (!MagicNumbers.TryGetValue(header, out var tuple))
+        if (!MachOMagicNumbers.MagicNumbers.TryGetValue(header, out var tuple))
             return null;
 
         var (bitness, endianness, isFat) = tuple;
@@ -58,7 +41,7 @@ public class MachODecoder : IBinaryFormatDecoder
             streamingBinaryReader.Offset = (long) offset;
             var header = await streamingBinaryReader.ReadBytesAsync(4);
 
-            (bitness, endianness, _) = MagicNumbersNonFat[header];
+            (bitness, endianness, _) = MachOMagicNumbers.MagicNumbersNonFat[header];
             
             streamingBinaryReader.SetEndianness(endianness);
             streamingBinaryReader.Offset = (long) offset;
