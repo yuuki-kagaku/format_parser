@@ -6,6 +6,6 @@ public record PeFileFormatInfo(Bitness Bitness, Architecture Architecture, bool 
     
     public string ToPrettyString()
     {
-        return $"Mach-O: {Architecture} {Bitness} managed: {IsManaged}";
+        return $"PE: {Architecture} {Bitness} managed: {IsManaged}";
     }
 }
