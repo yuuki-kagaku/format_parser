@@ -2,11 +2,8 @@
 
 public class PEDecoder : IBinaryFormatDecoder
 {
-    private static readonly byte[] DosMagicNumbers = {0x4D, 0x5A};
-
     public async Task<IFileFormatInfo?> TryDecodeAsync(StreamingBinaryReader streamingBinaryReader)
     {
-        streamingBinaryReader.Offset = 0;
         streamingBinaryReader.SetEndianness(Endianness.LittleEndian);
         var dosHeader = await TryReadDosHeader(streamingBinaryReader);
 
@@ -104,7 +101,7 @@ public class PEDecoder : IBinaryFormatDecoder
         }
     }
     
-    private static bool CheckDosHeaderMagicNumber(byte[] magicNumbers) => DosMagicNumbers.SequenceEqual(magicNumbers);
+    private static bool CheckDosHeaderMagicNumber(byte[] magicNumbers) => PEConstants.DosMagicNumbers.SequenceEqual(magicNumbers);
 
     private async Task<(uint VirtualAddress, uint Size)> ReadDataDirectoryAsync(StreamingBinaryReader streamingBinaryReader) 
         => (await streamingBinaryReader.ReadUInt(), await streamingBinaryReader.ReadUInt());

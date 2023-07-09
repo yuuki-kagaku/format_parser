@@ -40,6 +40,7 @@ public class FormatDecoder
         {
             try
             {
+                streamingBinaryReader.Offset = 0;
                 var result = await binaryFormatDecoder.TryDecodeAsync(streamingBinaryReader);
                 if (result != null)
                     return result;

@@ -4,12 +4,8 @@ namespace FormatParser.ELF;
 
 public class ElfDecoder : IBinaryFormatDecoder
 {
-    private static byte[] ElfMagicBytes = {0x7F, (byte)'E', (byte)'L', (byte)'F'};
-
     public async Task<IFileFormatInfo?> TryDecodeAsync(StreamingBinaryReader streamingBinaryReader)
     {
-        streamingBinaryReader.Offset = 0;
-
         var elfHeader = await TryReadElfHeader(streamingBinaryReader);
 
         if (elfHeader == null)
@@ -37,7 +33,7 @@ public class ElfDecoder : IBinaryFormatDecoder
         if (header.Count < 16)
             return null;
 
-        if (!ElfMagicBytes.SequenceEqual(header.GetSubSegment(4)))
+        if (!ELFConstants.ElfMagicBytes.SequenceEqual(header.GetSubSegment(4)))
             return null;
 
         var bitness = ParseBitness(header[4]);

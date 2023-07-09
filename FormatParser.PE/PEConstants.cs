@@ -2,6 +2,8 @@ namespace FormatParser.PE;
 
 internal static class PEConstants
 {
+    public static readonly byte[] DosMagicNumbers = {0x4D, 0x5A};
+    
     #region Directory Entries
 
     public const int IMAGE_NUMBEROF_DIRECTORY_ENTRIES = 16;

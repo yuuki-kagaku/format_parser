@@ -2,6 +2,8 @@ namespace FormatParser.ELF;
 
 internal static class ELFConstants
 {
+    public static byte[] ElfMagicBytes = {0x7F, (byte)'E', (byte)'L', (byte)'F'};
+    
     #region Endianness
     
     public const byte ELFDATA2LSB = 1;

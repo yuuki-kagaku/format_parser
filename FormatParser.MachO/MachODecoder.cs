@@ -7,8 +7,6 @@ public class MachODecoder : IBinaryFormatDecoder
 {
     public async Task<IFileFormatInfo?> TryDecodeAsync(StreamingBinaryReader streamingBinaryReader)
     {
-        streamingBinaryReader.Offset = 0;
-
         if (streamingBinaryReader.Length < 4)
             return null;
         
