@@ -110,13 +110,12 @@ public class ElfDecoder : IBinaryFormatDecoder
         const byte ELFCLASS32 = 1;
         const byte ELFCLASS64 = 2;
 
-        if (b == ELFCLASS32)
-            return Bitness.Bitness32;
-
-        if (b == ELFCLASS64)
-            return Bitness.Bitness64;
-
-        return Bitness.Unknown;
+        return b switch
+        {
+            ELFCLASS32 => Bitness.Bitness32,
+            ELFCLASS64 => Bitness.Bitness64,
+            _ => throw new Exception("Wrong byte at bitness position.")
+        };
     }
 
     private static Endianness ParseEndianness(byte b)
@@ -124,22 +123,16 @@ public class ElfDecoder : IBinaryFormatDecoder
         const byte ELFDATA2LSB = 1;
         const byte ELFDATA2MSB = 2;
 
-        if (b == ELFDATA2LSB)
-            return Endianness.LittleEndian;
-
-        if (b == ELFDATA2MSB)
-            return Endianness.BigEndian;
-
-        return Endianness.Unknown;
+        return b switch
+        {
+            ELFDATA2LSB => Endianness.LittleEndian,
+            ELFDATA2MSB => Endianness.BigEndian,
+            _ => throw new Exception("Wrong byte at endianness position.")
+        };
     }
 
-    private struct ElfHeaderInfo
+    private record struct ElfHeaderInfo(Endianness Endianness, short ProgramHeadersNumber, Bitness Bitness, Architecture Architecture )
     {
-        public Endianness Endianness { get; set; }
-        public short ProgramHeadersNumber  { get; set; }
-        public Bitness Bitness { get; set; }
-        public Architecture Architecture { get; set; }
-
         public void Deconstruct(out Endianness endianness, out short programHeadersNumber, out Bitness bitness, out Architecture architecture)
         {
             endianness = Endianness;
