@@ -20,6 +20,7 @@
       <ProjectReference Include="..\FormatParser.ELF\FormatParser.ELF.csproj" />
       <ProjectReference Include="..\FormatParser.MachO\FormatParser.MachO.csproj" />
       <ProjectReference Include="..\FormatParser.PE\FormatParser.PE.csproj" />
+      <ProjectReference Include="..\FormatParser.Text\FormatParser.Text.csproj" />
     </ItemGroup>
 
 
