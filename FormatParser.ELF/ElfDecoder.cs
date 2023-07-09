@@ -9,6 +9,31 @@ public class ElfDecoder : IBinaryFormatDecoder
     public async Task<IFileFormatInfo?> TryDecodeAsync(StreamingBinaryReader streamingBinaryReader)
     {
         streamingBinaryReader.Offset = 0;
+
+        var elfHeader = await TryReadElfHeader(streamingBinaryReader);
+
+        if (elfHeader == null)
+            return null;
+
+        var (endianness, programHeadersNumber, bitness, architecture) = elfHeader.Value;
+
+        const int PT_INTERP = 3;
+        for (var i = 0; i < programHeadersNumber; i++)
+        {
+            var (type, offset, size) = await ReadPhdr(streamingBinaryReader, bitness);
+            if (PT_INTERP == type)
+            {
+                streamingBinaryReader.Offset = offset;
+                var interpreter = await streamingBinaryReader.ReadNulTerminatingStringAsync((int) size);
+                return new ElfFileFormatInfo(endianness, bitness, architecture , interpreter);
+            }
+        }
+
+        return new ElfFileFormatInfo(endianness, bitness, architecture, null);
+    }
+
+    private static async Task<ElfHeaderInfo?> TryReadElfHeader(StreamingBinaryReader streamingBinaryReader)
+    {
         var header = await streamingBinaryReader.TryReadArraySegment(16);
         if (header.Count < 16)
             return null;
@@ -34,19 +59,7 @@ public class ElfDecoder : IBinaryFormatDecoder
         streamingBinaryReader.SkipShort(); // e_shnum
         streamingBinaryReader.SkipShort(); // e_shstrndx
 
-        const int PT_INTERP = 3;
-        for (var i = 0; i < programHeadersNumber; i++)
-        {
-            var (type, offset, size) = await ReadPhdr(streamingBinaryReader, bitness);
-            if (PT_INTERP == type)
-            {
-                streamingBinaryReader.Offset = offset;
-                var interpreter = await streamingBinaryReader.ReadNulTerminatingStringAsync((int) size);
-                return new ElfFileFormatInfo(endianness, bitness, architecture , interpreter);
-            }
-        }
-
-        return new ElfFileFormatInfo(endianness, bitness, architecture, null);
+        return new ElfHeaderInfo {ProgramHeadersNumber = programHeadersNumber, Bitness = bitness, Architecture = architecture, Endianness = endianness};
     }
 
     private static Architecture ParseArhitecture(ushort architecture)
@@ -118,5 +131,21 @@ public class ElfDecoder : IBinaryFormatDecoder
             return Endianness.BigEndian;
 
         return Endianness.Unknown;
+    }
+
+    private struct ElfHeaderInfo
+    {
+        public Endianness Endianness { get; set; }
+        public short ProgramHeadersNumber  { get; set; }
+        public Bitness Bitness { get; set; }
+        public Architecture Architecture { get; set; }
+
+        public void Deconstruct(out Endianness endianness, out short programHeadersNumber, out Bitness bitness, out Architecture architecture)
+        {
+            endianness = Endianness;
+            programHeadersNumber = ProgramHeadersNumber;
+            bitness = Bitness;
+            architecture = Architecture;
+        }
     }
 }

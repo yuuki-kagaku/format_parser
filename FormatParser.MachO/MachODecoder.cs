@@ -32,7 +32,7 @@ public class MachODecoder : IBinaryFormatDecoder
         var header = await streamingBinaryReader.ReadBytesAsync(4);
         
         if (!MagicNumbers.TryGetValue(header, out var tuple))
-            throw new Exception("Not a Mach O file.");
+            return null;
 
         var (bitness, endianness, isFat) = tuple;
         streamingBinaryReader.SetEndianess(endianness);
@@ -55,7 +55,7 @@ public class MachODecoder : IBinaryFormatDecoder
         var result = new List<MachOFileFormatInfo>(numberOfArchitectures);
         foreach (var (architecture, offset) in headers)
         {
-            streamingBinaryReader.Offset = (long )offset;
+            streamingBinaryReader.Offset = (long) offset;
             var header = await streamingBinaryReader.ReadBytesAsync(4);
 
             (bitness, endianness, _) = MagicNumbersNonFat[header];
@@ -98,7 +98,7 @@ public class MachODecoder : IBinaryFormatDecoder
         if (bitness == Bitness.Bitness64)
             streamingBinaryReader.SkipUInt(); // reserved
         
-        return (architecture, (ulong)offset);
+        return (architecture, offset);
     }
     
     private static async Task<(uint NumberOfCommands, Architecture Architecture)> ReadNotFatHeaderAsync(StreamingBinaryReader streamingBinaryReader, Bitness bitness)
