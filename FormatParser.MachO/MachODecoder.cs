@@ -45,7 +45,6 @@ public class MachODecoder : IBinaryFormatDecoder
 
     private static async Task<FatMachOFileFormatInfo> ReadFatFormatInfo(StreamingBinaryReader streamingBinaryReader, Endianness endianness, Bitness bitness)
     {
-        var fatMachOData = new FatMachOFileFormatInfo(endianness, bitness, ImmutableArray<MachOFileFormatInfo>.Empty);
         var numberOfArchitectures = (int)await streamingBinaryReader.ReadUInt();
 
         var headers = new List<(Architecture, ulong Offset)>(numberOfArchitectures);
@@ -67,7 +66,7 @@ public class MachODecoder : IBinaryFormatDecoder
             result.Add(await ReadNonFatHeader(streamingBinaryReader, bitness, endianness));
         }
 
-        return fatMachOData with { Datas = result.ToImmutableArray() };
+        return new FatMachOFileFormatInfo(endianness, bitness, result.ToImmutableArray());
     }
 
     private static async Task<MachOFileFormatInfo> ReadNonFatHeader(StreamingBinaryReader streamingBinaryReader, Bitness bitness, Endianness endianness)
