@@ -6,7 +6,7 @@ public class ElfDecoder : IBinaryFormatDecoder
 {
     private static byte[] ElfMagicBytes = {0x7F, (byte)'E', (byte)'L', (byte)'F'};
 
-    public async Task<IData?> TryDecodeAsync(Deserializer deserializer)
+    public async Task<IFileFormatInfo?> TryDecodeAsync(Deserializer deserializer)
     {
         deserializer.Offset = 0;
         var header = await deserializer.TryReadBytes(16);
@@ -42,11 +42,11 @@ public class ElfDecoder : IBinaryFormatDecoder
             {
                 deserializer.Offset = offset;
                 var interpreter = await deserializer.ReadNulTerminatingStringAsync((int) size);
-                return new ElfData(endianness, bitness, architecture , interpreter);
+                return new ElfFileFormatInfo(endianness, bitness, architecture , interpreter);
             }
         }
 
-        return new ElfData(endianness, bitness, architecture, null);
+        return new ElfFileFormatInfo(endianness, bitness, architecture, null);
     }
 
     private static Architecture ParseArhitecture(ushort architecture)

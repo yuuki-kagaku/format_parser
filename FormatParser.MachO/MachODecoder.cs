@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using FormatParser.Helpers;
 
 namespace FormatParser.MachO;
 
@@ -21,7 +22,7 @@ public class MachODecoder : IBinaryFormatDecoder
                 .Add(new byte[] { 0xCA, 0xFE, 0xBA, 0xBF }, (Bitness.Bitness64, Endianess.BigEndian, true))
                 .Add(new byte[] { 0xBF, 0xBA, 0xFE, 0xCA }, (Bitness.Bitness64, Endianess.LittleEndian, true));
 
-    public async Task<IData?> TryDecodeAsync(Deserializer deserializer)
+    public async Task<IFileFormatInfo?> TryDecodeAsync(Deserializer deserializer)
     {
         deserializer.Offset = 0;
         var header = await deserializer.ReadBytesAsync(4);
@@ -35,14 +36,14 @@ public class MachODecoder : IBinaryFormatDecoder
         if (!isFat)
             return await ReadNonFatHeader(deserializer, bitness, endianness);
 
-        var fatMachOData = new FatMachOData(endianness, bitness, ImmutableArray<MachOData>.Empty);
+        var fatMachOData = new FatMachOFileFormatInfo(endianness, bitness, ImmutableArray<MachOFileFormatInfo>.Empty);
         var numberOfArchitectures = (int)await deserializer.ReadUInt();
 
         var headers = new List<(Architecture, ulong Offset)>(numberOfArchitectures);
         for (int i = 0; i < numberOfArchitectures; i++)
             headers.Add(await ReadFatArchs(deserializer, bitness));
 
-        var result = new List<MachOData>(numberOfArchitectures);
+        var result = new List<MachOFileFormatInfo>(numberOfArchitectures);
         foreach (var (architecture, offset) in headers)
         {
             deserializer.Offset = (long )offset;
@@ -59,7 +60,7 @@ public class MachODecoder : IBinaryFormatDecoder
         return fatMachOData with { Datas = result.ToImmutableArray() };
     }
 
-    private static async Task<MachOData> ReadNonFatHeader(Deserializer deserializer, Bitness bitness, Endianess endianness)
+    private static async Task<MachOFileFormatInfo> ReadNonFatHeader(Deserializer deserializer, Bitness bitness, Endianess endianness)
     {
         var (numberOfCommands, architecture) = await ReadNotFatHeaderAsync(deserializer, bitness);
         const uint LC_CODE_SIGNATURE = 0x1d;
@@ -71,10 +72,10 @@ public class MachODecoder : IBinaryFormatDecoder
             if (command != LC_CODE_SIGNATURE)
                 deserializer.SkipBytes(commandSize);
             else
-                return new MachOData(endianness, bitness, architecture, true);
+                return new MachOFileFormatInfo(endianness, bitness, architecture, true);
         }
         
-        return new MachOData(endianness, bitness, architecture, false);
+        return new MachOFileFormatInfo(endianness, bitness, architecture, false);
     }
 
     private static async Task<(Architecture, ulong offset)> ReadFatArchs(Deserializer deserializer, Bitness bitness)
@@ -118,20 +119,4 @@ public class MachODecoder : IBinaryFormatDecoder
             _ => Architecture.Unknown
         };
     }
-}
-
-public class ArrayComparer<T> : IEqualityComparer<T[]> where T : IEquatable<T>
-{
-    private static readonly IEqualityComparer<T> elementComparer = EqualityComparer<T>.Default;
-    public static readonly ArrayComparer<T> Instance = new ();
-    
-    public bool Equals(T[]? x, T[]? y)
-    {
-        if (x == null || y == null)
-            return ReferenceEquals(x, y);
-
-        return x.SequenceEqual(y);
-    }
-
-    public int GetHashCode(T[] array) => array.Aggregate(array.Length, (current, element) => (current * 443) ^ elementComparer.GetHashCode(element));
 }

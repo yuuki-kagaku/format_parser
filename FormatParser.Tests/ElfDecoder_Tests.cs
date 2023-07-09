@@ -14,7 +14,7 @@ public class ElfDecoder_Tests
         await using var stream = new FileStream(@"./TestData/linux_amd64/vlc", FileMode.Open, FileAccess.Read);
         var deserializer = new Deserializer(stream);
 
-        var data = await elfDecoder.TryDecodeAsync(deserializer) as ElfData;
+        var data = await elfDecoder.TryDecodeAsync(deserializer) as ElfFileFormatInfo;
 
         data.Should().NotBeNull();
         data!.Bitness.Should().Be(Bitness.Bitness64);

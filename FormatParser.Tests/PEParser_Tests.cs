@@ -19,7 +19,7 @@ public class PEParser_Tests
     {
         await using var stream = new FileStream(@"./TestData/pe/windows/procdump64.exe", FileMode.Open, FileAccess.Read);
         var deserializer = new Deserializer(stream);
-        var data = (await peDecoder.TryDecodeAsync(deserializer)) as PEData;
+        var data = (await peDecoder.TryDecodeAsync(deserializer)) as PeFileFormatInfo;
 
         data.Should().NotBeNull();
         data!.Bitness.Should().Be(Bitness.Bitness64);
@@ -32,7 +32,7 @@ public class PEParser_Tests
     {
         await using var stream = new FileStream(@"./TestData/pe/windows/procdump.exe", FileMode.Open, FileAccess.Read);
         var deserializer = new Deserializer(stream);
-        var data = (await peDecoder.TryDecodeAsync(deserializer)) as PEData;
+        var data = (await peDecoder.TryDecodeAsync(deserializer)) as PeFileFormatInfo;
 
         data.Should().NotBeNull();
         data!.Bitness.Should().Be(Bitness.Bitness32);
@@ -45,7 +45,7 @@ public class PEParser_Tests
     {
         await using var stream = new FileStream(@"./TestData/pe/windows/procexp64a.exe", FileMode.Open, FileAccess.Read);
         var deserializer = new Deserializer(stream);
-        var data = (await peDecoder.TryDecodeAsync(deserializer)) as PEData;
+        var data = (await peDecoder.TryDecodeAsync(deserializer)) as PeFileFormatInfo;
 
         data.Should().NotBeNull();
         data!.Bitness.Should().Be(Bitness.Bitness64);
@@ -58,7 +58,7 @@ public class PEParser_Tests
     {
         await using var stream = new FileStream(@"./TestData/pe/managed/HelloWorld.Core.AnyCpu.dll", FileMode.Open, FileAccess.Read);
         var deserializer = new Deserializer(stream);
-        var data = (await peDecoder.TryDecodeAsync(deserializer)) as PEData;
+        var data = (await peDecoder.TryDecodeAsync(deserializer)) as PeFileFormatInfo;
 
         data.Should().NotBeNull();
         data!.Bitness.Should().Be(Bitness.Bitness32);
@@ -71,7 +71,7 @@ public class PEParser_Tests
     {
         await using var stream = new FileStream(@"./TestData/pe/managed/HelloWorld.Core.amd64.dll", FileMode.Open, FileAccess.Read);
         var deserializer = new Deserializer(stream);
-        var data = (await peDecoder.TryDecodeAsync(deserializer)) as PEData;
+        var data = (await peDecoder.TryDecodeAsync(deserializer)) as PeFileFormatInfo;
 
         data.Should().NotBeNull();
         data!.Bitness.Should().Be(Bitness.Bitness64);
@@ -84,7 +84,7 @@ public class PEParser_Tests
     {
         await using var stream = new FileStream(@"./TestData/pe/managed/HelloWorldCore.arm64.dll", FileMode.Open, FileAccess.Read);
         var deserializer = new Deserializer(stream);
-        var data = (await peDecoder.TryDecodeAsync(deserializer)) as PEData;
+        var data = (await peDecoder.TryDecodeAsync(deserializer)) as PeFileFormatInfo;
 
         data.Should().NotBeNull();
         data!.Bitness.Should().Be(Bitness.Bitness64);
@@ -97,7 +97,7 @@ public class PEParser_Tests
     {
         await using var stream = new FileStream(@"./TestData/pe/managed/HelloWorld.Core.86.dll", FileMode.Open, FileAccess.Read);
         var deserializer = new Deserializer(stream);
-        var data = (await peDecoder.TryDecodeAsync(deserializer)) as PEData;
+        var data = (await peDecoder.TryDecodeAsync(deserializer)) as PeFileFormatInfo;
 
         data.Should().NotBeNull();
         data!.Bitness.Should().Be(Bitness.Bitness32);

@@ -2,7 +2,7 @@
 
 public class PEDecoder : IBinaryFormatDecoder
 {
-    public async Task<IData?> TryDecodeAsync(Deserializer deserializer)
+    public async Task<IFileFormatInfo?> TryDecodeAsync(Deserializer deserializer)
     {
         deserializer.Offset = 0;
         deserializer.SetEndianess(Endianess.LittleEndian);
@@ -16,7 +16,7 @@ public class PEDecoder : IBinaryFormatDecoder
         var (architecture, bitness, sizeOfOptionalHeader) = await ReadImageFileHeaderAsync(deserializer);
         var isDotNet = await ReadOptionalHeader(deserializer, sizeOfOptionalHeader, bitness);
 
-        return new PEData(bitness, architecture, isDotNet);
+        return new PeFileFormatInfo(bitness, architecture, isDotNet);
     }
 
     private static async Task<(Architecture, Bitness, ushort SizeOfOptionalHeader)> ReadImageFileHeaderAsync(Deserializer deserializer)

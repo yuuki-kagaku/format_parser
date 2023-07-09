@@ -1,6 +1,6 @@
 namespace FormatParser;
 
-public class ParsingResult<TData> where TData : class, IData
+public class ParsingResult<TData> where TData : class, IFileFormatInfo
 {
     public ParsingResult(TData? result, string? error)
     {
@@ -14,12 +14,12 @@ public class ParsingResult<TData> where TData : class, IData
 
 public static class ParsingResult
 {
-    public static ParsingResult<TData> Success<TData>(TData result) where TData : class, IData
+    public static ParsingResult<TData> Success<TData>(TData result) where TData : class, IFileFormatInfo
     {
         return new(result, null);
     }
     
-    public static ParsingResult<TData> Error<TData>(string error) where TData : class, IData
+    public static ParsingResult<TData> Error<TData>(string error) where TData : class, IFileFormatInfo
     {
         return new(null, error);
     }

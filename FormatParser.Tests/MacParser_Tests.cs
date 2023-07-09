@@ -15,7 +15,7 @@ public class MacParser_Tests
         await using var stream = new FileStream(@"./TestData/mac/VLC", FileMode.Open, FileAccess.Read);
         var deserializer = new Deserializer(stream);
         
-        var data = (await macParser.TryDecodeAsync(deserializer)) as MachOData;
+        var data = (await macParser.TryDecodeAsync(deserializer)) as MachOFileFormatInfo;
 
         data.Should().NotBeNull();
         data!.Bitness.Should().Be(Bitness.Bitness64);

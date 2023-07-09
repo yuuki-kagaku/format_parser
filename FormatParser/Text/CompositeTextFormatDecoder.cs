@@ -28,7 +28,7 @@ public class CompositeTextFormatDecoder
         stringBuilder = new StringBuilder(settings.SampleSize);
     }
     
-    public IData? TryDecode(InMemoryDeserializer deserializer)
+    public IFileFormatInfo? TryDecode(InMemoryDeserializer deserializer)
     {
         if (TryFindBom(deserializer, out var encoding, out var bom))
         {
@@ -46,9 +46,9 @@ public class CompositeTextFormatDecoder
 
         var header = GetString(buffer);
         if (TryMatchTextBasedFormat(header, out var type, out var formatEncoding))
-            return new TextData(type, formatEncoding ?? encoding.ToString());
+            return new TextFileFormatInfo(type, formatEncoding ?? encoding.ToString());
             
-        return new TextData(DefaultTextType, encoding.ToString());
+        return new TextFileFormatInfo(DefaultTextType, encoding.ToString());
     }
 
     private bool TryDecodeAsUtf(InMemoryDeserializer deserializer, out Encoding encoding)
