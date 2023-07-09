@@ -5,7 +5,7 @@ namespace FormatParser.MachO;
 
 public record FatMachOFileFormatInfo(Endianness Endianness, Bitness Bitness, ImmutableArray<MachOFileFormatInfo> Datas) : IFileFormatInfo
 {
-    public virtual bool Equals(IFileFormatInfo? other) => other is FatMachOFileFormatInfo textFileFormatInfo && this.Equals(textFileFormatInfo);
+    public virtual bool Equals(IFileFormatInfo? other) => other is FatMachOFileFormatInfo fatMachOFileFormatInfo && this.Equals(fatMachOFileFormatInfo);
 
     public virtual bool Equals(FatMachOFileFormatInfo? other)
     {

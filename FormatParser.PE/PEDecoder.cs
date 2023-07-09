@@ -10,6 +10,9 @@ public class PEDecoder : IBinaryFormatDecoder
         if (dosHeader == null)
             return null;
 
+        if (dosHeader.Value.ExeOffset == 0)
+            return new DosMzFileFormatInfo();
+
         streamingBinaryReader.Offset = dosHeader.Value.ExeOffset;
 
         var (architecture, bitness, sizeOfOptionalHeader) = await ReadImageFileHeaderAsync(streamingBinaryReader);
