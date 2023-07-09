@@ -20,13 +20,13 @@ public class FormatDecoder
         await using var fileStream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, settings.BufferSize);
         var deserializer = new Deserializer(fileStream);
 
-        var result = await TryDecodeAsBinary(deserializer);
+        var result = await TryDecodeAsBinaryAsync(deserializer);
         if (result != null)
             return result;
 
-        var buffer = await deserializer.ReadBytes(settings.TextParserSettings.SampleSize);
+        var buffer = await deserializer.ReadBytesAsync(settings.TextParserSettings.SampleSize);
         var inMemoryDeserializer = new InMemoryDeserializer(buffer);
-        result = compositeTextFormatDecoder.TryDecodeAsync(inMemoryDeserializer);
+        result = compositeTextFormatDecoder.TryDecode(inMemoryDeserializer);
 
         if (result != null)
             return result;
@@ -34,7 +34,7 @@ public class FormatDecoder
         return new UnknownData();
     }
 
-    private async Task<IData?> TryDecodeAsBinary(Deserializer deserializer)
+    private async Task<IData?> TryDecodeAsBinaryAsync(Deserializer deserializer)
     {
         foreach (var binaryFormatDecoder in binaryDecoders)
         {

@@ -25,7 +25,7 @@ public class Deserializer
         set => stream.Position = value;
     }
     
-    public async Task<byte[]> ReadBytes(int count)
+    public async Task<byte[]> ReadBytesAsync(int count)
     {
         var array = new byte[count];
         await ReadInternalAsync(count, array, true);

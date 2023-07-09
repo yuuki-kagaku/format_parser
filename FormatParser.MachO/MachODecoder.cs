@@ -24,7 +24,7 @@ public class MachODecoder : IBinaryFormatDecoder
     public async Task<IData?> TryDecodeAsync(Deserializer deserializer)
     {
         deserializer.Offset = 0;
-        var header = await deserializer.ReadBytes(4);
+        var header = await deserializer.ReadBytesAsync(4);
         
         if (!MagicNumbers.TryGetValue(header, out var tuple))
             throw new Exception("Not a Mach O file.");
@@ -46,7 +46,7 @@ public class MachODecoder : IBinaryFormatDecoder
         foreach (var (architecture, offset) in headers)
         {
             deserializer.Offset = (long )offset;
-            header = await deserializer.ReadBytes(4);
+            header = await deserializer.ReadBytesAsync(4);
 
             (bitness, endianness, _) = MagicNumbersNonFat[header];
             

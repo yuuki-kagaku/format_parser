@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace FormatParser.Text;
@@ -27,7 +28,7 @@ public class CompositeTextFormatDecoder
         stringBuilder = new StringBuilder(settings.SampleSize);
     }
     
-    public IData? TryDecodeAsync(InMemoryDeserializer deserializer)
+    public IData? TryDecode(InMemoryDeserializer deserializer)
     {
         if (TryFindBom(deserializer, out var encoding, out var bom))
         {
@@ -80,7 +81,7 @@ public class CompositeTextFormatDecoder
         return stringBuilder.ToString();
     }
 
-    private bool TryMatchTextBasedFormat(string header, out string? type, out string? encoding)
+    private bool TryMatchTextBasedFormat(string header, [NotNullWhen(true)] out string? type, [NotNullWhen(true)] out string? encoding)
     {
         foreach (var detector in textBasedFormatDetectors)
         {
@@ -96,7 +97,7 @@ public class CompositeTextFormatDecoder
         return false;
     }
 
-    private static bool TryFindBom(InMemoryDeserializer deserializer, out Encoding result, out byte[]? bom)
+    private static bool TryFindBom(InMemoryDeserializer deserializer, out Encoding result, [NotNullWhen(true)] out byte[]? bom)
     {
         deserializer.Offset = 0;
         var firstBytes = deserializer.ReadBytes(4);

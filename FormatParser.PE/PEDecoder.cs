@@ -141,7 +141,7 @@ public class PEDecoder : IBinaryFormatDecoder
 
     private static async Task<DosHeaderInfo?> TryParseHeader(Deserializer deserializer)
     {
-        var magicNumbers = await deserializer.ReadBytes(2);
+        var magicNumbers = await deserializer.ReadBytesAsync(2);
 
         if (!CheckDosHeaderMagicNumber(magicNumbers))
             return null;
