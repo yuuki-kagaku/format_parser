@@ -3,12 +3,29 @@ namespace FormatParser;
 public class InMemoryDeserializer
 {
     private int offset = 0;
-    private byte[] buffer;
+    private readonly byte[] buffer;
+    private readonly int length;
+    
     private Endianness endianness = Endianness.LittleEndian;
 
     public InMemoryDeserializer(byte[] buffer)
     {
         this.buffer = buffer;
+        length = buffer.Length;
+    }
+    
+    public InMemoryDeserializer(ArraySegment<byte> arraySegment)
+    {
+        if (arraySegment.Offset == 0)
+        {
+            this.buffer = arraySegment.Array!;
+            this.length = arraySegment.Count;
+        }
+        else
+        {
+            this.buffer = arraySegment.ToArray();
+            this.length = this.buffer.Length;
+        }
     }
 
     public void SetEndianess(Endianness endianness)
@@ -24,8 +41,8 @@ public class InMemoryDeserializer
 
     public byte[] ReadBytes(int count)
     {
-        if (offset + count <= buffer.Length)
-            count = buffer.Length - offset;
+        if (offset + count <= length)
+            count = length - offset;
 
         var result = buffer[offset..count];
         offset += count;
@@ -84,5 +101,5 @@ public class InMemoryDeserializer
         return result;
     }
     
-    public bool CanRead(int size) => offset + size <= buffer.Length;
+    public bool CanRead(int size) => offset + size <= length;
 }

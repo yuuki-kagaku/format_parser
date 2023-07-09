@@ -24,7 +24,7 @@ public class FormatDecoder
         if (result != null)
             return result;
 
-        var buffer = await deserializer.ReadBytesAsync(settings.TextParserSettings.SampleSize);
+        var buffer = await deserializer.TryReadArraySegment(settings.TextParserSettings.SampleSize);
         var inMemoryDeserializer = new InMemoryDeserializer(buffer);
         result = compositeTextFormatDecoder.TryDecode(inMemoryDeserializer);
 

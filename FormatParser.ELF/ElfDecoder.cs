@@ -9,7 +9,7 @@ public class ElfDecoder : IBinaryFormatDecoder
     public async Task<IFileFormatInfo?> TryDecodeAsync(Deserializer deserializer)
     {
         deserializer.Offset = 0;
-        var header = await deserializer.TryReadBytes(16);
+        var header = await deserializer.TryReadArraySegment(16);
         if (header.Count < 16)
             return null;
 

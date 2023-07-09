@@ -1,6 +1,6 @@
 namespace FormatParser;
 
-public class UnknownFileFormatInfo : IFileFormatInfo
+public record UnknownFileFormatInfo : IFileFormatInfo
 {
     public bool Equals(IFileFormatInfo? other)
     {

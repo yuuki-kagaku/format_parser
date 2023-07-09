@@ -32,7 +32,7 @@ public class Deserializer
         return array;
     }
     
-    public async Task<ArraySegment<byte>> TryReadBytes(int count)
+    public async Task<ArraySegment<byte>> TryReadArraySegment(int count)
     {
         var array = new byte[count];
         var readBytes = await ReadInternalAsync(count, array, false);
