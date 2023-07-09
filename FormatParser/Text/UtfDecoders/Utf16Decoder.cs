@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 namespace FormatParser.Text;
 
@@ -15,15 +16,15 @@ public class Utf16Decoder : IUtfDecoder
         this.settings = settings;
     }
 
-    public bool TryDecode(InMemoryDeserializer deserializer, List<char> buffer, [NotNullWhen(true)] out string? encoding)
+    public bool TryDecode(InMemoryDeserializer deserializer, StringBuilder stringBuilder, [NotNullWhen(true)] out string? encoding)
     {
-        if (TryParseInternal(deserializer, buffer, Endianness.BigEndian))
+        if (TryParseInternal(deserializer, stringBuilder, Endianness.BigEndian))
         {
             encoding = WellKnownEncodings.UTF16BeNoBom;
             return true;
         }
         
-        if (TryParseInternal(deserializer, buffer, Endianness.LittleEndian))
+        if (TryParseInternal(deserializer, stringBuilder, Endianness.LittleEndian))
         {
             encoding = WellKnownEncodings.UTF16LeNoBom;
             return true;
@@ -35,12 +36,12 @@ public class Utf16Decoder : IUtfDecoder
     
     public string[] CanReadEncodings { get; } = { WellKnownEncodings.UTF16BeBom, WellKnownEncodings.UTF16LeBom, WellKnownEncodings.UTF16BeNoBom, WellKnownEncodings.UTF16LeNoBom  };
 
-    private bool TryParseInternal(InMemoryDeserializer deserializer, List<char> buffer, Endianness endianness)
+    private bool TryParseInternal(InMemoryDeserializer deserializer, StringBuilder stringBuilder, Endianness endianness)
     {
         deserializer.Offset = 0;
         deserializer.SetEndianess(endianness);
         
-        buffer.Clear();
+        stringBuilder.Clear();
         var processedChars = 0;
         
         while (deserializer.CanRead(sizeof(ushort)))
@@ -52,7 +53,7 @@ public class Utf16Decoder : IUtfDecoder
             
             if (processedChars < settings.SampleSize)
             {
-                codepointConverter.Convert(codepoint, buffer);
+                codepointConverter.Convert(codepoint, stringBuilder);
                 processedChars++;
             }
         }

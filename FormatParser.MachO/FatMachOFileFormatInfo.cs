@@ -3,7 +3,7 @@ using FormatParser.Helpers;
 
 namespace FormatParser.MachO;
 
-public record FatMachOFileFormatInfo (Endianness Endianness, Bitness Bitness, ImmutableArray<MachOFileFormatInfo> Datas) : IFileFormatInfo
+public record FatMachOFileFormatInfo(Endianness Endianness, Bitness Bitness, ImmutableArray<MachOFileFormatInfo> Datas) : IFileFormatInfo
 {
     public virtual bool Equals(IFileFormatInfo? other) => other is FatMachOFileFormatInfo textFileFormatInfo && this.Equals(textFileFormatInfo);
 

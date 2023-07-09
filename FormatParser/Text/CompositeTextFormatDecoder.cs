@@ -8,7 +8,6 @@ public class CompositeTextFormatDecoder
     private readonly IUtfDecoder[] utfDecoders;
     private readonly ITextBasedFormatDetector[] textBasedFormatDetectors;
     private readonly TextParserSettings settings;
-    private readonly StringBuilder stringBuilder;
     private readonly Dictionary<string, IUtfDecoder> utfDecodersByEncoding;
     
     public CompositeTextFormatDecoder(IUtfDecoder[] utfDecoders, ITextBasedFormatDetector[] textBasedFormatDetectors, TextParserSettings settings)
@@ -20,43 +19,42 @@ public class CompositeTextFormatDecoder
             
         this.textBasedFormatDetectors = textBasedFormatDetectors;
         this.settings = settings;
-        stringBuilder = new StringBuilder(settings.SampleSize);
     }
     
     public IFileFormatInfo? TryDecode(InMemoryDeserializer deserializer)
     {
-        var buffer = new List<char>(settings.SampleSize);
+        var stringBuilder = new StringBuilder(settings.SampleSize);
         if (TryFindUtfBom(deserializer, out var encoding, out var bom))
         {
             var decoder = utfDecodersByEncoding[encoding];
             deserializer.Offset = bom.Length;
 
-            if (!decoder.TryDecode(deserializer, buffer, out _))
+            if (!decoder.TryDecode(deserializer, stringBuilder, out _))
                 throw new Exception("File is corrupted.");
         }
         else
         {
-            if (!TryDecodeAsUtf(deserializer, buffer, out encoding))
+            if (!TryDecodeAsUtf(deserializer, stringBuilder, out encoding))
                 return null;
         }
 
-        var header = GetString(buffer);
+        var header = stringBuilder.ToString();
         if (TryMatchTextBasedFormat(header, out var type, out var formatEncoding))
             return new TextFileFormatInfo(type, formatEncoding ?? encoding.ToString());
             
         return new TextFileFormatInfo(DefaultTextType, encoding.ToString());
     }
 
-    private bool TryDecodeAsUtf(InMemoryDeserializer deserializer, List<char> buffer, [NotNullWhen(true)] out string? encoding)
+    private bool TryDecodeAsUtf(InMemoryDeserializer deserializer, StringBuilder stringBuilder, [NotNullWhen(true)] out string? encoding)
     {
         foreach (var utfDecoder in utfDecoders)
         {
             try
             {
                 deserializer.Offset = 0;
-                buffer.Clear();
+                stringBuilder.Clear();
 
-                if (utfDecoder.TryDecode(deserializer, buffer, out encoding))
+                if (utfDecoder.TryDecode(deserializer, stringBuilder, out encoding))
                     return true;
             }
             catch (Exception e)
@@ -66,15 +64,6 @@ public class CompositeTextFormatDecoder
 
         encoding = default;
         return false;
-    }
-
-    private string GetString(List<char> buffer)
-    {
-        stringBuilder.Clear();
-        foreach (var c in buffer)
-            stringBuilder.Append(c);
-
-        return stringBuilder.ToString();
     }
 
     private bool TryMatchTextBasedFormat(string header, [NotNullWhen(true)] out string? type, out string? encoding)

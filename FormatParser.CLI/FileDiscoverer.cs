@@ -1,4 +1,5 @@
 using System.Threading.Channels;
+using FormatParser.Helpers;
 
 namespace FormatParser.CLI;
 
@@ -31,7 +32,7 @@ public class FileDiscoverer
         {
             foreach (var subDirectory in Directory.GetDirectories(directory))
             {
-                if (IsSymlink(new FileInfo(subDirectory)))
+                if (new FileInfo(subDirectory).IsSymlink())
                     continue;
 
                 await DiscoverFilesInternal(subDirectory, channel);
@@ -45,9 +46,6 @@ public class FileDiscoverer
     private static bool ShouldSkip(string file)
     {
         var fileInfo = new FileInfo(file);
-        return IsSymlink(fileInfo) || IsEmpty(fileInfo);
+        return fileInfo.IsSymlink() || fileInfo.IsEmpty();
     }
-    
-    private static bool IsSymlink(FileInfo fileInfo) => fileInfo.Attributes.HasFlag(FileAttributes.ReparsePoint);
-    private static bool IsEmpty(FileInfo fileInfo) => fileInfo.Length == 0;
 }

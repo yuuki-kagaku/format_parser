@@ -1,17 +1,20 @@
+using System.Text;
+
 namespace FormatParser.Text;
 
 public class CodepointConverter
 {
-    public void Convert(ulong codepoint, List<char> buffer)
+    public void Convert(ulong codepoint, StringBuilder stringBuilder)
     {
-        if(codepoint < 0xD800 || (codepoint > 0xDFFF && codepoint < 0x10000))
+        if (codepoint < 0xD800 || (codepoint > 0xDFFF && codepoint < 0x10000))
         {
-            buffer.Add((char)(ushort)(codepoint));
+            stringBuilder.Append((char)(ushort)(codepoint));
+            return;
         }
 
         codepoint -= 0x010000;
 
-        buffer.Add((char)(((0b11111111110000000000 & codepoint) >> 10) + 0xD800));
-        buffer.Add((char)(((0b00000000001111111111 & codepoint) >> 00) + 0xDC00));
+        stringBuilder.Append((char)(((0xFFC00 & codepoint) >> 10) + 0xD800));
+        stringBuilder.Append((char)(((0x3FF & codepoint) >> 00) + 0xDC00));
     }
 }

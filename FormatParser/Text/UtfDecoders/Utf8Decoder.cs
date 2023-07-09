@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 namespace FormatParser.Text;
 
@@ -15,9 +16,8 @@ public class Utf8Decoder : IUtfDecoder
         this.settings = settings;
     }
     
-    public bool TryDecode(InMemoryDeserializer deserializer, List<char> buffer, [NotNullWhen(true) ]out string? encoding)
+    public bool TryDecode(InMemoryDeserializer deserializer, StringBuilder stringBuilder, [NotNullWhen(true)] out string? encoding)
     {
-        buffer.Clear();
         var processedChars = 0;
 
         var onlyAsciiSymbols = true;
@@ -37,7 +37,7 @@ public class Utf8Decoder : IUtfDecoder
 
                 if (processedChars < settings.SampleSize)
                 {
-                    codepointConverter.Convert(codepoint, buffer);
+                    codepointConverter.Convert(codepoint, stringBuilder);
                     processedChars++;
                 }
             }
