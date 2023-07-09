@@ -17,7 +17,7 @@ public class ElfDecoder : IBinaryFormatDecoder
             return null;
 
         var bitness = ParseBitness(header[4]);
-        var endianness = ParseEndianess(header[5]);
+        var endianness = ParseEndianness(header[5]);
         streamingBinaryReader.SetEndianess(endianness);
         
         streamingBinaryReader.SkipShort(); // e_type
@@ -106,7 +106,7 @@ public class ElfDecoder : IBinaryFormatDecoder
         return Bitness.Unknown;
     }
 
-    private static Endianness ParseEndianess(byte b)
+    private static Endianness ParseEndianness(byte b)
     {
         const byte ELFDATA2LSB = 1;
         const byte ELFDATA2MSB = 2;
