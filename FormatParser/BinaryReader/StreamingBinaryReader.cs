@@ -14,7 +14,7 @@ public class StreamingBinaryReader
         this.stream = stream;
     }
 
-    public void SetEndianess(Endianness endianness)
+    public void SetEndianness(Endianness endianness)
     {
         this.endianness = endianness;
     }
@@ -211,7 +211,7 @@ public class StreamingBinaryReader
 
             if (bytesRead == 0)
                 if (ensureSize)
-                    throw new DeserializerException("Not enough data in stream.");
+                    throw new BinaryReaderException("Not enough data in stream.");
                 else
                     return bytesRead;
 

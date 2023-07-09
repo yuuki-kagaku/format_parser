@@ -5,7 +5,7 @@ public class PEDecoder : IBinaryFormatDecoder
     public async Task<IFileFormatInfo?> TryDecodeAsync(StreamingBinaryReader streamingBinaryReader)
     {
         streamingBinaryReader.Offset = 0;
-        streamingBinaryReader.SetEndianess(Endianness.LittleEndian);
+        streamingBinaryReader.SetEndianness(Endianness.LittleEndian);
         var dosHeader = await TryReadHeader(streamingBinaryReader);
 
         if (dosHeader == null)

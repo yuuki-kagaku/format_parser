@@ -8,29 +8,25 @@ public class CompositeTextFormatDecoder
     private readonly IUtfDecoder[] utfDecoders;
     private readonly ITextBasedFormatDetector[] textBasedFormatDetectors;
     private readonly TextParserSettings settings;
-    private readonly List<char> buffer;
     private readonly StringBuilder stringBuilder;
-    private readonly Dictionary<Encoding, IUtfDecoder> utfDecodersByEncoding;
-    
+    private readonly Dictionary<string, IUtfDecoder> utfDecodersByEncoding;
     
     public CompositeTextFormatDecoder(IUtfDecoder[] utfDecoders, ITextBasedFormatDetector[] textBasedFormatDetectors, TextParserSettings settings)
     {
         this.utfDecoders = utfDecoders;
-        utfDecodersByEncoding = Enum
-            .GetValues<Encoding>()
-            .Select(e => (Encoding: e, Decoder: utfDecoders.FirstOrDefault(d => d.MatchEncoding(e))))
-            .Where(x => x.Decoder != null)
-            .ToDictionary(x => x.Encoding, x => x.Decoder!);
+        utfDecodersByEncoding = utfDecoders
+            .SelectMany(d => d.CanReadEncodings.Select(e => (Decoder: d, Encoding: e)))
+            .ToDictionary(x => x.Encoding, x => x.Decoder);
             
         this.textBasedFormatDetectors = textBasedFormatDetectors;
         this.settings = settings;
-        buffer = new List<char>(settings.SampleSize);
         stringBuilder = new StringBuilder(settings.SampleSize);
     }
     
     public IFileFormatInfo? TryDecode(InMemoryDeserializer deserializer)
     {
-        if (TryFindBom(deserializer, out var encoding, out var bom))
+        var buffer = new List<char>(settings.SampleSize);
+        if (TryFindUtfBom(deserializer, out var encoding, out var bom))
         {
             var decoder = utfDecodersByEncoding[encoding];
             deserializer.Offset = bom.Length;
@@ -40,7 +36,7 @@ public class CompositeTextFormatDecoder
         }
         else
         {
-            if (!TryDecodeAsUtf(deserializer, out encoding))
+            if (!TryDecodeAsUtf(deserializer, buffer, out encoding))
                 return null;
         }
 
@@ -51,7 +47,7 @@ public class CompositeTextFormatDecoder
         return new TextFileFormatInfo(DefaultTextType, encoding.ToString());
     }
 
-    private bool TryDecodeAsUtf(InMemoryDeserializer deserializer, out Encoding encoding)
+    private bool TryDecodeAsUtf(InMemoryDeserializer deserializer, List<char> buffer, [NotNullWhen(true)] out string? encoding)
     {
         foreach (var utfDecoder in utfDecoders)
         {
@@ -81,7 +77,7 @@ public class CompositeTextFormatDecoder
         return stringBuilder.ToString();
     }
 
-    private bool TryMatchTextBasedFormat(string header, [NotNullWhen(true)] out string? type, [NotNullWhen(true)] out string? encoding)
+    private bool TryMatchTextBasedFormat(string header, [NotNullWhen(true)] out string? type, out string? encoding)
     {
         foreach (var detector in textBasedFormatDetectors)
         {
@@ -97,35 +93,35 @@ public class CompositeTextFormatDecoder
         return false;
     }
 
-    private static bool TryFindBom(InMemoryDeserializer deserializer, out Encoding result, [NotNullWhen(true)] out byte[]? bom)
+    private static bool TryFindUtfBom(InMemoryDeserializer deserializer, [NotNullWhen(true)] out string? encoding, [NotNullWhen(true)] out byte[]? bom)
     {
         deserializer.Offset = 0;
         var firstBytes = deserializer.ReadBytes(4);
         
-        foreach (var (magicBytes, encoding) in boms)
+        foreach (var (magicBytes, e) in boms)
         {
             if (magicBytes.SequenceEqual(firstBytes))
             {
-                result = encoding;
+                encoding = e;
                 bom = magicBytes;
                 return true;
             }
         }
 
-        result = default;
+        encoding = default;
         bom = null;
         return false;
     }
 
     private static string DefaultTextType => "text/plain";
 
-    private static readonly (byte[], Encoding)[] boms =
+    private static readonly (byte[], string)[] boms =
     {
-        (new byte[]{0xFF, 0xFE, 0x00, 0x00}, Encoding.UTF32LeBom),
-        (new byte[]{0x00, 0x00, 0xFE, 0xFF}, Encoding.UTF32LeBom),
-        (new byte[]{0xEF, 0xBB, 0xBF}, Encoding.Utf8BOM),
-        (new byte[]{0xFE, 0xFF}, Encoding.UTF16BeBom),
-        (new byte[]{0xFF, 0xFE}, Encoding.UTF16LeBom),
+        (new byte[]{0xFF, 0xFE, 0x00, 0x00}, WellKnownEncodings.UTF32LeBom),
+        (new byte[]{0x00, 0x00, 0xFE, 0xFF}, WellKnownEncodings.UTF32LeBom),
+        (new byte[]{0xEF, 0xBB, 0xBF}, WellKnownEncodings.Utf8BOM),
+        (new byte[]{0xFE, 0xFF}, WellKnownEncodings.UTF16BeBom),
+        (new byte[]{0xFF, 0xFE}, WellKnownEncodings.UTF16LeBom),
     };
     
 }

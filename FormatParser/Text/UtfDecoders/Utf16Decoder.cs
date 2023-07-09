@@ -1,4 +1,6 @@
-﻿namespace FormatParser.Text;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace FormatParser.Text;
 
 public class Utf16Decoder : IUtfDecoder
 {
@@ -13,26 +15,25 @@ public class Utf16Decoder : IUtfDecoder
         this.settings = settings;
     }
 
-    public bool TryDecode(InMemoryDeserializer deserializer, List<char> buffer, out Encoding encoding)
+    public bool TryDecode(InMemoryDeserializer deserializer, List<char> buffer, [NotNullWhen(true)] out string? encoding)
     {
         if (TryParseInternal(deserializer, buffer, Endianness.BigEndian))
         {
-            encoding = Encoding.UTF16BeNoBom;
+            encoding = WellKnownEncodings.UTF16BeNoBom;
             return true;
         }
         
         if (TryParseInternal(deserializer, buffer, Endianness.LittleEndian))
         {
-            encoding = Encoding.UTF16LeNoBom;
+            encoding = WellKnownEncodings.UTF16LeNoBom;
             return true;
         }
 
-        encoding = Encoding.Unknown;
+        encoding = null;
         return false;
     }
-
-    public bool MatchEncoding(Encoding encoding) 
-        => encoding is Encoding.UTF16BeBom or Encoding.UTF16LeBom or Encoding.UTF16BeNoBom or Encoding.UTF16LeNoBom;
+    
+    public string[] CanReadEncodings { get; } = { WellKnownEncodings.UTF16BeBom, WellKnownEncodings.UTF16LeBom, WellKnownEncodings.UTF16BeNoBom, WellKnownEncodings.UTF16LeNoBom  };
 
     private bool TryParseInternal(InMemoryDeserializer deserializer, List<char> buffer, Endianness endianness)
     {
@@ -66,7 +67,7 @@ public class Utf16Decoder : IUtfDecoder
         if (current >= 0xd800 && current < 0xdc00)
         {
             if (!deserializer.TryReadUShort(out var next))
-                throw new DeserializerException("Unexpected end of utf16 string.");
+                throw new BinaryReaderException("Unexpected end of utf16 string.");
             return ((current & (uint)0x3ff) << 10) + (next & (uint)0x3ff) + (uint)0x10000;
         }
 

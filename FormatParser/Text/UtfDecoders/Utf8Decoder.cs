@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace FormatParser.Text;
 
 public class Utf8Decoder : IUtfDecoder
@@ -13,7 +15,7 @@ public class Utf8Decoder : IUtfDecoder
         this.settings = settings;
     }
     
-    public bool TryDecode(InMemoryDeserializer deserializer, List<char> buffer, out Encoding encoding)
+    public bool TryDecode(InMemoryDeserializer deserializer, List<char> buffer, [NotNullWhen(true) ]out string? encoding)
     {
         buffer.Clear();
         var processedChars = 0;
@@ -29,7 +31,7 @@ public class Utf8Decoder : IUtfDecoder
                 
                 if (!textChecker.IsValidCodepoint(codepoint))
                 {
-                    encoding = Encoding.Unknown;
+                    encoding = null;
                     return false;
                 }
 
@@ -40,18 +42,17 @@ public class Utf8Decoder : IUtfDecoder
                 }
             }
 
-            encoding = onlyAsciiSymbols ? Encoding.ASCII : Encoding.Utf8NoBOM;
+            encoding = onlyAsciiSymbols ? WellKnownEncodings.ASCII : WellKnownEncodings.Utf8NoBOM;
             return true;
         }
         catch (Exception e)
         {
-            encoding = Encoding.Unknown;
+            encoding = null;
             return false;
         }
     }
-    
-    public bool MatchEncoding(Encoding encoding) 
-        => encoding is Encoding.Utf8NoBOM or Encoding.Utf8BOM;
+
+    public string[] CanReadEncodings { get; } = { WellKnownEncodings.Utf8BOM, WellKnownEncodings.Utf8NoBOM };
 
     private bool TryGetNextCodepoint(InMemoryDeserializer deserializer, out uint result)
     {

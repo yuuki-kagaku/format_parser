@@ -78,7 +78,7 @@ public class InMemoryDeserializer
     public unsafe ushort ReadUShort()
     {
         if (!CanRead(sizeof(ushort)))
-            throw new DeserializerException("Does not have enough capacity to read.");
+            throw new BinaryReaderException("Does not have enough capacity to read.");
 
         ushort result;
         fixed (void* ptr = &buffer[offset])
@@ -91,7 +91,7 @@ public class InMemoryDeserializer
     public unsafe byte ReadByte()
     {
         if (!CanRead(sizeof(byte)))
-            throw new DeserializerException("Does not have enough capacity to read.");
+            throw new BinaryReaderException("Does not have enough capacity to read.");
 
         byte result;
         fixed (void* ptr = &buffer[offset])

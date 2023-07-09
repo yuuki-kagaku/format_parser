@@ -35,7 +35,7 @@ public class MachODecoder : IBinaryFormatDecoder
             return null;
 
         var (bitness, endianness, isFat) = tuple;
-        streamingBinaryReader.SetEndianess(endianness);
+        streamingBinaryReader.SetEndianness(endianness);
 
         if (!isFat)
             return await ReadNonFatHeader(streamingBinaryReader, bitness, endianness);
@@ -60,7 +60,7 @@ public class MachODecoder : IBinaryFormatDecoder
 
             (bitness, endianness, _) = MagicNumbersNonFat[header];
             
-            streamingBinaryReader.SetEndianess(endianness);
+            streamingBinaryReader.SetEndianness(endianness);
             streamingBinaryReader.Offset = (long) offset;
             
             result.Add(await ReadNonFatHeader(streamingBinaryReader, bitness, endianness));

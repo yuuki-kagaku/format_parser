@@ -43,7 +43,7 @@ public class ElfDecoder : IBinaryFormatDecoder
 
         var bitness = ParseBitness(header[4]);
         var endianness = ParseEndianness(header[5]);
-        streamingBinaryReader.SetEndianess(endianness);
+        streamingBinaryReader.SetEndianness(endianness);
         
         streamingBinaryReader.SkipShort(); // e_type
         var architecture = ParseArhitecture (await streamingBinaryReader.ReadUShort()); // e_machine
