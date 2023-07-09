@@ -18,7 +18,7 @@ public class PEParser_Tests
     public async Task PEParser_ShouldParse_Amd64Exe()
     {
         await using var stream = new FileStream(@"./TestData/pe/windows/procdump64.exe", FileMode.Open, FileAccess.Read);
-        var deserializer = new Deserializer(stream);
+        var deserializer = new StreamingBinaryReader(stream);
         var data = (await peDecoder.TryDecodeAsync(deserializer)) as PeFileFormatInfo;
 
         data.Should().NotBeNull();
@@ -31,7 +31,7 @@ public class PEParser_Tests
     public async Task PEParser_ShouldParse_i386Exe()
     {
         await using var stream = new FileStream(@"./TestData/pe/windows/procdump.exe", FileMode.Open, FileAccess.Read);
-        var deserializer = new Deserializer(stream);
+        var deserializer = new StreamingBinaryReader(stream);
         var data = (await peDecoder.TryDecodeAsync(deserializer)) as PeFileFormatInfo;
 
         data.Should().NotBeNull();
@@ -44,7 +44,7 @@ public class PEParser_Tests
     public async Task PEParser_ShouldParse_ArmExe()
     {
         await using var stream = new FileStream(@"./TestData/pe/windows/procexp64a.exe", FileMode.Open, FileAccess.Read);
-        var deserializer = new Deserializer(stream);
+        var deserializer = new StreamingBinaryReader(stream);
         var data = (await peDecoder.TryDecodeAsync(deserializer)) as PeFileFormatInfo;
 
         data.Should().NotBeNull();
@@ -57,7 +57,7 @@ public class PEParser_Tests
     public async Task PEParser_ShouldParse_Managed_AnyCPUDll()
     {
         await using var stream = new FileStream(@"./TestData/pe/managed/HelloWorld.Core.AnyCpu.dll", FileMode.Open, FileAccess.Read);
-        var deserializer = new Deserializer(stream);
+        var deserializer = new StreamingBinaryReader(stream);
         var data = (await peDecoder.TryDecodeAsync(deserializer)) as PeFileFormatInfo;
 
         data.Should().NotBeNull();
@@ -70,7 +70,7 @@ public class PEParser_Tests
     public async Task PEParser_ShouldParse_Managed_amd64_Dll()
     {
         await using var stream = new FileStream(@"./TestData/pe/managed/HelloWorld.Core.amd64.dll", FileMode.Open, FileAccess.Read);
-        var deserializer = new Deserializer(stream);
+        var deserializer = new StreamingBinaryReader(stream);
         var data = (await peDecoder.TryDecodeAsync(deserializer)) as PeFileFormatInfo;
 
         data.Should().NotBeNull();
@@ -83,7 +83,7 @@ public class PEParser_Tests
     public async Task PEParser_ShouldParse_Managed_arm64_Dll()
     {
         await using var stream = new FileStream(@"./TestData/pe/managed/HelloWorldCore.arm64.dll", FileMode.Open, FileAccess.Read);
-        var deserializer = new Deserializer(stream);
+        var deserializer = new StreamingBinaryReader(stream);
         var data = (await peDecoder.TryDecodeAsync(deserializer)) as PeFileFormatInfo;
 
         data.Should().NotBeNull();
@@ -96,7 +96,7 @@ public class PEParser_Tests
     public async Task PEParser_ShouldParse_Managed_x86_Dll()
     {
         await using var stream = new FileStream(@"./TestData/pe/managed/HelloWorld.Core.86.dll", FileMode.Open, FileAccess.Read);
-        var deserializer = new Deserializer(stream);
+        var deserializer = new StreamingBinaryReader(stream);
         var data = (await peDecoder.TryDecodeAsync(deserializer)) as PeFileFormatInfo;
 
         data.Should().NotBeNull();

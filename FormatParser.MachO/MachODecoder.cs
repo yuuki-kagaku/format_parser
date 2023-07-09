@@ -22,55 +22,66 @@ public class MachODecoder : IBinaryFormatDecoder
                 .Add(new byte[] { 0xCA, 0xFE, 0xBA, 0xBF }, (Bitness.Bitness64, Endianness.BigEndian, true))
                 .Add(new byte[] { 0xBF, 0xBA, 0xFE, 0xCA }, (Bitness.Bitness64, Endianness.LittleEndian, true));
 
-    public async Task<IFileFormatInfo?> TryDecodeAsync(Deserializer deserializer)
+    public async Task<IFileFormatInfo?> TryDecodeAsync(StreamingBinaryReader streamingBinaryReader)
     {
-        deserializer.Offset = 0;
-        var header = await deserializer.ReadBytesAsync(4);
+        streamingBinaryReader.Offset = 0;
+
+        if (streamingBinaryReader.Length < 4)
+            return null;
+        
+        var header = await streamingBinaryReader.ReadBytesAsync(4);
         
         if (!MagicNumbers.TryGetValue(header, out var tuple))
             throw new Exception("Not a Mach O file.");
 
         var (bitness, endianness, isFat) = tuple;
-        deserializer.SetEndianess(endianness);
+        streamingBinaryReader.SetEndianess(endianness);
 
         if (!isFat)
-            return await ReadNonFatHeader(deserializer, bitness, endianness);
+            return await ReadNonFatHeader(streamingBinaryReader, bitness, endianness);
 
+        return await ReadFatFormatInfo(streamingBinaryReader, endianness, bitness);
+    }
+
+    private static async Task<FatMachOFileFormatInfo> ReadFatFormatInfo(StreamingBinaryReader streamingBinaryReader, Endianness endianness, Bitness bitness)
+    {
         var fatMachOData = new FatMachOFileFormatInfo(endianness, bitness, ImmutableArray<MachOFileFormatInfo>.Empty);
-        var numberOfArchitectures = (int)await deserializer.ReadUInt();
+        var numberOfArchitectures = (int)await streamingBinaryReader.ReadUInt();
 
         var headers = new List<(Architecture, ulong Offset)>(numberOfArchitectures);
+        
         for (int i = 0; i < numberOfArchitectures; i++)
-            headers.Add(await ReadFatArchs(deserializer, bitness));
+            headers.Add(await ReadFatArchs(streamingBinaryReader, bitness));
 
         var result = new List<MachOFileFormatInfo>(numberOfArchitectures);
         foreach (var (architecture, offset) in headers)
         {
-            deserializer.Offset = (long )offset;
-            header = await deserializer.ReadBytesAsync(4);
+            streamingBinaryReader.Offset = (long )offset;
+            var header = await streamingBinaryReader.ReadBytesAsync(4);
 
             (bitness, endianness, _) = MagicNumbersNonFat[header];
             
-            deserializer.SetEndianess(endianness);
-            deserializer.Offset = (long) offset;
+            streamingBinaryReader.SetEndianess(endianness);
+            streamingBinaryReader.Offset = (long) offset;
             
-            result.Add(await ReadNonFatHeader(deserializer, bitness, endianness));
+            result.Add(await ReadNonFatHeader(streamingBinaryReader, bitness, endianness));
         }
 
         return fatMachOData with { Datas = result.ToImmutableArray() };
     }
 
-    private static async Task<MachOFileFormatInfo> ReadNonFatHeader(Deserializer deserializer, Bitness bitness, Endianness endianness)
+    private static async Task<MachOFileFormatInfo> ReadNonFatHeader(StreamingBinaryReader streamingBinaryReader, Bitness bitness, Endianness endianness)
     {
-        var (numberOfCommands, architecture) = await ReadNotFatHeaderAsync(deserializer, bitness);
+        var (numberOfCommands, architecture) = await ReadNotFatHeaderAsync(streamingBinaryReader, bitness);
         const uint LC_CODE_SIGNATURE = 0x1d;
+        
         for (int i = 0; i < numberOfCommands; i++)
         {
-            var command = await deserializer.ReadUInt();
-            var commandSize = await deserializer.ReadUInt();
+            var command = await streamingBinaryReader.ReadUInt();
+            var commandSize = await streamingBinaryReader.ReadUInt();
 
             if (command != LC_CODE_SIGNATURE)
-                deserializer.SkipBytes(commandSize);
+                streamingBinaryReader.SkipBytes(commandSize);
             else
                 return new MachOFileFormatInfo(endianness, bitness, architecture, true);
         }
@@ -78,30 +89,30 @@ public class MachODecoder : IBinaryFormatDecoder
         return new MachOFileFormatInfo(endianness, bitness, architecture, false);
     }
 
-    private static async Task<(Architecture, ulong offset)> ReadFatArchs(Deserializer deserializer, Bitness bitness)
+    private static async Task<(Architecture, ulong offset)> ReadFatArchs(StreamingBinaryReader streamingBinaryReader, Bitness bitness)
     {
-        var architecture = ParseCPUType(await deserializer.ReadInt()); // cputype
-        deserializer.SkipInt(); // cpusubtype
-        var offset = await deserializer.ReadPointer(bitness); // offset
-        deserializer.SkipPointer(bitness); // size
-        deserializer.SkipPointer(bitness); // align
+        var architecture = ParseCPUType(await streamingBinaryReader.ReadInt()); // cputype
+        streamingBinaryReader.SkipInt(); // cpusubtype
+        var offset = await streamingBinaryReader.ReadPointer(bitness); // offset
+        streamingBinaryReader.SkipPointer(bitness); // size
+        streamingBinaryReader.SkipPointer(bitness); // align
         if (bitness == Bitness.Bitness64)
-            deserializer.SkipUInt(); // reserved
+            streamingBinaryReader.SkipUInt(); // reserved
         
         return (architecture, (ulong)offset);
     }
     
-    private static async Task<(uint NumberOfCommands, Architecture Architecture)> ReadNotFatHeaderAsync(Deserializer deserializer, Bitness bitness)
+    private static async Task<(uint NumberOfCommands, Architecture Architecture)> ReadNotFatHeaderAsync(StreamingBinaryReader streamingBinaryReader, Bitness bitness)
     {
-        var architecture = ParseCPUType(await deserializer.ReadInt()); // cputype
-        deserializer.SkipInt(); // cpusubtype
-        deserializer.SkipUInt(); // filetype
-        var numberOfCommands = await deserializer.ReadUInt(); // ncmds
-        deserializer.SkipUInt(); // sizeofcmds
-        deserializer.SkipUInt(); // flags
+        var architecture = ParseCPUType(await streamingBinaryReader.ReadInt()); // cputype
+        streamingBinaryReader.SkipInt(); // cpusubtype
+        streamingBinaryReader.SkipUInt(); // filetype
+        var numberOfCommands = await streamingBinaryReader.ReadUInt(); // ncmds
+        streamingBinaryReader.SkipUInt(); // sizeofcmds
+        streamingBinaryReader.SkipUInt(); // flags
         
         if (bitness == Bitness.Bitness64)
-            deserializer.SkipUInt(); // reserved
+            streamingBinaryReader.SkipUInt(); // reserved
 
         return (numberOfCommands, architecture);
     }

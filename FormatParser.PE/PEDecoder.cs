@@ -2,83 +2,83 @@
 
 public class PEDecoder : IBinaryFormatDecoder
 {
-    public async Task<IFileFormatInfo?> TryDecodeAsync(Deserializer deserializer)
+    public async Task<IFileFormatInfo?> TryDecodeAsync(StreamingBinaryReader streamingBinaryReader)
     {
-        deserializer.Offset = 0;
-        deserializer.SetEndianess(Endianness.LittleEndian);
-        var dosHeader = await TryParseHeader(deserializer);
+        streamingBinaryReader.Offset = 0;
+        streamingBinaryReader.SetEndianess(Endianness.LittleEndian);
+        var dosHeader = await TryReadHeader(streamingBinaryReader);
 
         if (dosHeader == null)
             return null;
 
-        deserializer.Offset = dosHeader.Value.ExeOffset;
+        streamingBinaryReader.Offset = dosHeader.Value.ExeOffset;
 
-        var (architecture, bitness, sizeOfOptionalHeader) = await ReadImageFileHeaderAsync(deserializer);
-        var isDotNet = await ReadOptionalHeader(deserializer, sizeOfOptionalHeader, bitness);
+        var (architecture, bitness, sizeOfOptionalHeader) = await ReadImageFileHeaderAsync(streamingBinaryReader);
+        var isDotNet = await ReadOptionalHeader(streamingBinaryReader, sizeOfOptionalHeader, bitness);
 
         return new PeFileFormatInfo(bitness, architecture, isDotNet);
     }
 
-    private static async Task<(Architecture, Bitness, ushort SizeOfOptionalHeader)> ReadImageFileHeaderAsync(Deserializer deserializer)
+    private static async Task<(Architecture, Bitness, ushort SizeOfOptionalHeader)> ReadImageFileHeaderAsync(StreamingBinaryReader streamingBinaryReader)
     {
-        EnsureCorrectImageHeaderMagicNumber(await deserializer.ReadUInt()); // Magic
-        var (architecture, bitness) = ParseArchitecture(await deserializer.ReadUShort()); // Machine
-        deserializer.SkipUShort(); // NumberOfSections
-        deserializer.SkipUInt(); //  TimeDateStamp
-        deserializer.SkipUInt(); //  PointerToSymbolTable
-        deserializer.SkipUInt(); //  NumberOfSymbols
-        var sizeOfOptionalHeader = await deserializer.ReadUShort(); // SizeOfOptionalHeader
-        deserializer.SkipUShort(); // Characteristics
+        EnsureCorrectImageHeaderMagicNumber(await streamingBinaryReader.ReadUInt()); // Magic
+        var (architecture, bitness) = ParseArchitecture(await streamingBinaryReader.ReadUShort()); // Machine
+        streamingBinaryReader.SkipUShort(); // NumberOfSections
+        streamingBinaryReader.SkipUInt(); //  TimeDateStamp
+        streamingBinaryReader.SkipUInt(); //  PointerToSymbolTable
+        streamingBinaryReader.SkipUInt(); //  NumberOfSymbols
+        var sizeOfOptionalHeader = await streamingBinaryReader.ReadUShort(); // SizeOfOptionalHeader
+        streamingBinaryReader.SkipUShort(); // Characteristics
 
         return (architecture, bitness, sizeOfOptionalHeader);
     }
 
-    private async Task<bool> ReadOptionalHeader(Deserializer deserializer, ushort size, Bitness bitness)
+    private async Task<bool> ReadOptionalHeader(StreamingBinaryReader streamingBinaryReader, ushort size, Bitness bitness)
     {
         if (size < 224)
             return false;
         
-        var magicNumber = await deserializer.ReadUShort(); // Magic
+        var magicNumber = await streamingBinaryReader.ReadUShort(); // Magic
         EnsureCorrectOptionalHeaderMagicNumber(magicNumber, bitness);
 
-        deserializer.SkipByte(); // MajorLinkerVersion
-        deserializer.SkipByte(); // MinorLinkerVersion
-        deserializer.SkipUInt();; // SizeOfCode
-        deserializer.SkipUInt(); // SizeOfInitializedData
-        deserializer.SkipUInt(); // SizeOfUninitializedData
-        deserializer.SkipUInt(); // AddressOfEntryPoint
-        deserializer.SkipUInt(); // BaseOfCode
+        streamingBinaryReader.SkipByte(); // MajorLinkerVersion
+        streamingBinaryReader.SkipByte(); // MinorLinkerVersion
+        streamingBinaryReader.SkipUInt();; // SizeOfCode
+        streamingBinaryReader.SkipUInt(); // SizeOfInitializedData
+        streamingBinaryReader.SkipUInt(); // SizeOfUninitializedData
+        streamingBinaryReader.SkipUInt(); // AddressOfEntryPoint
+        streamingBinaryReader.SkipUInt(); // BaseOfCode
         if (bitness == Bitness.Bitness32)
-            deserializer.SkipUInt(); // BaseOfData
-        deserializer.SkipPointer(bitness); // ImageBase
-        deserializer.SkipUInt(); // SectionAlignment
-        deserializer.SkipUInt(); // FileAlignment
-        deserializer.SkipUShort(); // MajorOperatingSystemVersion
-        deserializer.SkipUShort(); // MinorOperatingSystemVersion
-        deserializer.SkipUShort(); // MajorImageVersion
-        deserializer.SkipUShort(); // MinorImageVersion
-        deserializer.SkipUShort(); // MajorSubsystemVersion
-        deserializer.SkipUShort(); // MinorSubsystemVersion
-        deserializer.SkipUInt(); // Win32VersionValue
-        deserializer.SkipUInt(); // SizeOfImage
-        deserializer.SkipUInt(); // SizeOfHeaders
-        deserializer.SkipUInt(); // CheckSum
-        deserializer.SkipUShort(); // Subsystem
-        deserializer.SkipUShort(); // DllCharacteristics
-        deserializer.SkipPointer(bitness); // SizeOfStackReserve
-        deserializer.SkipPointer(bitness); // SizeOfStackCommit
-        deserializer.SkipPointer(bitness); // SizeOfHeapReserve
-        deserializer.SkipPointer(bitness); // SizeOfHeapCommit
-        deserializer.SkipUInt(); // LoaderFlags
-        deserializer.SkipUInt(); // NumberOfRvaAndSizes
+            streamingBinaryReader.SkipUInt(); // BaseOfData
+        streamingBinaryReader.SkipPointer(bitness); // ImageBase
+        streamingBinaryReader.SkipUInt(); // SectionAlignment
+        streamingBinaryReader.SkipUInt(); // FileAlignment
+        streamingBinaryReader.SkipUShort(); // MajorOperatingSystemVersion
+        streamingBinaryReader.SkipUShort(); // MinorOperatingSystemVersion
+        streamingBinaryReader.SkipUShort(); // MajorImageVersion
+        streamingBinaryReader.SkipUShort(); // MinorImageVersion
+        streamingBinaryReader.SkipUShort(); // MajorSubsystemVersion
+        streamingBinaryReader.SkipUShort(); // MinorSubsystemVersion
+        streamingBinaryReader.SkipUInt(); // Win32VersionValue
+        streamingBinaryReader.SkipUInt(); // SizeOfImage
+        streamingBinaryReader.SkipUInt(); // SizeOfHeaders
+        streamingBinaryReader.SkipUInt(); // CheckSum
+        streamingBinaryReader.SkipUShort(); // Subsystem
+        streamingBinaryReader.SkipUShort(); // DllCharacteristics
+        streamingBinaryReader.SkipPointer(bitness); // SizeOfStackReserve
+        streamingBinaryReader.SkipPointer(bitness); // SizeOfStackCommit
+        streamingBinaryReader.SkipPointer(bitness); // SizeOfHeapReserve
+        streamingBinaryReader.SkipPointer(bitness); // SizeOfHeapCommit
+        streamingBinaryReader.SkipUInt(); // LoaderFlags
+        streamingBinaryReader.SkipUInt(); // NumberOfRvaAndSizes
 
         const int IMAGE_NUMBEROF_DIRECTORY_ENTRIES = 16;
         const int IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR = 14;
         const int SizeOfDataDirectory = sizeof(uint) + sizeof(uint);
         
-        deserializer.SkipBytes(SizeOfDataDirectory * (IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR));
-        var dotnetHeader = await ReadDataDirectoryAsync(deserializer);
-        deserializer.SkipBytes(SizeOfDataDirectory * (IMAGE_NUMBEROF_DIRECTORY_ENTRIES - IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR - 1));
+        streamingBinaryReader.SkipBytes(SizeOfDataDirectory * (IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR));
+        var dotnetHeader = await ReadDataDirectoryAsync(streamingBinaryReader);
+        streamingBinaryReader.SkipBytes(SizeOfDataDirectory * (IMAGE_NUMBEROF_DIRECTORY_ENTRIES - IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR - 1));
 
         return dotnetHeader.VirtualAddress != 0;
     }
@@ -115,8 +115,8 @@ public class PEDecoder : IBinaryFormatDecoder
 
     private static bool CheckDosHeaderMagicNumber(byte[] magicNumbers) => DosMagicNumbers.SequenceEqual(magicNumbers);
 
-    private async Task<(uint VirtualAddress, uint Size)> ReadDataDirectoryAsync(Deserializer deserializer) 
-        => (await deserializer.ReadUInt(), await deserializer.ReadUInt());
+    private async Task<(uint VirtualAddress, uint Size)> ReadDataDirectoryAsync(StreamingBinaryReader streamingBinaryReader) 
+        => (await streamingBinaryReader.ReadUInt(), await streamingBinaryReader.ReadUInt());
 
     private static (Architecture, Bitness) ParseArchitecture(uint i)
     {
@@ -139,31 +139,34 @@ public class PEDecoder : IBinaryFormatDecoder
         };
     }
 
-    private static async Task<DosHeaderInfo?> TryParseHeader(Deserializer deserializer)
+    private static async Task<DosHeaderInfo?> TryReadHeader(StreamingBinaryReader streamingBinaryReader)
     {
-        var magicNumbers = await deserializer.ReadBytesAsync(2);
+        if (streamingBinaryReader.Length < 44)
+            return null;
+        
+        var magicNumbers = await streamingBinaryReader.ReadBytesAsync(2);
 
         if (!CheckDosHeaderMagicNumber(magicNumbers))
             return null;
         
-        deserializer.SkipUShort(); // e_cblp
-        deserializer.SkipUShort(); // e_cp
-        deserializer.SkipUShort(); // e_crlc
-        deserializer.SkipUShort(); // e_cparhdr
-        deserializer.SkipUShort(); // e_minalloc
-        deserializer.SkipUShort(); // e_maxalloc
-        deserializer.SkipUShort(); // e_ss
-        deserializer.SkipUShort(); // e_sp
-        deserializer.SkipUShort(); // e_csum
-        deserializer.SkipUShort(); // e_ip
-        deserializer.SkipUShort(); // e_cs
-        deserializer.SkipUShort(); // e_lfarlc
-        deserializer.SkipUShort(); // e_ovno
-        deserializer.SkipBytes(sizeof(ushort) * 4); // e_res
-        deserializer.SkipUShort(); // e_oemid
-        deserializer.SkipUShort(); // e_oeminfo
-        deserializer.SkipBytes(sizeof(ushort) * 10); // e_res2
-        var exeOffset = await deserializer.ReadUInt();
+        streamingBinaryReader.SkipUShort(); // e_cblp
+        streamingBinaryReader.SkipUShort(); // e_cp
+        streamingBinaryReader.SkipUShort(); // e_crlc
+        streamingBinaryReader.SkipUShort(); // e_cparhdr
+        streamingBinaryReader.SkipUShort(); // e_minalloc
+        streamingBinaryReader.SkipUShort(); // e_maxalloc
+        streamingBinaryReader.SkipUShort(); // e_ss
+        streamingBinaryReader.SkipUShort(); // e_sp
+        streamingBinaryReader.SkipUShort(); // e_csum
+        streamingBinaryReader.SkipUShort(); // e_ip
+        streamingBinaryReader.SkipUShort(); // e_cs
+        streamingBinaryReader.SkipUShort(); // e_lfarlc
+        streamingBinaryReader.SkipUShort(); // e_ovno
+        streamingBinaryReader.SkipBytes(sizeof(ushort) * 4); // e_res
+        streamingBinaryReader.SkipUShort(); // e_oemid
+        streamingBinaryReader.SkipUShort(); // e_oeminfo
+        streamingBinaryReader.SkipBytes(sizeof(ushort) * 10); // e_res2
+        var exeOffset = await streamingBinaryReader.ReadUInt();
 
         return new DosHeaderInfo {ExeOffset = exeOffset};
     }

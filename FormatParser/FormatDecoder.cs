@@ -18,7 +18,7 @@ public class FormatDecoder
     public async Task<IFileFormatInfo> DecodeFile(string file)
     {
         await using var fileStream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, settings.BufferSize);
-        var deserializer = new Deserializer(fileStream);
+        var deserializer = new StreamingBinaryReader(fileStream);
 
         var result = await TryDecodeAsBinaryAsync(deserializer);
         if (result != null)
@@ -34,13 +34,13 @@ public class FormatDecoder
         return new UnknownFileFormatInfo();
     }
 
-    private async Task<IFileFormatInfo?> TryDecodeAsBinaryAsync(Deserializer deserializer)
+    private async Task<IFileFormatInfo?> TryDecodeAsBinaryAsync(StreamingBinaryReader streamingBinaryReader)
     {
         foreach (var binaryFormatDecoder in binaryDecoders)
         {
             try
             {
-                var result = await binaryFormatDecoder.TryDecodeAsync(deserializer);
+                var result = await binaryFormatDecoder.TryDecodeAsync(streamingBinaryReader);
                 if (result != null)
                     return result;
             }

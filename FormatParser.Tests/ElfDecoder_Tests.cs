@@ -12,7 +12,7 @@ public class ElfDecoder_Tests
         var elfDecoder = new ElfDecoder();
 
         await using var stream = new FileStream(@"./TestData/linux_amd64/vlc", FileMode.Open, FileAccess.Read);
-        var deserializer = new Deserializer(stream);
+        var deserializer = new StreamingBinaryReader(stream);
 
         var data = await elfDecoder.TryDecodeAsync(deserializer) as ElfFileFormatInfo;
 

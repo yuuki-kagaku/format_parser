@@ -6,10 +6,10 @@ public class ElfDecoder : IBinaryFormatDecoder
 {
     private static byte[] ElfMagicBytes = {0x7F, (byte)'E', (byte)'L', (byte)'F'};
 
-    public async Task<IFileFormatInfo?> TryDecodeAsync(Deserializer deserializer)
+    public async Task<IFileFormatInfo?> TryDecodeAsync(StreamingBinaryReader streamingBinaryReader)
     {
-        deserializer.Offset = 0;
-        var header = await deserializer.TryReadArraySegment(16);
+        streamingBinaryReader.Offset = 0;
+        var header = await streamingBinaryReader.TryReadArraySegment(16);
         if (header.Count < 16)
             return null;
 
@@ -18,30 +18,30 @@ public class ElfDecoder : IBinaryFormatDecoder
 
         var bitness = ParseBitness(header[4]);
         var endianness = ParseEndianess(header[5]);
-        deserializer.SetEndianess(endianness);
+        streamingBinaryReader.SetEndianess(endianness);
         
-        deserializer.SkipShort(); // e_type
-        var architecture = ParseArhitecture (await deserializer.ReadUShort()); // e_machine
-        deserializer.SkipInt(); // e_version
-        deserializer.SkipPointer(bitness); // e_entry
-        deserializer.SkipPointer(bitness); // e_phoff
-        deserializer.SkipPointer(bitness); // e_shoff
-        deserializer.SkipInt(); // e_flags
-        deserializer.SkipShort(); // e_ehsize
-        deserializer.SkipShort(); // e_phentsize
-        var programHeadersNumber = await deserializer.ReadShort(); // e_phnum
-        deserializer.SkipShort(); // e_shentsize
-        deserializer.SkipShort(); // e_shnum
-        deserializer.SkipShort(); // e_shstrndx
+        streamingBinaryReader.SkipShort(); // e_type
+        var architecture = ParseArhitecture (await streamingBinaryReader.ReadUShort()); // e_machine
+        streamingBinaryReader.SkipInt(); // e_version
+        streamingBinaryReader.SkipPointer(bitness); // e_entry
+        streamingBinaryReader.SkipPointer(bitness); // e_phoff
+        streamingBinaryReader.SkipPointer(bitness); // e_shoff
+        streamingBinaryReader.SkipInt(); // e_flags
+        streamingBinaryReader.SkipShort(); // e_ehsize
+        streamingBinaryReader.SkipShort(); // e_phentsize
+        var programHeadersNumber = await streamingBinaryReader.ReadShort(); // e_phnum
+        streamingBinaryReader.SkipShort(); // e_shentsize
+        streamingBinaryReader.SkipShort(); // e_shnum
+        streamingBinaryReader.SkipShort(); // e_shstrndx
 
         const int PT_INTERP = 3;
         for (var i = 0; i < programHeadersNumber; i++)
         {
-            var (type, offset, size) = await ReadPhdr(deserializer, bitness);
+            var (type, offset, size) = await ReadPhdr(streamingBinaryReader, bitness);
             if (PT_INTERP == type)
             {
-                deserializer.Offset = offset;
-                var interpreter = await deserializer.ReadNulTerminatingStringAsync((int) size);
+                streamingBinaryReader.Offset = offset;
+                var interpreter = await streamingBinaryReader.ReadNulTerminatingStringAsync((int) size);
                 return new ElfFileFormatInfo(endianness, bitness, architecture , interpreter);
             }
         }
@@ -59,32 +59,32 @@ public class ElfDecoder : IBinaryFormatDecoder
         return Architecture.Unknown;
     }
 
-    private static async Task<(int Type, long Offset, long size)> ReadPhdr(Deserializer deserializer, Bitness bitness)
+    private static async Task<(int Type, long Offset, long size)> ReadPhdr(StreamingBinaryReader streamingBinaryReader, Bitness bitness)
     {
         if (bitness == Bitness.Bitness32)
         {
-            var type = await deserializer.ReadInt(); // p_type
-            var offset = await deserializer.ReadInt(); // p_offset
-            await deserializer.ReadInt(); // p_vaddr
-            await deserializer.ReadInt(); // p_paddr
-            var p_filesz = await deserializer.ReadInt(); // p_filesz
-            await deserializer.ReadInt(); // p_memsz
-            await deserializer.ReadInt(); // p_flags
-            await deserializer.ReadInt(); // p_align
+            var type = await streamingBinaryReader.ReadInt(); // p_type
+            var offset = await streamingBinaryReader.ReadInt(); // p_offset
+            await streamingBinaryReader.ReadInt(); // p_vaddr
+            await streamingBinaryReader.ReadInt(); // p_paddr
+            var p_filesz = await streamingBinaryReader.ReadInt(); // p_filesz
+            await streamingBinaryReader.ReadInt(); // p_memsz
+            await streamingBinaryReader.ReadInt(); // p_flags
+            await streamingBinaryReader.ReadInt(); // p_align
             
             return (type, offset, p_filesz);
         }
 
         if (bitness == Bitness.Bitness64)
         {
-            var type = await deserializer.ReadInt(); // p_type
-            await deserializer.ReadInt(); // p_flags
-            var offset = await deserializer.ReadLong(); // p_offset
-            await deserializer.ReadLong(); // p_vaddr
-            await deserializer.ReadLong(); // p_paddr
-            var p_filesz = await deserializer.ReadLong(); // p_filesz
-            await deserializer.ReadLong(); // p_memsz
-            await deserializer.ReadLong(); // p_align
+            var type = await streamingBinaryReader.ReadInt(); // p_type
+            await streamingBinaryReader.ReadInt(); // p_flags
+            var offset = await streamingBinaryReader.ReadLong(); // p_offset
+            await streamingBinaryReader.ReadLong(); // p_vaddr
+            await streamingBinaryReader.ReadLong(); // p_paddr
+            var p_filesz = await streamingBinaryReader.ReadLong(); // p_filesz
+            await streamingBinaryReader.ReadLong(); // p_memsz
+            await streamingBinaryReader.ReadLong(); // p_align
             
             return (type, offset, p_filesz);
         }

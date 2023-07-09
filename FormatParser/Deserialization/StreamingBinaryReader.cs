@@ -2,14 +2,14 @@ using System.Text;
 
 namespace FormatParser;
 
-public class Deserializer
+public class StreamingBinaryReader
 {
     private readonly Stream stream;
     private readonly byte[] defaultBuffer = GC.AllocateArray<byte>(16, true);
     private Endianness endianness = Endianness.LittleEndian;
     private static readonly Endianness RunningCpuEndianness = BitConverter.IsLittleEndian ? Endianness.LittleEndian : Endianness.BigEndian;
 
-    public Deserializer(Stream stream)
+    public StreamingBinaryReader(Stream stream)
     {
         this.stream = stream;
     }
@@ -24,6 +24,8 @@ public class Deserializer
         get => stream.Position;
         set => stream.Position = value;
     }
+
+    public long Length => stream.Length;
     
     public async Task<byte[]> ReadBytesAsync(int count)
     {
