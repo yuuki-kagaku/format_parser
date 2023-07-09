@@ -17,11 +17,10 @@ public class ElfDecoder : IBinaryFormatDecoder
 
         var (endianness, programHeadersNumber, bitness, architecture) = elfHeader.Value;
 
-        const int PT_INTERP = 3;
         for (var i = 0; i < programHeadersNumber; i++)
         {
             var (type, offset, size) = await ReadProgramHeader(streamingBinaryReader, bitness);
-            if (PT_INTERP == type)
+            if (ELFConstants.PT_INTERP == type)
             {
                 streamingBinaryReader.Offset = (long)offset;
                 var interpreter = await streamingBinaryReader.ReadNulTerminatingStringAsync((int) size);
@@ -46,7 +45,7 @@ public class ElfDecoder : IBinaryFormatDecoder
         streamingBinaryReader.SetEndianness(endianness);
         
         streamingBinaryReader.SkipUShort(); // e_type
-        var architecture = ParseArhitecture (await streamingBinaryReader.ReadUShort()); // e_machine
+        var architecture = ParseArchitecture (await streamingBinaryReader.ReadUShort()); // e_machine
         streamingBinaryReader.SkipUInt(); // e_version
         streamingBinaryReader.SkipPointer(bitness); // e_entry
         streamingBinaryReader.SkipPointer(bitness); // e_phoff
@@ -62,74 +61,66 @@ public class ElfDecoder : IBinaryFormatDecoder
         return new ElfHeaderInfo {ProgramHeadersNumber = programHeadersNumber, Bitness = bitness, Architecture = architecture, Endianness = endianness};
     }
 
-    private static Architecture ParseArhitecture(ushort architecture)
+    private static Architecture ParseArchitecture(ushort architecture)
     {
-        const ushort EM_X86_64 = 62;
-
-        if (architecture == EM_X86_64)
+        if (architecture == ELFConstants.EM_X86_64)
             return Architecture.Amd64;
 
         return Architecture.Unknown;
     }
 
-    private static async Task<(uint Type, ulong Offset, ulong size)> ReadProgramHeader(StreamingBinaryReader streamingBinaryReader, Bitness bitness)
+    private static async Task<ProgramHeaderInfo> ReadProgramHeader(StreamingBinaryReader streamingBinaryReader, Bitness bitness)
     {
-        if (bitness == Bitness.Bitness32)
+        switch (bitness)
         {
-            var type = await streamingBinaryReader.ReadUInt(); // p_type
-            var offset = await streamingBinaryReader.ReadUInt(); // p_offset
-            streamingBinaryReader.SkipUInt(); // p_vaddr
-            await streamingBinaryReader.ReadUInt(); // p_paddr
-            var size = await streamingBinaryReader.ReadUInt(); // p_filesz
-            streamingBinaryReader.SkipUInt(); // p_memsz
-            streamingBinaryReader.SkipUInt(); // p_flags
-            streamingBinaryReader.SkipUInt(); // p_align
+            case Bitness.Bitness32:
+            {
+                var type = await streamingBinaryReader.ReadUInt(); // p_type
+                var offset = await streamingBinaryReader.ReadUInt(); // p_offset
+                streamingBinaryReader.SkipUInt(); // p_vaddr
+                await streamingBinaryReader.ReadUInt(); // p_paddr
+                var size = await streamingBinaryReader.ReadUInt(); // p_filesz
+                streamingBinaryReader.SkipUInt(); // p_memsz
+                streamingBinaryReader.SkipUInt(); // p_flags
+                streamingBinaryReader.SkipUInt(); // p_align
             
-            return (type, offset, size);
-        }
-
-        if (bitness == Bitness.Bitness64)
-        {
-            var type = await streamingBinaryReader.ReadUInt(); // p_type
-            streamingBinaryReader.SkipUInt(); // p_flags
-            var offset = await streamingBinaryReader.ReadULong(); // p_offset
-            streamingBinaryReader.SkipUlong(); // p_vaddr
-            streamingBinaryReader.SkipUlong(); // p_paddr
-            var size = await streamingBinaryReader.ReadULong(); // p_filesz
-            streamingBinaryReader.SkipUlong(); // p_memsz
-            streamingBinaryReader.SkipUlong(); // p_align
+                return new ProgramHeaderInfo(type, offset, size);
+            }
+            case Bitness.Bitness64:
+            {
+                var type = await streamingBinaryReader.ReadUInt(); // p_type
+                streamingBinaryReader.SkipUInt(); // p_flags
+                var offset = await streamingBinaryReader.ReadULong(); // p_offset
+                streamingBinaryReader.SkipUlong(); // p_vaddr
+                streamingBinaryReader.SkipUlong(); // p_paddr
+                var size = await streamingBinaryReader.ReadULong(); // p_filesz
+                streamingBinaryReader.SkipUlong(); // p_memsz
+                streamingBinaryReader.SkipUlong(); // p_align
             
-            return (type, offset, size);
+                return new ProgramHeaderInfo(type, offset, size);
+            }
+            default:
+                throw new ArgumentOutOfRangeException(nameof(bitness));
         }
-
-        throw new Exception();
     }
 
-    private static Bitness ParseBitness(byte b)
-    {
-        const byte ELFCLASS32 = 1;
-        const byte ELFCLASS64 = 2;
-
-        return b switch
+    private static Bitness ParseBitness(byte b) =>
+        b switch
         {
-            ELFCLASS32 => Bitness.Bitness32,
-            ELFCLASS64 => Bitness.Bitness64,
-            _ => throw new Exception("Wrong byte at bitness position.")
+            ELFConstants.ELFCLASS32 => Bitness.Bitness32,
+            ELFConstants.ELFCLASS64 => Bitness.Bitness64,
+            _ => throw new ArgumentOutOfRangeException("Wrong byte at bitness position.")
         };
-    }
 
-    private static Endianness ParseEndianness(byte b)
-    {
-        const byte ELFDATA2LSB = 1;
-        const byte ELFDATA2MSB = 2;
-
-        return b switch
+    private static Endianness ParseEndianness(byte b) =>
+        b switch
         {
-            ELFDATA2LSB => Endianness.LittleEndian,
-            ELFDATA2MSB => Endianness.BigEndian,
-            _ => throw new Exception("Wrong byte at endianness position.")
+            ELFConstants.ELFDATA2LSB => Endianness.LittleEndian,
+            ELFConstants.ELFDATA2MSB => Endianness.BigEndian,
+            _ => throw new ArgumentOutOfRangeException("Wrong byte at endianness position.")
         };
-    }
 
     private record struct ElfHeaderInfo(Endianness Endianness, ushort ProgramHeadersNumber, Bitness Bitness, Architecture Architecture);
+
+    private record struct ProgramHeaderInfo(uint Type, ulong Offset, ulong Size);
 }
