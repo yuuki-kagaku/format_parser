@@ -20,7 +20,7 @@ public class MacParser_Tests
         data.Should().NotBeNull();
         data!.Bitness.Should().Be(Bitness.Bitness64);
         data!.Architecture.Should().Be(Architecture.Amd64);
-        data!.Endianess.Should().Be(Endianess.LittleEndian);
+        data!.Endianness.Should().Be(Endianness.LittleEndian);
         data.Signed!.Should().Be(false);
     }
 }

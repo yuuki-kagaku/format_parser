@@ -4,16 +4,16 @@ public class InMemoryDeserializer
 {
     private int offset = 0;
     private byte[] buffer;
-    private Endianess endianess = Endianess.LittleEndian;
+    private Endianness endianness = Endianness.LittleEndian;
 
     public InMemoryDeserializer(byte[] buffer)
     {
         this.buffer = buffer;
     }
 
-    public void SetEndianess(Endianess endianess)
+    public void SetEndianess(Endianness endianness)
     {
-        this.endianess = endianess;
+        this.endianness = endianness;
     }
     
     public int Offset

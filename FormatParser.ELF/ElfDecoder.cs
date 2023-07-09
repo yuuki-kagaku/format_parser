@@ -106,17 +106,17 @@ public class ElfDecoder : IBinaryFormatDecoder
         return Bitness.Unknown;
     }
 
-    private static Endianess ParseEndianess(byte b)
+    private static Endianness ParseEndianess(byte b)
     {
         const byte ELFDATA2LSB = 1;
         const byte ELFDATA2MSB = 2;
 
         if (b == ELFDATA2LSB)
-            return Endianess.LittleEndian;
+            return Endianness.LittleEndian;
 
         if (b == ELFDATA2MSB)
-            return Endianess.BigEndian;
+            return Endianness.BigEndian;
 
-        return Endianess.Unknown;
+        return Endianness.Unknown;
     }
 }

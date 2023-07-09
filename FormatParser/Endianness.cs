@@ -1,6 +1,6 @@
 namespace FormatParser;
 
-public enum Endianess
+public enum Endianness
 {
     Unknown,
     LittleEndian,

@@ -1,6 +1,6 @@
 namespace FormatParser.MachO;
 
-public record MachOFileFormatInfo(Endianess Endianess, Bitness Bitness, Architecture Architecture, bool Signed) : IFileFormatInfo
+public record MachOFileFormatInfo(Endianness Endianness, Bitness Bitness, Architecture Architecture, bool Signed) : IFileFormatInfo
 {
     public virtual bool Equals(IFileFormatInfo? other)
     {
@@ -12,6 +12,6 @@ public record MachOFileFormatInfo(Endianess Endianess, Bitness Bitness, Architec
 
     public string ToPrettyString()
     {
-        return $"Mach-O: {Architecture} {Bitness} {Endianess} signed:{Signed}";
+        return $"Mach-O: {Architecture} {Bitness} {Endianness} signed:{Signed}";
     }
 }

@@ -1,6 +1,6 @@
 namespace FormatParser.ELF;
 
-public record ElfFileFormatInfo(Endianess Endianess, Bitness Bitness, Architecture Architecture, string? Interpreter) : IFileFormatInfo
+public record ElfFileFormatInfo(Endianness Endianness, Bitness Bitness, Architecture Architecture, string? Interpreter) : IFileFormatInfo
 {
     public virtual bool Equals(IFileFormatInfo? other)
     {
@@ -12,6 +12,6 @@ public record ElfFileFormatInfo(Endianess Endianess, Bitness Bitness, Architectu
 
     public string ToPrettyString()
     {
-        return $"ELF: {Architecture} {Bitness} {Endianess} {Interpreter}";
+        return $"ELF: {Architecture} {Bitness} {Endianness} {Interpreter}";
     }
 }

@@ -3,7 +3,7 @@ using FormatParser.Helpers;
 
 namespace FormatParser.MachO;
 
-public record FatMachOFileFormatInfo (Endianess Endianess, Bitness Bitness, ImmutableArray<MachOFileFormatInfo> Datas) : IFileFormatInfo
+public record FatMachOFileFormatInfo (Endianness Endianness, Bitness Bitness, ImmutableArray<MachOFileFormatInfo> Datas) : IFileFormatInfo
 {
     public virtual bool Equals(IFileFormatInfo? other)
     {
@@ -20,16 +20,16 @@ public record FatMachOFileFormatInfo (Endianess Endianess, Bitness Bitness, Immu
         if (ReferenceEquals(this, other)) 
             return true;
         
-        return Endianess == other.Endianess && Bitness == other.Bitness && Datas.SequenceEqual(other.Datas);
+        return Endianness == other.Endianness && Bitness == other.Bitness && Datas.SequenceEqual(other.Datas);
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine((int)Endianess, (int)Bitness, SequentialCollectionComparer<MachOFileFormatInfo>.Instance.GetHashCode(Datas));
+        return HashCode.Combine((int)Endianness, (int)Bitness, SequentialCollectionComparer<MachOFileFormatInfo>.Instance.GetHashCode(Datas));
     }
 
     public string ToPrettyString()
     {
-        return $"Fat Mach-O {Endianess} {Bitness}: {string.Join(',', Datas.Select(x => x))}";
+        return $"Fat Mach-O {Endianness} {Bitness}: {string.Join(',', Datas.Select(x => x))}";
     }
 }

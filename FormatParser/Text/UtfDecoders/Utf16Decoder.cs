@@ -15,13 +15,13 @@ public class Utf16Decoder : IUtfDecoder
 
     public bool TryDecode(InMemoryDeserializer deserializer, List<char> buffer, out Encoding encoding)
     {
-        if (TryParseInternal(deserializer, buffer, Endianess.BigEndian))
+        if (TryParseInternal(deserializer, buffer, Endianness.BigEndian))
         {
             encoding = Encoding.UTF16BeNoBom;
             return true;
         }
         
-        if (TryParseInternal(deserializer, buffer, Endianess.LittleEndian))
+        if (TryParseInternal(deserializer, buffer, Endianness.LittleEndian))
         {
             encoding = Encoding.UTF16LeNoBom;
             return true;
@@ -34,10 +34,10 @@ public class Utf16Decoder : IUtfDecoder
     public bool MatchEncoding(Encoding encoding) 
         => encoding is Encoding.UTF16BeBom or Encoding.UTF16LeBom or Encoding.UTF16BeNoBom or Encoding.UTF16LeNoBom;
 
-    private bool TryParseInternal(InMemoryDeserializer deserializer, List<char> buffer, Endianess endianess)
+    private bool TryParseInternal(InMemoryDeserializer deserializer, List<char> buffer, Endianness endianness)
     {
         deserializer.Offset = 0;
-        deserializer.SetEndianess(endianess);
+        deserializer.SetEndianess(endianness);
         
         buffer.Clear();
         var processedChars = 0;

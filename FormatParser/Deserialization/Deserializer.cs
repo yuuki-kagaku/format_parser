@@ -6,17 +6,17 @@ public class Deserializer
 {
     private readonly Stream stream;
     private readonly byte[] defaultBuffer = GC.AllocateArray<byte>(16, true);
-    private Endianess endianess = Endianess.LittleEndian;
-    private static readonly Endianess runningCpuEndianess = BitConverter.IsLittleEndian ? Endianess.LittleEndian : Endianess.BigEndian;
+    private Endianness endianness = Endianness.LittleEndian;
+    private static readonly Endianness RunningCpuEndianness = BitConverter.IsLittleEndian ? Endianness.LittleEndian : Endianness.BigEndian;
 
     public Deserializer(Stream stream)
     {
         this.stream = stream;
     }
 
-    public void SetEndianess(Endianess endianess)
+    public void SetEndianess(Endianness endianness)
     {
-        this.endianess = endianess;
+        this.endianness = endianness;
     }
 
     public long Offset
@@ -107,7 +107,7 @@ public class Deserializer
     
     private unsafe short ConvertShort()
     {
-        if (endianess != runningCpuEndianess)
+        if (endianness != RunningCpuEndianness)
             InvertByteForShort();
         
         fixed (byte* ptr = defaultBuffer)
@@ -116,7 +116,7 @@ public class Deserializer
     
     private unsafe ushort ConvertUShort()
     {
-        if (endianess != runningCpuEndianess)
+        if (endianness != RunningCpuEndianness)
             InvertByteForShort();
         
         fixed (byte* ptr = defaultBuffer)
@@ -125,7 +125,7 @@ public class Deserializer
     
     private unsafe int ConvertInt()
     {
-        if (endianess != runningCpuEndianess)
+        if (endianness != RunningCpuEndianness)
             InvertByteForInt();
         
         fixed (byte* ptr = defaultBuffer)
@@ -134,7 +134,7 @@ public class Deserializer
     
     private unsafe uint ConvertUInt()
     {
-        if (endianess != runningCpuEndianess)
+        if (endianness != RunningCpuEndianness)
             InvertByteForInt();
         
         fixed (byte* ptr = defaultBuffer)
@@ -143,7 +143,7 @@ public class Deserializer
     
     private unsafe ulong ConvertULong()
     {
-        if (endianess != runningCpuEndianess)
+        if (endianness != RunningCpuEndianness)
             InvertBytesForLong();
         
         fixed (byte* ptr = defaultBuffer)
@@ -152,7 +152,7 @@ public class Deserializer
     
     private unsafe long ConvertLong()
     {
-        if (endianess != runningCpuEndianess)
+        if (endianness != RunningCpuEndianness)
             InvertBytesForLong();
         
         fixed (byte* ptr = defaultBuffer)
