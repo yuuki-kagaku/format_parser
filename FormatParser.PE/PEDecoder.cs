@@ -2,11 +2,13 @@
 
 public class PEDecoder : IBinaryFormatDecoder
 {
+    private static readonly byte[] DosMagicNumbers = {0x4D, 0x5A};
+
     public async Task<IFileFormatInfo?> TryDecodeAsync(StreamingBinaryReader streamingBinaryReader)
     {
         streamingBinaryReader.Offset = 0;
         streamingBinaryReader.SetEndianness(Endianness.LittleEndian);
-        var dosHeader = await TryReadHeader(streamingBinaryReader);
+        var dosHeader = await TryReadDosHeader(streamingBinaryReader);
 
         if (dosHeader == null)
             return null;
@@ -71,48 +73,37 @@ public class PEDecoder : IBinaryFormatDecoder
         streamingBinaryReader.SkipPointer(bitness); // SizeOfHeapCommit
         streamingBinaryReader.SkipUInt(); // LoaderFlags
         streamingBinaryReader.SkipUInt(); // NumberOfRvaAndSizes
-
-        const int IMAGE_NUMBEROF_DIRECTORY_ENTRIES = 16;
-        const int IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR = 14;
-        const int SizeOfDataDirectory = sizeof(uint) + sizeof(uint);
         
-        streamingBinaryReader.SkipBytes(SizeOfDataDirectory * (IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR));
+        streamingBinaryReader.SkipBytes(PEConstants.SizeOfDataDirectory * (PEConstants.IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR));
         var dotnetHeader = await ReadDataDirectoryAsync(streamingBinaryReader);
-        streamingBinaryReader.SkipBytes(SizeOfDataDirectory * (IMAGE_NUMBEROF_DIRECTORY_ENTRIES - IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR - 1));
+        streamingBinaryReader.SkipBytes(PEConstants.SizeOfDataDirectory * (PEConstants.IMAGE_NUMBEROF_DIRECTORY_ENTRIES - PEConstants.IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR - 1));
 
         return dotnetHeader.VirtualAddress != 0;
     }
 
     private static void EnsureCorrectImageHeaderMagicNumber(uint magic)
     {
-        const uint PE00 = 0x00004550;
-        if (magic != PE00)
+        if (magic != PEConstants.ImageHeaderMagicNumber)
             throw new ParsingException("Wrong NT Header magic number");
     }
     
     private static void EnsureCorrectOptionalHeaderMagicNumber(ushort magic, Bitness bitness)
     {
-        const ushort IMAGE_NT_OPTIONAL_HDR32_MAGIC = 0x10b;
-        const ushort IMAGE_NT_OPTIONAL_HDR64_MAGIC = 0x20b;
-        const ushort IMAGE_ROM_OPTIONAL_HDR_MAGIC = 0x107;
-
         switch (magic)
         {
-            case IMAGE_NT_OPTIONAL_HDR32_MAGIC:
+            case PEConstants.IMAGE_NT_OPTIONAL_HDR32_MAGIC:
                 if (bitness != Bitness.Bitness32)
                     throw new ParsingException($"Found 32 bit header in {bitness} binary.");
                 break;
-            case IMAGE_NT_OPTIONAL_HDR64_MAGIC:
+            case PEConstants.IMAGE_NT_OPTIONAL_HDR64_MAGIC:
                 if (bitness != Bitness.Bitness64)
                     throw new ParsingException($"Found 64 bit header in {bitness} binary.");
                 break;
             default:
-                throw new ParsingException("Unknown optional PE Header magic number.");
+                throw new ArgumentOutOfRangeException(nameof(magic), "Unknown optional PE Header magic number.");
         }
     }
-
-    private static readonly byte[] DosMagicNumbers = {0x4D, 0x5A};
-
+    
     private static bool CheckDosHeaderMagicNumber(byte[] magicNumbers) => DosMagicNumbers.SequenceEqual(magicNumbers);
 
     private async Task<(uint VirtualAddress, uint Size)> ReadDataDirectoryAsync(StreamingBinaryReader streamingBinaryReader) 
@@ -120,26 +111,21 @@ public class PEDecoder : IBinaryFormatDecoder
 
     private static (Architecture, Bitness) ParseArchitecture(uint i)
     {
-        const ushort IMAGE_FILE_MACHINE_I386 = 0x014c;
-        const ushort IMAGE_FILE_MACHINE_IA64 = 0x0200;
-        const ushort IMAGE_FILE_MACHINE_AMD64 = 0x8664;
-        const ushort IMAGE_FILE_MACHINE_ARM64 = 0xAA64;
-
         var bitness = (i & 0x00FF) == 0x64 ? Bitness.Bitness64: Bitness.Bitness32;
 
         return (GetArchitecture(), bitness);
         
         Architecture GetArchitecture() => i switch
         {
-            IMAGE_FILE_MACHINE_I386 => Architecture.i386,
-            IMAGE_FILE_MACHINE_AMD64 => Architecture.Amd64,
-            IMAGE_FILE_MACHINE_IA64 => Architecture.ia64,
-            IMAGE_FILE_MACHINE_ARM64 => Architecture.Arm64,
+            PEConstants.IMAGE_FILE_MACHINE_I386 => Architecture.i386,
+            PEConstants.IMAGE_FILE_MACHINE_AMD64 => Architecture.Amd64,
+            PEConstants.IMAGE_FILE_MACHINE_IA64 => Architecture.ia64,
+            PEConstants.IMAGE_FILE_MACHINE_ARM64 => Architecture.Arm64,
             _ => Architecture.Unknown
         };
     }
 
-    private static async Task<DosHeaderInfo?> TryReadHeader(StreamingBinaryReader streamingBinaryReader)
+    private static async Task<DosHeaderInfo?> TryReadDosHeader(StreamingBinaryReader streamingBinaryReader)
     {
         if (streamingBinaryReader.Length < 44)
             return null;
@@ -171,8 +157,5 @@ public class PEDecoder : IBinaryFormatDecoder
         return new DosHeaderInfo {ExeOffset = exeOffset};
     }
 
-    private struct DosHeaderInfo
-    {
-        public uint ExeOffset { get; init; }
-    }
+    private record struct DosHeaderInfo(uint ExeOffset);
 }
