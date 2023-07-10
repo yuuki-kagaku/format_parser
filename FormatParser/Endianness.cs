@@ -2,7 +2,6 @@ namespace FormatParser;
 
 public enum Endianness
 {
-    Unknown,
-    LittleEndian,
-    BigEndian,
+    LittleEndian = 1,
+    BigEndian = 2,
 }

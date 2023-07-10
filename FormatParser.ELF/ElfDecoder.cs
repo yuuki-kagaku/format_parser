@@ -6,7 +6,7 @@ public class ElfDecoder : IBinaryFormatDecoder
 {
     public async Task<IFileFormatInfo?> TryDecodeAsync(StreamingBinaryReader streamingBinaryReader)
     {
-        var elfHeader = await TryReadElfHeader(streamingBinaryReader);
+        var elfHeader = await TryReadElfHeaderAsync(streamingBinaryReader);
 
         if (elfHeader == null)
             return null;
@@ -16,7 +16,7 @@ public class ElfDecoder : IBinaryFormatDecoder
         for (var i = 0; i < programHeadersNumber; i++)
         {
             var (type, offset, size) = await ReadProgramHeader(streamingBinaryReader, bitness);
-            if (ELFConstants.PT_INTERP == type)
+            if (type == ELFConstants.PT_INTERP)
             {
                 streamingBinaryReader.Offset = (long)offset;
                 var interpreter = await streamingBinaryReader.ReadNulTerminatingStringAsync((int) size);
@@ -27,7 +27,7 @@ public class ElfDecoder : IBinaryFormatDecoder
         return new ElfFileFormatInfo(endianness, bitness, architecture, null);
     }
 
-    private static async Task<ElfHeaderInfo?> TryReadElfHeader(StreamingBinaryReader streamingBinaryReader)
+    private static async Task<ElfHeaderInfo?> TryReadElfHeaderAsync(StreamingBinaryReader streamingBinaryReader)
     {
         var header = await streamingBinaryReader.TryReadArraySegment(16);
         if (header.Count < 16)
@@ -74,7 +74,7 @@ public class ElfDecoder : IBinaryFormatDecoder
                 var type = await streamingBinaryReader.ReadUInt(); // p_type
                 var offset = await streamingBinaryReader.ReadUInt(); // p_offset
                 streamingBinaryReader.SkipUInt(); // p_vaddr
-                await streamingBinaryReader.ReadUInt(); // p_paddr
+                streamingBinaryReader.SkipUInt(); // p_paddr
                 var size = await streamingBinaryReader.ReadUInt(); // p_filesz
                 streamingBinaryReader.SkipUInt(); // p_memsz
                 streamingBinaryReader.SkipUInt(); // p_flags
@@ -105,7 +105,7 @@ public class ElfDecoder : IBinaryFormatDecoder
         {
             ELFConstants.ELFCLASS32 => Bitness.Bitness32,
             ELFConstants.ELFCLASS64 => Bitness.Bitness64,
-            _ => throw new ArgumentOutOfRangeException("Wrong byte at bitness position.")
+            _ => throw new ArgumentOutOfRangeException(nameof(b), "Wrong byte at bitness position.")
         };
 
     private static Endianness ParseEndianness(byte b) =>
@@ -113,10 +113,9 @@ public class ElfDecoder : IBinaryFormatDecoder
         {
             ELFConstants.ELFDATA2LSB => Endianness.LittleEndian,
             ELFConstants.ELFDATA2MSB => Endianness.BigEndian,
-            _ => throw new ArgumentOutOfRangeException("Wrong byte at endianness position.")
+            _ => throw new ArgumentOutOfRangeException(nameof(b), "Wrong byte at endianness position.")
         };
 
     private record struct ElfHeaderInfo(Endianness Endianness, ushort ProgramHeadersNumber, Bitness Bitness, Architecture Architecture);
-
     private record struct ProgramHeaderInfo(uint Type, ulong Offset, ulong Size);
 }
