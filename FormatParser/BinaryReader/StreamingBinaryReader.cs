@@ -16,6 +16,9 @@ public class StreamingBinaryReader
 
     public void SetEndianness(Endianness endianness)
     {
+        if (endianness is not (Endianness.BigEndian or Endianness.LittleEndian))
+            throw new ArgumentOutOfRangeException(nameof(endianness));
+        
         this.endianness = endianness;
     }
 
@@ -39,12 +42,6 @@ public class StreamingBinaryReader
         var array = new byte[count];
         var readBytes = await ReadInternalAsync(count, array, false);
         return new ArraySegment<byte>(array, 0, readBytes);
-    }
-
-    public async Task<byte> ReadByte()
-    {
-        await ReadInternalAsync(sizeof(byte));
-        return defaultBuffer[0];
     }
 
     public void SkipUlong() => SkipLong();

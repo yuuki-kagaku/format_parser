@@ -12,16 +12,16 @@ public class MachODecoder : IBinaryFormatDecoder
         
         var header = await streamingBinaryReader.ReadBytesAsync(4);
         
-        if (!MachOMagicNumbers.MagicNumbers.TryGetValue(header, out var tuple))
+        if (!MachOMagicNumbers.All.TryGetValue(header, out var tuple))
             return null;
 
         var (bitness, endianness, isFat) = tuple;
         streamingBinaryReader.SetEndianness(endianness);
 
-        if (!isFat)
-            return await ReadNonFatFormatInfo(streamingBinaryReader, bitness, endianness);
+        if (isFat)
+            return await ReadFatFormatInfo(streamingBinaryReader, endianness, bitness);
 
-        return await ReadFatFormatInfo(streamingBinaryReader, endianness, bitness);
+        return await ReadNonFatFormatInfo(streamingBinaryReader, bitness, endianness);
     }
 
     private static async Task<FatMachOFileFormatInfo> ReadFatFormatInfo(StreamingBinaryReader streamingBinaryReader, Endianness endianness, Bitness bitness)
@@ -30,7 +30,7 @@ public class MachODecoder : IBinaryFormatDecoder
 
         var headers = new List<(Architecture, ulong Offset)>(numberOfArchitectures);
         
-        for (int i = 0; i < numberOfArchitectures; i++)
+        for (var i = 0; i < numberOfArchitectures; i++)
             headers.Add(await ReadArchitectures(streamingBinaryReader, bitness));
 
         var result = new List<MachOFileFormatInfo>(numberOfArchitectures);
@@ -39,7 +39,7 @@ public class MachODecoder : IBinaryFormatDecoder
             streamingBinaryReader.Offset = (long) offset;
             var header = await streamingBinaryReader.ReadBytesAsync(4);
 
-            (bitness, endianness, _) = MachOMagicNumbers.MagicNumbersNonFat[header];
+            (bitness, endianness, _) = MachOMagicNumbers.NonFat[header];
             
             streamingBinaryReader.SetEndianness(endianness);
             streamingBinaryReader.Offset = (long) offset;
@@ -54,12 +54,12 @@ public class MachODecoder : IBinaryFormatDecoder
     {
         var (numberOfCommands, architecture) = await ReadSingleArchitectureOfFatFormatAsync(streamingBinaryReader, bitness);
         
-        for (int i = 0; i < numberOfCommands; i++)
+        for (var i = 0; i < numberOfCommands; i++)
         {
-            var command = await streamingBinaryReader.ReadUInt();
+            var commandType = await streamingBinaryReader.ReadUInt();
             var commandSize = await streamingBinaryReader.ReadUInt();
 
-            if (command != MachOConstants.LC_CODE_SIGNATURE)
+            if (commandType != MachOConstants.LC_CODE_SIGNATURE)
                 streamingBinaryReader.SkipBytes(commandSize);
             else
                 return new MachOFileFormatInfo(endianness, bitness, architecture, true);

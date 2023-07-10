@@ -1,6 +1,6 @@
 namespace FormatParser.Text;
 
-public class TextChecker
+public class CodepointChecker
 {
     private static HashSet<uint> NonTextC0Controls =
         Enumerable.Range(0, 32)

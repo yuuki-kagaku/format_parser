@@ -5,7 +5,8 @@ public class InMemoryDeserializer
     private int offset = 0;
     private readonly byte[] buffer;
     private readonly int length;
-    
+    private static readonly Endianness RunningCpuEndianness = BitConverter.IsLittleEndian ? Endianness.LittleEndian : Endianness.BigEndian;
+
     private Endianness endianness = Endianness.LittleEndian;
 
     public InMemoryDeserializer(byte[] buffer)
@@ -28,8 +29,11 @@ public class InMemoryDeserializer
         }
     }
 
-    public void SetEndianess(Endianness endianness)
+    public void SetEndianness(Endianness endianness)
     {
+        if (endianness is not (Endianness.BigEndian or Endianness.LittleEndian))
+            throw new ArgumentOutOfRangeException(nameof(endianness));
+        
         this.endianness = endianness;
     }
     
@@ -85,7 +89,11 @@ public class InMemoryDeserializer
             result = *(ushort*) ptr;
         
         offset += sizeof (ushort);
-        return result;
+        
+        if (endianness == RunningCpuEndianness)
+            return result;
+
+        return ReverseEndianness(result);
     }
     
     public unsafe byte ReadByte()
@@ -99,6 +107,14 @@ public class InMemoryDeserializer
         
         offset += sizeof (byte);
         return result;
+    }
+
+    private static ushort ReverseEndianness(ushort val)
+    {
+        ushort movedLeft = (ushort)(val << 8);
+        ushort movedRight = (ushort)(val >> 8);
+
+        return (ushort)(movedLeft | movedRight);
     }
     
     public bool CanRead(int size) => offset + size <= length;
