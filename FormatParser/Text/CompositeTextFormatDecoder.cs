@@ -5,14 +5,26 @@ namespace FormatParser.Text;
 
 public class CompositeTextFormatDecoder
 {
-    private readonly IUtfDecoder[] utfDecoders;
     private readonly ITextBasedFormatDetector[] textBasedFormatDetectors;
     private readonly TextParserSettings settings;
     private readonly Dictionary<string, IUtfDecoder> utfDecodersByEncoding;
+    private readonly Dictionary<string, ILanguageAnalyzer> languageAnalyzers;
+    private readonly ITextDecoder[] decoders;
     
-    public CompositeTextFormatDecoder(IUtfDecoder[] utfDecoders, ITextBasedFormatDetector[] textBasedFormatDetectors, TextParserSettings settings)
+    public CompositeTextFormatDecoder(
+        IUtfDecoder[] utfDecoders,
+        ITextDecoder[] nonUtfDecoders, 
+        ILanguageAnalyzer[] languageAnalyzers,
+        ITextBasedFormatDetector[] textBasedFormatDetectors,
+        TextParserSettings settings
+        )
     {
-        this.utfDecoders = utfDecoders;
+        decoders = utfDecoders.Concat(nonUtfDecoders).ToArray();
+        
+        this.languageAnalyzers = languageAnalyzers
+            .SelectMany(analyzer => analyzer.SupportedLanguages.Select(lang => (Language: lang, Analyzer: analyzer)))
+            .ToDictionary(x => x.Language, x => x.Analyzer);
+        
         utfDecodersByEncoding = utfDecoders
             .SelectMany(d => d.CanReadEncodings.Select(e => (Decoder: d, Encoding: e)))
             .ToDictionary(x => x.Encoding, x => x.Decoder);
@@ -29,12 +41,12 @@ public class CompositeTextFormatDecoder
             var decoder = utfDecodersByEncoding[encoding];
             deserializer.Offset = bom.Length;
 
-            if (!decoder.TryDecode(deserializer, stringBuilder, out _))
-                throw new Exception("File is corrupted.");
+            if (!decoder.TryDecode(deserializer, stringBuilder, out _, out _) )
+                throw new Exception("File is corrupt.");
         }
         else
         {
-            if (!TryDecodeAsUtf(deserializer, stringBuilder, out encoding))
+            if (!TryDecode(deserializer, stringBuilder, out encoding))
                 return null;
         }
 
@@ -45,27 +57,77 @@ public class CompositeTextFormatDecoder
         return new TextFileFormatInfo(DefaultTextType, encoding.ToString());
     }
 
-    private bool TryDecodeAsUtf(InMemoryDeserializer deserializer, StringBuilder stringBuilder, [NotNullWhen(true)] out string? encoding)
+    private bool TryDecode(InMemoryDeserializer deserializer, StringBuilder stringBuilder, [NotNullWhen(true)] out string? resultEncoding)
     {
-        foreach (var utfDecoder in utfDecoders)
+        var bestMatchProbability = DetectionProbability.No;
+        resultEncoding = default;
+        
+        foreach (var decoder in decoders)
         {
             try
             {
                 deserializer.Offset = 0;
                 stringBuilder.Clear();
 
-                if (utfDecoder.TryDecode(deserializer, stringBuilder, out encoding))
-                    return true;
+                if (decoder.TryDecode(deserializer, stringBuilder, out var encoding, out var detectionProbability))
+                {
+                    if (detectionProbability > bestMatchProbability)
+                    {
+                        (bestMatchProbability, resultEncoding) = (detectionProbability, encoding);
+
+                        if (bestMatchProbability == DetectionProbability.High)
+                            return true;
+                    }
+
+                    var languageAnalyzer = FindLanguageAnalyzer(decoder);
+
+                    if (decoder.RequiredLanguageAnalyzer != null && TryMatchWithLanguageDetector(languageAnalyzer, stringBuilder, out detectionProbability))
+                    {
+                        (bestMatchProbability, resultEncoding) = (detectionProbability, encoding);
+
+                        if (bestMatchProbability == DetectionProbability.High)
+                            return true;
+                    }
+                }
             }
             catch (Exception e)
             {
             }
         }
 
-        encoding = default;
+        if (bestMatchProbability > DetectionProbability.No)
+            return true;
+
         return false;
     }
 
+    private static bool TryMatchWithLanguageDetector(ILanguageAnalyzer? languageAnalyzer, StringBuilder stringBuilder, out DetectionProbability detectionProbability)
+    {
+        detectionProbability = DetectionProbability.No;
+        if (languageAnalyzer == null)
+            return false;
+        
+        var text = stringBuilder.ToString().ToLowerInvariant();
+        if (languageAnalyzer.IsCorrectText(text))
+        {
+            detectionProbability = languageAnalyzer.DetectionProbabilityOnSuccessfulMatch;
+            return true;
+        }
+
+        return false;
+    }
+
+    private ILanguageAnalyzer? FindLanguageAnalyzer(ITextDecoder decoder)
+    {
+        if (decoder.RequiredLanguageAnalyzer == null)
+            return null;
+
+        if (!languageAnalyzers.TryGetValue(decoder.RequiredLanguageAnalyzer, out var analyzer))
+            return null;
+
+        return analyzer;
+    }
+    
     private bool TryMatchTextBasedFormat(string header, [NotNullWhen(true)] out string? type, out string? encoding)
     {
         foreach (var detector in textBasedFormatDetectors)
@@ -112,5 +174,4 @@ public class CompositeTextFormatDecoder
         (new byte[]{0xFE, 0xFF}, WellKnownEncodings.UTF16BeBom),
         (new byte[]{0xFF, 0xFE}, WellKnownEncodings.UTF16LeBom),
     };
-    
 }

@@ -3,54 +3,54 @@ using System.Text;
 
 namespace FormatParser.Text;
 
-public class Utf16Decoder : IUtfDecoder
+public abstract class Utf16Decoder : IUtfDecoder
 {
-    private readonly TextChecker textChecker;
+    private readonly CodepointChecker codepointChecker;
     private readonly CodepointConverter codepointConverter;
     private readonly TextParserSettings settings;
 
-    public Utf16Decoder(TextChecker textChecker, CodepointConverter codepointConverter, TextParserSettings settings)
+    protected Utf16Decoder(CodepointChecker codepointChecker, CodepointConverter codepointConverter, TextParserSettings settings)
     {
-        this.textChecker = textChecker;
+        this.codepointChecker = codepointChecker;
         this.codepointConverter = codepointConverter;
         this.settings = settings;
     }
 
-    public bool TryDecode(InMemoryDeserializer deserializer, StringBuilder stringBuilder, [NotNullWhen(true)] out string? encoding)
-    {
-        if (TryParseInternal(deserializer, stringBuilder, Endianness.BigEndian))
-        {
-            encoding = WellKnownEncodings.UTF16BeNoBom;
-            return true;
-        }
-        
-        if (TryParseInternal(deserializer, stringBuilder, Endianness.LittleEndian))
-        {
-            encoding = WellKnownEncodings.UTF16LeNoBom;
-            return true;
-        }
+    public abstract bool TryDecode(InMemoryDeserializer deserializer, StringBuilder stringBuilder, [NotNullWhen(true)] out string? encoding,out DetectionProbability detectionProbability);
 
-        encoding = null;
-        return false;
-    }
+    public abstract string[] CanReadEncodings { get; }
+
+    public string? RequiredLanguageAnalyzer { get; } = null;
+
+    protected ushort BOMInNativeEndianess = 0xFFFE;
     
-    public string[] CanReadEncodings { get; } = { WellKnownEncodings.UTF16BeBom, WellKnownEncodings.UTF16LeBom, WellKnownEncodings.UTF16BeNoBom, WellKnownEncodings.UTF16LeNoBom  };
-
-    private bool TryParseInternal(InMemoryDeserializer deserializer, StringBuilder stringBuilder, Endianness endianness)
+    protected bool TryParseInternal(InMemoryDeserializer deserializer, StringBuilder stringBuilder, Endianness endianness, out bool foundBom, out DetectionProbability probability)
     {
-        deserializer.Offset = 0;
-        deserializer.SetEndianess(endianness);
+        deserializer.SetEndianness(endianness);
         
         stringBuilder.Clear();
         var processedChars = 0;
+        var onlyAsciiChars = true;
+        foundBom = false;
         
         while (deserializer.CanRead(sizeof(ushort)))
         {
             var codepoint = GetNextCodepoint(deserializer);
-            
-            if (!textChecker.IsValidCodepoint(codepoint))
+            if (codepoint > 127)
+                onlyAsciiChars = false;
+
+            if (!codepointChecker.IsValidCodepoint(codepoint))
+            {
+                probability = DetectionProbability.No;
                 return false;
-            
+            }
+
+            if (processedChars == 0 && codepoint == BOMInNativeEndianess)
+            {
+                foundBom = true;
+                continue;
+            }
+
             if (processedChars < settings.SampleSize)
             {
                 codepointConverter.Convert(codepoint, stringBuilder);
@@ -58,6 +58,7 @@ public class Utf16Decoder : IUtfDecoder
             }
         }
 
+        probability = onlyAsciiChars ? DetectionProbability.Medium : DetectionProbability.Low;
         return true;
     }
 
@@ -65,11 +66,11 @@ public class Utf16Decoder : IUtfDecoder
     {
         var current = deserializer.ReadUShort();
         
-        if (current >= 0xd800 && current < 0xdc00)
+        if (current >= 0xd800 && current < 0xDC00)
         {
             if (!deserializer.TryReadUShort(out var next))
                 throw new BinaryReaderException("Unexpected end of utf16 string.");
-            return ((current & (uint)0x3ff) << 10) + (next & (uint)0x3ff) + (uint)0x10000;
+            return ((current & (uint)0x3FF) << 10) + (next & (uint)0x3FF) + (uint)0x10000;
         }
 
         return current;
