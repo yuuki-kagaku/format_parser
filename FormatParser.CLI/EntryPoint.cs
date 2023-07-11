@@ -41,7 +41,7 @@ public class EntryPoint
             new Utf16BeDecoder(textChecker, codepointConverter, textParserSettings),
         };
         
-        var textBasedFormats = new ITextBasedFormatDetector[]
+        var textBasedFormatDetectors = new ITextBasedFormatDetector[]
         {
             new XmlDecoder()
         };
@@ -50,13 +50,12 @@ public class EntryPoint
             utfDecoders, 
             nonUnicodeDecoders,
             languageAnalyzers,
-            textBasedFormats, 
             textParserSettings);
 
         var runner = new CLIRunner(
             new FileDiscoverer(), 
             new FormatDecoder(binaryDecoders, 
-                compositeTextFormatDecoder, 
+                new TextFileProcessor(textBasedFormatDetectors, compositeTextFormatDecoder), 
                 new FormatDecoderSettings(textParserSettings, 8192)
                 )
             );

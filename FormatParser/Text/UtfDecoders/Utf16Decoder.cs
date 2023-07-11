@@ -16,7 +16,7 @@ public abstract class Utf16Decoder : IUtfDecoder
         this.settings = settings;
     }
 
-    public abstract bool TryDecode(InMemoryDeserializer deserializer, StringBuilder stringBuilder, [NotNullWhen(true)] out string? encoding,out DetectionProbability detectionProbability);
+    public abstract bool TryDecode(InMemoryBinaryReader binaryReader, StringBuilder stringBuilder, [NotNullWhen(true)] out string? encoding,out DetectionProbability detectionProbability);
 
     public abstract string[] CanReadEncodings { get; }
 
@@ -24,18 +24,18 @@ public abstract class Utf16Decoder : IUtfDecoder
 
     protected ushort BOMInNativeEndianess = 0xFFFE;
     
-    protected bool TryParseInternal(InMemoryDeserializer deserializer, StringBuilder stringBuilder, Endianness endianness, out bool foundBom, out DetectionProbability probability)
+    protected bool TryParseInternal(InMemoryBinaryReader binaryReader, StringBuilder stringBuilder, Endianness endianness, out bool foundBom, out DetectionProbability probability)
     {
-        deserializer.SetEndianness(endianness);
+        binaryReader.SetEndianness(endianness);
         
         stringBuilder.Clear();
         var processedChars = 0;
         var onlyAsciiChars = true;
         foundBom = false;
         
-        while (deserializer.CanRead(sizeof(ushort)))
+        while (binaryReader.CanRead(sizeof(ushort)))
         {
-            var codepoint = GetNextCodepoint(deserializer);
+            var codepoint = GetNextCodepoint(binaryReader);
             if (codepoint > 127)
                 onlyAsciiChars = false;
 
@@ -62,13 +62,13 @@ public abstract class Utf16Decoder : IUtfDecoder
         return true;
     }
 
-    private static uint GetNextCodepoint(InMemoryDeserializer deserializer)
+    private static uint GetNextCodepoint(InMemoryBinaryReader binaryReader)
     {
-        var current = deserializer.ReadUShort();
+        var current = binaryReader.ReadUShort();
         
         if (current >= 0xd800 && current < 0xDC00)
         {
-            if (!deserializer.TryReadUShort(out var next))
+            if (!binaryReader.TryReadUShort(out var next))
                 throw new BinaryReaderException("Unexpected end of utf16 string.");
             return ((current & (uint)0x3FF) << 10) + (next & (uint)0x3FF) + (uint)0x10000;
         }

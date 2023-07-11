@@ -20,12 +20,12 @@ public class Utf8Decoder : IUtfDecoder
 
     public string? RequiredLanguageAnalyzer { get; } = null;
 
-    public bool TryDecode(InMemoryDeserializer deserializer, StringBuilder stringBuilder, [NotNullWhen(true)] out string? encoding, out DetectionProbability detectionProbability)
+    public bool TryDecode(InMemoryBinaryReader binaryReader, StringBuilder stringBuilder, [NotNullWhen(true)] out string? encoding, out DetectionProbability detectionProbability)
     {
         var processedChars = 0;
         var onlyAsciiSymbols = true;
       
-        while (TryGetNextCodepoint(deserializer, out var codepoint))
+        while (TryGetNextCodepoint(binaryReader, out var codepoint))
         {
             if (codepoint > 128)
                 onlyAsciiSymbols = false;
@@ -48,10 +48,10 @@ public class Utf8Decoder : IUtfDecoder
         return true;
     }
 
-    private bool TryGetNextCodepoint(InMemoryDeserializer deserializer, out uint result)
+    private bool TryGetNextCodepoint(InMemoryBinaryReader binaryReader, out uint result)
     {
         result = 0;
-        if (!deserializer.TryReadByte(out var b))
+        if (!binaryReader.TryReadByte(out var b))
             return false;
         
         if (b < 0x80)
@@ -85,7 +85,7 @@ public class Utf8Decoder : IUtfDecoder
 
         for (var i = 1; i < size; i++)
         {
-            if  (!deserializer.TryReadByte(out b))
+            if  (!binaryReader.TryReadByte(out b))
                 if (settings.CrashAtSplitCharAtEnd)
                     throw new Exception();
                 else

@@ -5,7 +5,7 @@ namespace FormatParser.Text;
 
 public interface ITextDecoder
 {
-    bool TryDecode(InMemoryDeserializer deserializer, StringBuilder stringBuilder, [NotNullWhen(true)] out string? encoding, out DetectionProbability detectionProbability);
+    bool TryDecode(InMemoryBinaryReader binaryReader, StringBuilder stringBuilder, [NotNullWhen(true)] out string? encoding, out DetectionProbability detectionProbability);
     
     string? RequiredLanguageAnalyzer { get; }
 }

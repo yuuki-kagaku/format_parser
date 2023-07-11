@@ -1,6 +1,6 @@
 namespace FormatParser;
 
-public class InMemoryDeserializer
+public class InMemoryBinaryReader
 {
     private int offset = 0;
     private readonly byte[] buffer;
@@ -9,13 +9,13 @@ public class InMemoryDeserializer
 
     private Endianness endianness = Endianness.LittleEndian;
 
-    public InMemoryDeserializer(byte[] buffer)
+    public InMemoryBinaryReader(byte[] buffer)
     {
         this.buffer = buffer;
         length = buffer.Length;
     }
     
-    public InMemoryDeserializer(ArraySegment<byte> arraySegment)
+    public InMemoryBinaryReader(ArraySegment<byte> arraySegment)
     {
         if (arraySegment.Offset == 0)
         {
