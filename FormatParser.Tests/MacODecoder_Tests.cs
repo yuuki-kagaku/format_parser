@@ -53,12 +53,10 @@ public class MacODecoder_Tests
     }
     
     [Test]
-    public async Task MachDecoder_ShouldParse_signed()
+    public async Task MachDecoder_ShouldParse_signed_amd64_file()
     {
-        var fileInfo = await DecodeAsync(@"/TestData/mac/Read_Before_You_Install_iTunes") as MachOFileFormatInfo;
+        var fileInfo = await DecodeAsync(@"./TestData/mac/Read_Before_You_Install_iTunes") as MachOFileFormatInfo;
     
-        Console.WriteLine(fileInfo.GetType());
-        
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
         fileInfo!.Architecture.Should().Be(Architecture.Amd64);
@@ -67,12 +65,10 @@ public class MacODecoder_Tests
     }
     
     [Test]
-    public async Task MachDecoder_ShouldParse_signedrrrrrr()
+    public async Task MachDecoder_ShouldParse_signed_arm_file()
     {
-        var fileInfo = await DecodeAsync(@"/TestData/mac/MachO-iOS-armv7s-Helloworld") as MachOFileFormatInfo;
+        var fileInfo = await DecodeAsync(@"./TestData/mac/MachO-iOS-armv7s-Helloworld") as MachOFileFormatInfo;
     
-        Console.WriteLine(fileInfo.GetType());
-        
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
         fileInfo!.Architecture.Should().Be(Architecture.Arm);
@@ -81,12 +77,10 @@ public class MacODecoder_Tests
     }
     
     [Test]
-    public async Task MachDecoder_ShouldParse_signedrrrsssrrr()
+    public async Task MachDecoder_ShouldParse_unsigned_file()
     {
-        var fileInfo = await DecodeAsync(@"/TestData/mac//hello_world") as MachOFileFormatInfo;
+        var fileInfo = await DecodeAsync(@"./TestData/mac//hello_world") as MachOFileFormatInfo;
     
-        Console.WriteLine(fileInfo.GetType());
-        
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
         fileInfo!.Architecture.Should().Be(Architecture.i386);
