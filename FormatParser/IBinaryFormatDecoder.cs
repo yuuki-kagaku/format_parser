@@ -2,5 +2,5 @@
 
 public interface IBinaryFormatDecoder
 {
-    Task<IFileFormatInfo?> TryDecodeAsync(StreamingBinaryReader streamingBinaryReader);
+    Task<IFileFormatInfo?> TryDecodeAsync(StreamingBinaryReader binaryReader);
 }

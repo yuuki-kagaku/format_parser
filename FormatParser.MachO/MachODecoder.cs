@@ -5,62 +5,62 @@ namespace FormatParser.MachO;
 
 public class MachODecoder : IBinaryFormatDecoder
 {
-    public async Task<IFileFormatInfo?> TryDecodeAsync(StreamingBinaryReader streamingBinaryReader)
+    public async Task<IFileFormatInfo?> TryDecodeAsync(StreamingBinaryReader binaryReader)
     {
-        if (streamingBinaryReader.Length < 4)
+        if (binaryReader.Length < 4)
             return null;
         
-        var header = await streamingBinaryReader.ReadBytesAsync(4);
+        var header = await binaryReader.ReadBytesAsync(4);
         
         if (!MachOMagicNumbers.All.TryGetValue(header, out var tuple))
             return null;
 
         var (bitness, endianness, isFat) = tuple;
-        streamingBinaryReader.SetEndianness(endianness);
 
         if (isFat)
-            return await ReadFatFormatInfo(streamingBinaryReader, endianness, bitness);
+            return await ReadFatFormatInfo(binaryReader, endianness, bitness);
 
-        return await ReadNonFatFormatInfo(streamingBinaryReader, bitness, endianness);
+        return await ReadNonFatFormatInfo(binaryReader, bitness, endianness);
     }
 
-    private static async Task<FatMachOFileFormatInfo> ReadFatFormatInfo(StreamingBinaryReader streamingBinaryReader, Endianness endianness, Bitness bitness)
+    private static async Task<FatMachOFileFormatInfo> ReadFatFormatInfo(StreamingBinaryReader binaryReader, Endianness endianness, Bitness bitness)
     {
-        var numberOfArchitectures = (int)await streamingBinaryReader.ReadUInt();
+        binaryReader.SetEndianness(endianness);
+        var numberOfArchitectures = (int)await binaryReader.ReadUInt();
 
         var headers = new List<(Architecture, ulong Offset)>(numberOfArchitectures);
         
         for (var i = 0; i < numberOfArchitectures; i++)
-            headers.Add(await ReadArchitectures(streamingBinaryReader, bitness));
+            headers.Add(await ReadArchitecturesOfFatFileAsync(binaryReader, bitness));
 
         var result = new List<MachOFileFormatInfo>(numberOfArchitectures);
         foreach (var (architecture, offset) in headers)
         {
-            streamingBinaryReader.Offset = (long) offset;
-            var header = await streamingBinaryReader.ReadBytesAsync(4);
+            binaryReader.Offset = (long) offset;
+            var header = await binaryReader.ReadBytesAsync(4);
 
             (bitness, endianness, _) = MachOMagicNumbers.NonFat[header];
             
-            streamingBinaryReader.SetEndianness(endianness);
-            streamingBinaryReader.Offset = (long) offset;
+            binaryReader.SetEndianness(endianness);
             
-            result.Add(await ReadNonFatFormatInfo(streamingBinaryReader, bitness, endianness));
+            result.Add(await ReadNonFatFormatInfo(binaryReader, bitness, endianness));
         }
 
         return new FatMachOFileFormatInfo(endianness, bitness, result.ToImmutableArray());
     }
 
-    private static async Task<MachOFileFormatInfo> ReadNonFatFormatInfo(StreamingBinaryReader streamingBinaryReader, Bitness bitness, Endianness endianness)
+    private static async Task<MachOFileFormatInfo> ReadNonFatFormatInfo(StreamingBinaryReader binaryReader, Bitness bitness, Endianness endianness)
     {
-        var (numberOfCommands, architecture) = await ReadSingleArchitectureOfFatFormatAsync(streamingBinaryReader, bitness);
-        
+        binaryReader.SetEndianness(endianness);
+        var (numberOfCommands, architecture) = await ReadNonFatHeaderAsync(binaryReader, bitness);
+
         for (var i = 0; i < numberOfCommands; i++)
         {
-            var commandType = await streamingBinaryReader.ReadUInt();
-            var commandSize = await streamingBinaryReader.ReadUInt();
+            var commandType = await binaryReader.ReadUInt();
+            var commandSize = await binaryReader.ReadUInt();
 
             if (commandType != MachOConstants.LC_CODE_SIGNATURE)
-                streamingBinaryReader.SkipBytes(commandSize);
+                binaryReader.SkipBytes(commandSize - 2 * sizeof(uint));
             else
                 return new MachOFileFormatInfo(endianness, bitness, architecture, true);
         }
@@ -68,9 +68,10 @@ public class MachODecoder : IBinaryFormatDecoder
         return new MachOFileFormatInfo(endianness, bitness, architecture, false);
     }
 
-    private static async Task<(Architecture, ulong Offset)> ReadArchitectures(StreamingBinaryReader streamingBinaryReader, Bitness bitness)
+    private static async Task<(Architecture, ulong Offset)> ReadArchitecturesOfFatFileAsync(StreamingBinaryReader streamingBinaryReader, Bitness bitness)
     {
-        var architecture = ParseCPUType(await streamingBinaryReader.ReadInt()); // cputype
+        var architecture = MachOArchitectureConverter.Convert(await streamingBinaryReader.ReadInt()); // cputype
+        
         streamingBinaryReader.SkipInt(); // cpusubtype
         var offset = await streamingBinaryReader.ReadPointer(bitness); // offset
         streamingBinaryReader.SkipPointer(bitness); // size
@@ -81,13 +82,15 @@ public class MachODecoder : IBinaryFormatDecoder
         return (architecture, offset);
     }
     
-    private static async Task<NonFatHeader> ReadSingleArchitectureOfFatFormatAsync(StreamingBinaryReader streamingBinaryReader, Bitness bitness)
+    private static async Task<NonFatHeader> ReadNonFatHeaderAsync(StreamingBinaryReader streamingBinaryReader, Bitness bitness)
     {
-        var architecture = ParseCPUType(await streamingBinaryReader.ReadInt()); // cputype
+        var architecture = MachOArchitectureConverter.Convert(await streamingBinaryReader.ReadInt()); // cputype
         streamingBinaryReader.SkipInt(); // cpusubtype
         streamingBinaryReader.SkipUInt(); // filetype
         var numberOfCommands = await streamingBinaryReader.ReadUInt(); // ncmds
+        
         streamingBinaryReader.SkipUInt(); // sizeofcmds
+        
         streamingBinaryReader.SkipUInt(); // flags
         
         if (bitness == Bitness.Bitness64)
@@ -95,14 +98,6 @@ public class MachODecoder : IBinaryFormatDecoder
 
         return new (numberOfCommands, architecture);
     }
-
-    private static Architecture ParseCPUType(int type) =>
-        type switch
-        {
-            MachOConstants.CPU_TYPE_I386 => Architecture.i386,
-            MachOConstants.CPU_TYPE_X86_64 => Architecture.Amd64,
-            _ => Architecture.Unknown
-        };
 
     private record struct NonFatHeader(uint NumberOfCommands, Architecture Architecture);
 }

@@ -4,9 +4,9 @@ namespace FormatParser.ELF;
 
 public class ElfDecoder : IBinaryFormatDecoder
 {
-    public async Task<IFileFormatInfo?> TryDecodeAsync(StreamingBinaryReader streamingBinaryReader)
+    public async Task<IFileFormatInfo?> TryDecodeAsync(StreamingBinaryReader binaryReader)
     {
-        var elfHeader = await TryReadElfHeaderAsync(streamingBinaryReader);
+        var elfHeader = await TryReadElfHeaderAsync(binaryReader);
 
         if (elfHeader == null)
             return null;
@@ -15,11 +15,11 @@ public class ElfDecoder : IBinaryFormatDecoder
 
         for (var i = 0; i < programHeadersNumber; i++)
         {
-            var (type, offset, size) = await ReadProgramHeader(streamingBinaryReader, bitness);
+            var (type, offset, size) = await ReadProgramHeader(binaryReader, bitness);
             if (type == ELFConstants.PT_INTERP)
             {
-                streamingBinaryReader.Offset = (long)offset;
-                var interpreter = await streamingBinaryReader.ReadNulTerminatingStringAsync((int) size);
+                binaryReader.Offset = (long)offset;
+                var interpreter = await binaryReader.ReadNulTerminatingStringAsync((int) size);
                 return new ElfFileFormatInfo(endianness, bitness, architecture , interpreter);
             }
         }
@@ -41,7 +41,7 @@ public class ElfDecoder : IBinaryFormatDecoder
         streamingBinaryReader.SetEndianness(endianness);
         
         streamingBinaryReader.SkipUShort(); // e_type
-        var architecture = ParseArchitecture (await streamingBinaryReader.ReadUShort()); // e_machine
+        var architecture = ElfArchitectureConverter.Convert (await streamingBinaryReader.ReadUShort()); // e_machine
         streamingBinaryReader.SkipUInt(); // e_version
         streamingBinaryReader.SkipPointer(bitness); // e_entry
         streamingBinaryReader.SkipPointer(bitness); // e_phoff
@@ -57,13 +57,6 @@ public class ElfDecoder : IBinaryFormatDecoder
         return new ElfHeaderInfo {ProgramHeadersNumber = programHeadersNumber, Bitness = bitness, Architecture = architecture, Endianness = endianness};
     }
 
-    private static Architecture ParseArchitecture(ushort architecture)
-    {
-        if (architecture == ELFConstants.EM_X86_64)
-            return Architecture.Amd64;
-
-        return Architecture.Unknown;
-    }
 
     private static async Task<ProgramHeaderInfo> ReadProgramHeader(StreamingBinaryReader streamingBinaryReader, Bitness bitness)
     {
