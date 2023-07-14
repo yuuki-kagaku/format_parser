@@ -187,18 +187,25 @@ public class StreamingBinaryReader
     
     public void SkipPointer(Bitness bitness)
     {
-        if (bitness == Bitness.Bitness32)
+        switch (bitness)
         {
-            SkipInt();
-            return;
+            case Bitness.Bitness32:
+                SkipInt();
+                return;
+            case Bitness.Bitness64:
+                SkipLong();
+                return;
+            case Bitness.Bitness16:
+                SkipShort();
+                return;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(bitness));
         }
-
-        SkipLong();
     }
 
     private Task ReadInternalAsync(int count) => ReadInternalAsync(count, defaultBuffer, true);
 
-    private async Task<int> ReadInternalAsync(int count, byte[] buffer, bool ensureSize)
+    private async Task<int> ReadInternalAsync(int count, byte[] buffer, bool ensureAllBytesRead)
     {
         var totalBytesRead = 0;
 
@@ -207,10 +214,7 @@ public class StreamingBinaryReader
             var bytesRead = await ReadInternalAsync(buffer, totalBytesRead, count - totalBytesRead);
 
             if (bytesRead == 0)
-                if (ensureSize)
-                    throw new BinaryReaderException("Not enough data in stream.");
-                else
-                    return bytesRead;
+                return ensureAllBytesRead ? throw new BinaryReaderException("Not enough data in stream.") : bytesRead;
 
             totalBytesRead += bytesRead;
         }
