@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
-using FormatParser;
-using FormatParser.CLI;
 using FormatParser.Text;
+
+namespace FormatParser.CLI;
 
 public class EntryPoint
 {
@@ -9,7 +9,6 @@ public class EntryPoint
     {
         var directory = args[0];
 
-        var textChecker = new CodepointChecker();
         var codepointConverter = new CodepointConverter();
         var textParserSettings = TextParserSettings.Default;
         var formatParserSetting = new FormatParserCliSettings
@@ -17,28 +16,18 @@ public class EntryPoint
             Directory = directory
         };
 
-        var wellKnownDlls = new string[]
-        {
-            "../../../../FormatParser.ELF/bin/Debug/net7.0/FormatParser.ELF.dll",
-            "../../../../FormatParser.PE/bin/Debug/net7.0/FormatParser.PE.dll",
-            "../../../../FormatParser.MachO/bin/Debug/net7.0/FormatParser.MachO.dll",
-        };
-        foreach (var dll in wellKnownDlls)
-        {
-            var a = Assembly.LoadFrom(dll);
-            AppDomain.CurrentDomain.Load(a.GetName());
-        }
+        LoadPlugins();
         
-        var binaryDecoders = GetAllClassesInstances<IBinaryFormatDecoder>().ToArray();
+        var binaryDecoders = GetAllInstancesOf<IBinaryFormatDecoder>().ToArray();
         
-        var nonUnicodeDecoders = new ITextDecoder[] {new Windows1251Decoder(new CodepointChecker(), textParserSettings)};
+        var nonUnicodeDecoders = new ITextDecoder[] {new Windows1251Decoder(textParserSettings)};
         var languageAnalyzers = new ILanguageAnalyzer[] {new RussianLanguageAnalyzer()};
         
         var utfDecoders = new IUtfDecoder[]
         {
-            new Utf8Decoder(textChecker, codepointConverter, textParserSettings),
-            new Utf16LeDecoder(textChecker, codepointConverter, textParserSettings),
-            new Utf16BeDecoder(textChecker, codepointConverter, textParserSettings),
+            new Utf8Decoder(codepointConverter, textParserSettings),
+            new Utf16LeDecoder(codepointConverter, textParserSettings),
+            new Utf16BeDecoder(codepointConverter, textParserSettings),
         };
         
         var textBasedFormatDetectors = new ITextBasedFormatDetector[]
@@ -57,8 +46,8 @@ public class EntryPoint
             new FormatDecoder(binaryDecoders, 
                 new TextFileProcessor(textBasedFormatDetectors, compositeTextFormatDecoder), 
                 new FormatDecoderSettings(textParserSettings, 8192)
-                )
-            );
+            )
+        );
 
         var cts = new CancellationTokenSource();
         var state = new ForamatParserCliState();
@@ -66,11 +55,29 @@ public class EntryPoint
         
         foreach (var (formatInfo, occurence) in state.Occurence.OrderByDescending(x => x.Value.Read()))
         {
-            Console.WriteLine($"[{occurence.Read().ToString(),6}] : {formatInfo}");
+            Console.WriteLine($"[{occurence.Read().ToString(),6}] : {formatInfo.ToPrettyString()}");
         }
     }
 
-    private static IEnumerable<T> GetAllClassesInstances<T>()
+    private static void LoadPlugins()
+    {
+        const string pluginDirectory = "./plugins/";
+        
+        if (Directory.Exists(pluginDirectory))
+            return;
+
+        var plugins = Directory
+            .EnumerateFiles(pluginDirectory)
+            .Where(x => x.EndsWith(".dll"));
+        
+        foreach (var dll in plugins)
+        {
+            var a = Assembly.LoadFrom(dll);
+            AppDomain.CurrentDomain.Load(a.GetName());
+        }
+    }
+
+    private static IEnumerable<T> GetAllInstancesOf<T>()
     {
         var type = typeof(T);
         var types = AppDomain
@@ -82,7 +89,7 @@ public class EntryPoint
 
         foreach (var t in types)
         {
-            yield return (T)Activator.CreateInstance(t);
+            yield return (T)Activator.CreateInstance(t)!;
         }
     }
 }
