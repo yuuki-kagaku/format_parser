@@ -4,7 +4,7 @@ namespace FormatParser.Text;
 
 public class XmlDecoder : ITextBasedFormatDetector
 {
-    private static readonly Regex pattern = new (@$"^<?xml([^>+])encoding=""(?<encoding>[^""]+)""([^>+])\?>",
+    private static readonly Regex pattern = new (@$"^<\?xml([^>]+)encoding=""(?<encoding>[^""]+)""",
         RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
     
     public bool TryMatchFormat(string header, out string? encoding)
