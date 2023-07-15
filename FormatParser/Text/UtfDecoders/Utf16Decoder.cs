@@ -33,8 +33,6 @@ public abstract class Utf16Decoder : IUtfDecoder
             return false;
         
         binaryReader.SetEndianness(endianness);
-        
-        stringBuilder.Clear();
         var processedChars = 0;
         
         while (binaryReader.CanRead(sizeof(ushort)))
