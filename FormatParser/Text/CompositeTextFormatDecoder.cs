@@ -6,70 +6,31 @@ namespace FormatParser.Text;
 public class CompositeTextFormatDecoder
 {
     private readonly TextParserSettings settings;
-    private readonly Dictionary<string, IUtfDecoder> utfDecodersByEncoding;
-    private readonly Dictionary<string, ILanguageAnalyzer> languageAnalyzers;
     private readonly ITextDecoder[] decoders;
-    
+    private readonly Dictionary<ITextDecoder, IEnumerable<ITextAnalyzer>> encodingAnalyzersDictionary;
+
     public CompositeTextFormatDecoder(
         IUtfDecoder[] utfDecoders,
         ITextDecoder[] nonUtfDecoders, 
-        ILanguageAnalyzer[] languageAnalyzers,
+        ITextAnalyzer[] encodingAnalyzers,
         TextParserSettings settings)
     {
         decoders = utfDecoders.Concat(nonUtfDecoders).ToArray();
         
-        this.languageAnalyzers = languageAnalyzers
+        var encodingAnalyzersByLanguage = encodingAnalyzers
             .SelectMany(analyzer => analyzer.SupportedLanguages.Select(lang => (Language: lang, Analyzer: analyzer)))
             .ToDictionary(x => x.Language, x => x.Analyzer);
-        
-        utfDecodersByEncoding = utfDecoders
-            .SelectMany(d => d.CanReadEncodings.Select(e => (Decoder: d, Encoding: e)))
-            .ToDictionary(x => x.Encoding, x => x.Decoder);
+
+        encodingAnalyzersDictionary = decoders.ToDictionary(x => x, x => GetEncodingAnalyzers(x, encodingAnalyzersByLanguage));
             
         this.settings = settings;
     }
-    
-    public bool TryDecode(InMemoryBinaryReader binaryReader, [NotNullWhen(true)] out string? encoding, [NotNullWhen(true)] out string? textSample)
-    {
-        if (TryFindUtfBom(binaryReader, out encoding, out var bom))
-        {
-            var decoder = utfDecodersByEncoding[encoding];
-            binaryReader.Offset = bom.Length;
 
-            var stringBuilder = new StringBuilder(settings.SampleSize);
-            if (!decoder.TryDecode(binaryReader, stringBuilder, out _, out _) )
-                throw new Exception("File is corrupt.");
-
-            textSample = stringBuilder.ToString();
-            return true;
-        }
-      
-        return TryDecodeInternal(binaryReader, out encoding, out textSample);
-    }
-    
-    private static bool TryFindUtfBom(InMemoryBinaryReader binaryReader, [NotNullWhen(true)] out string? encoding, [NotNullWhen(true)] out byte[]? bom)
-    {
-        binaryReader.Offset = 0;
-        var firstBytes = binaryReader.ReadBytes(4);
-        
-        foreach (var (magicBytes, e) in UTFConstants.BOMs)
-        {
-            if (magicBytes.SequenceEqual(new ArraySegment<byte>(firstBytes, 0, magicBytes.Length)))
-            {
-                (encoding, bom) = (e, magicBytes);
-                return true;
-            }
-        }
-
-        (encoding, bom) = (default, null);
-        return false;
-    }
-
-    private bool TryDecodeInternal(InMemoryBinaryReader binaryReader, [NotNullWhen(true)] out string? resultEncoding, [NotNullWhen(true)] out string? textSample)
+    public bool TryDecode(InMemoryBinaryReader binaryReader, [NotNullWhen(true)] out string? resultEncoding, [NotNullWhen(true)] out string? resultTextSample)
     {
         var bestMatchProbability = DetectionProbability.No;
         resultEncoding = null;
-        textSample = null;
+        resultTextSample = null;
         var stringBuilder = new StringBuilder(settings.SampleSize);
         
         foreach (var decoder in decoders)
@@ -79,24 +40,25 @@ public class CompositeTextFormatDecoder
                 binaryReader.Offset = 0;
                 stringBuilder.Clear();
 
-                if (decoder.TryDecode(binaryReader, stringBuilder, out var encoding, out var detectionProbability))
+                if (decoder.TryDecode(binaryReader, stringBuilder, out var encoding))
                 {
-                    var text = new Lazy<string>(() => stringBuilder.ToString(), LazyThreadSafetyMode.None);
+                    var textSample = new TextSample(stringBuilder);
 
-                    if (detectionProbability > bestMatchProbability)
+                    var defaultDetectionProbability = decoder.DefaultDetectionProbability;
+                    if (defaultDetectionProbability > bestMatchProbability)
+                        (bestMatchProbability, resultEncoding, resultTextSample) = (defaultDetectionProbability, encoding, textSample.Text);
+                    
+                    foreach (var encodingAnalyzer in encodingAnalyzersDictionary[decoder])
                     {
-                        (bestMatchProbability, resultEncoding, textSample) = (detectionProbability, encoding, text.Value);
+                        var detectionProbability = encodingAnalyzer.AnalyzeProbability(textSample, encoding, out var clarifiedEncoding);
 
-                        if (bestMatchProbability == DetectionProbability.High)
-                            return true;
-                    }
-
-                    if (TryMatchWithLanguageDetector(decoder, text.Value, out detectionProbability) && detectionProbability > bestMatchProbability)
-                    {
-                        (bestMatchProbability, resultEncoding, textSample) = (detectionProbability, encoding, text.Value);
+                        if (detectionProbability > bestMatchProbability)
+                        {
+                            (bestMatchProbability, resultEncoding, resultTextSample) = (detectionProbability, clarifiedEncoding ?? encoding, textSample.Text);
                             
-                        if (bestMatchProbability == DetectionProbability.High)
-                            return true;
+                            if (bestMatchProbability >= DetectionProbability.High)
+                                return true;
+                        }
                     }
                 }
             }
@@ -104,38 +66,21 @@ public class CompositeTextFormatDecoder
             {
             }
         }
-
+        
         return bestMatchProbability > DetectionProbability.No;
     }
-
-    private bool TryMatchWithLanguageDetector(ITextDecoder decoder, string textSample, out DetectionProbability detectionProbability)
+    
+    private static IEnumerable<ITextAnalyzer> GetEncodingAnalyzers(ITextDecoder decoder, Dictionary<string, ITextAnalyzer> encodingAnalyzersByLanguage)
     {
-        detectionProbability = DetectionProbability.No;
+        yield return new AsciiCharactersTextAnalyzer();
+        yield return new UTF16Heuristics();
 
-        if (decoder.RequiredLanguageAnalyzer == null)
-            return false;
+        if (decoder.RequiredEncodingAnalyzer == null)
+            yield break;
         
-        var languageAnalyzer = FindLanguageAnalyzer(decoder);
-        
-        if (languageAnalyzer == null)
-            return false;
-        
-        if (languageAnalyzer.IsCorrectText(textSample.ToLowerInvariant()))
-        {
-            detectionProbability = languageAnalyzer.DetectionProbabilityOnSuccessfulMatch;
-            return true;
-        }
-        return false;
-    }
+        if (!encodingAnalyzersByLanguage.TryGetValue(decoder.RequiredEncodingAnalyzer, out var analyzer))
+            throw new Exception($"Could not find analyzer for {decoder.RequiredEncodingAnalyzer}");
 
-    private ILanguageAnalyzer? FindLanguageAnalyzer(ITextDecoder decoder)
-    {
-        if (decoder.RequiredLanguageAnalyzer == null)
-            return null;
-
-        if (!languageAnalyzers.TryGetValue(decoder.RequiredLanguageAnalyzer, out var analyzer))
-            return null;
-
-        return analyzer;
+        yield return analyzer;
     }
 }

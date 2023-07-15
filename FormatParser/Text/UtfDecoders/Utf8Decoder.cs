@@ -9,32 +9,36 @@ public class Utf8Decoder : IUtfDecoder
     private readonly CodepointConverter codepointConverter;
     private readonly TextParserSettings settings;
 
-    public Utf8Decoder(CodepointChecker codepointChecker, CodepointConverter codepointConverter, TextParserSettings settings)
+    private static readonly byte[] bom = { 0xEF, 0xBB, 0xBF };
+
+    public Utf8Decoder(CodepointConverter codepointConverter, TextParserSettings settings)
     {
-        this.codepointChecker = codepointChecker;
+        this.codepointChecker = CodepointChecker.IllegalC0AndC1Controls(CodepointCheckerSettings.Default);
         this.codepointConverter = codepointConverter;
         this.settings = settings;
     }
     
     public string[] CanReadEncodings { get; } = { WellKnownEncodings.Utf8BOM, WellKnownEncodings.Utf8NoBOM };
 
-    public string? RequiredLanguageAnalyzer { get; } = null;
+    public string? RequiredEncodingAnalyzer { get; } = null;
+    
+    public DetectionProbability DefaultDetectionProbability { get; } = DetectionProbability.Lowest;
 
-    public bool TryDecode(InMemoryBinaryReader binaryReader, StringBuilder stringBuilder, [NotNullWhen(true)] out string? encoding, out DetectionProbability detectionProbability)
+    public bool TryDecode(InMemoryBinaryReader binaryReader, StringBuilder stringBuilder, [NotNullWhen(true)]  out string? encoding)
     {
+        var originalOffset = binaryReader.Offset;
+        var haveBom = TryFindBom(binaryReader);
+
+        if (!haveBom)
+            binaryReader.Offset = originalOffset;
+
         var processedChars = 0;
-        var onlyAsciiSymbols = true;
-      
+        encoding = null;
+
         while (TryGetNextCodepoint(binaryReader, out var codepoint))
         {
-            if (codepoint > 128)
-                onlyAsciiSymbols = false;
-                
             if (!codepointChecker.IsValidCodepoint(codepoint))
-            {
-                (encoding, detectionProbability) = (null, DetectionProbability.No);
                 return false;
-            }
 
             if (processedChars < settings.SampleSize)
             {
@@ -43,8 +47,27 @@ public class Utf8Decoder : IUtfDecoder
             }
         }
 
-        encoding = onlyAsciiSymbols ? WellKnownEncodings.ASCII : WellKnownEncodings.Utf8NoBOM;
-        detectionProbability = onlyAsciiSymbols ? DetectionProbability.Medium : DetectionProbability.Low;
+        encoding = haveBom ? WellKnownEncodings.Utf8BOM : WellKnownEncodings.Utf8NoBOM;
+        return true;
+    }
+
+    private static bool TryFindBom(InMemoryBinaryReader binaryReader)
+    {
+        if (!binaryReader.CanRead(3 * sizeof(byte)))
+            return false;
+        
+        var b = binaryReader.ReadByte();
+        if (b != bom[0])
+            return false;
+
+        b = binaryReader.ReadByte();
+        if (b != bom[1])
+            return false;
+        
+        b = binaryReader.ReadByte();
+        if (b != bom[2])
+            return false;
+
         return true;
     }
 
@@ -61,8 +84,10 @@ public class Utf8Decoder : IUtfDecoder
         }
 
         if (b < 0xC0)
+        {
             throw new Exception();
-                    
+        }
+
         int size;
 
         if (b < 0xE0)
@@ -85,7 +110,7 @@ public class Utf8Decoder : IUtfDecoder
 
         for (var i = 1; i < size; i++)
         {
-            if  (!binaryReader.TryReadByte(out b))
+            if (!binaryReader.TryReadByte(out b))
                 if (settings.CrashAtSplitCharAtEnd)
                     throw new Exception();
                 else

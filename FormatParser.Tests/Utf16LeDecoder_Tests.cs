@@ -12,11 +12,10 @@ public class Utf16LeDecoder_Tests
     [SetUp]
     public void SetUp()
     {
-        var textChecker = new CodepointChecker();
         var codepointConverter = new CodepointConverter();
         var textParserSettings = TextParserSettings.Default;
         
-        decoder = new Utf16LeDecoder(textChecker, codepointConverter, textParserSettings);
+        decoder = new Utf16LeDecoder(codepointConverter, textParserSettings);
     }
     
     [Test]
@@ -27,7 +26,7 @@ public class Utf16LeDecoder_Tests
         var deserializer = new InMemoryBinaryReader(content);
         var sb = new StringBuilder();
 
-        var isSuccessful = decoder.TryDecode(deserializer, sb, out var encoding, out var probability);
+        var isSuccessful = decoder.TryDecode(deserializer, sb, out var encoding);
         
         isSuccessful.Should().Be(true);
         encoding.Should().BeEquivalentTo(WellKnownEncodings.UTF16LeNoBom);

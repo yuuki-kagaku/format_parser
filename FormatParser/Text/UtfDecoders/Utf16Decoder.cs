@@ -9,43 +9,42 @@ public abstract class Utf16Decoder : IUtfDecoder
     private readonly CodepointConverter codepointConverter;
     private readonly TextParserSettings settings;
 
-    protected Utf16Decoder(CodepointChecker codepointChecker, CodepointConverter codepointConverter, TextParserSettings settings)
+    protected Utf16Decoder(CodepointConverter codepointConverter, TextParserSettings settings)
     {
-        this.codepointChecker = codepointChecker;
+        this.codepointChecker = CodepointChecker.IllegalC0AndC1Controls(CodepointCheckerSettings.Default);
         this.codepointConverter = codepointConverter;
         this.settings = settings;
     }
 
-    public abstract bool TryDecode(InMemoryBinaryReader binaryReader, StringBuilder stringBuilder, [NotNullWhen(true)] out string? encoding,out DetectionProbability detectionProbability);
+    public abstract bool TryDecode(InMemoryBinaryReader binaryReader, StringBuilder stringBuilder, [NotNullWhen(true)] out string? encoding);
 
     public abstract string[] CanReadEncodings { get; }
 
-    public string? RequiredLanguageAnalyzer { get; } = null;
+    public string? RequiredEncodingAnalyzer { get; } = null;
 
-    protected ushort BOMInNativeEndianess = 0xFFFE;
+    public DetectionProbability DefaultDetectionProbability { get; } = DetectionProbability.No;
+
+    private ushort bomInNativeEndianess = 0xFFFE;
     
-    protected bool TryParseInternal(InMemoryBinaryReader binaryReader, StringBuilder stringBuilder, Endianness endianness, out bool foundBom, out DetectionProbability probability)
+    protected bool TryParseInternal(InMemoryBinaryReader binaryReader, StringBuilder stringBuilder, Endianness endianness, out bool foundBom)
     {
+        foundBom = false;
+        if (settings.CrashIfUtf16InputIsNotEven && ((binaryReader.Length - binaryReader.Offset) / 2 == 1))
+            return false;
+        
         binaryReader.SetEndianness(endianness);
         
         stringBuilder.Clear();
         var processedChars = 0;
-        var onlyAsciiChars = true;
-        foundBom = false;
         
         while (binaryReader.CanRead(sizeof(ushort)))
         {
             var codepoint = GetNextCodepoint(binaryReader);
-            if (codepoint > 127)
-                onlyAsciiChars = false;
 
             if (!codepointChecker.IsValidCodepoint(codepoint))
-            {
-                probability = DetectionProbability.No;
                 return false;
-            }
 
-            if (processedChars == 0 && codepoint == BOMInNativeEndianess)
+            if (processedChars == 0 && codepoint == bomInNativeEndianess)
             {
                 foundBom = true;
                 continue;
@@ -58,7 +57,6 @@ public abstract class Utf16Decoder : IUtfDecoder
             }
         }
 
-        probability = onlyAsciiChars ? DetectionProbability.Medium : DetectionProbability.Low;
         return true;
     }
 
@@ -70,6 +68,7 @@ public abstract class Utf16Decoder : IUtfDecoder
         {
             if (!binaryReader.TryReadUShort(out var next))
                 throw new BinaryReaderException("Unexpected end of utf16 string.");
+            
             return ((current & (uint)0x3FF) << 10) + (next & (uint)0x3FF) + (uint)0x10000;
         }
 

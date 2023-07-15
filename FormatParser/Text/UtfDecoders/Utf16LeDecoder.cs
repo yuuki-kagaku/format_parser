@@ -5,15 +5,15 @@ namespace FormatParser.Text;
 
 public class Utf16LeDecoder : Utf16Decoder
 {
-    public Utf16LeDecoder(CodepointChecker codepointChecker, CodepointConverter codepointConverter, TextParserSettings settings) : base(codepointChecker, codepointConverter, settings)
+    public Utf16LeDecoder(CodepointConverter codepointConverter, TextParserSettings settings) : base(codepointConverter, settings)
     {
     }
 
     public override string[] CanReadEncodings { get; } = { WellKnownEncodings.UTF16LeBom, WellKnownEncodings.UTF16LeNoBom };
     
-    public override bool TryDecode(InMemoryBinaryReader binaryReader, StringBuilder stringBuilder, [NotNullWhen(true)] out string? encoding, out DetectionProbability detectionProbability)
+    public override bool TryDecode(InMemoryBinaryReader binaryReader, StringBuilder stringBuilder, [NotNullWhen(true)]  out string? encoding)
     {
-        if (TryParseInternal(binaryReader, stringBuilder, Endianness.LittleEndian, out var foundBom, out detectionProbability))
+        if (TryParseInternal(binaryReader, stringBuilder, Endianness.LittleEndian, out var foundBom))
         {
             encoding = foundBom ? WellKnownEncodings.UTF16LeBom : WellKnownEncodings.UTF16LeNoBom;
             return true;
