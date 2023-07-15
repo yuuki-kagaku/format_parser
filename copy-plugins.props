@@ -1,0 +1,7 @@
+<Project TreatAsLocalProperty="Target">
+<Target Name="CustomAfterBuild" AfterTargets="PostBuildEvent">
+            <Copy SourceFiles="$(SolutionDir)\FormatParser.ELF\bin\$(Configuration)\$(TargetFramework)\FormatParser.ELF.dll" DestinationFiles="$(OutputPath)\plugins\FormatParser.ELF.dll" ContinueOnError="false" OverwriteReadOnlyFiles="true"/>
+            <Copy SourceFiles="$(SolutionDir)\FormatParser.MachO\bin\$(Configuration)\$(TargetFramework)\FormatParser.MachO.dll" DestinationFiles="$(OutputPath)\plugins\FormatParser.MachO.dll" ContinueOnError="false" OverwriteReadOnlyFiles="true"/>
+            <Copy SourceFiles="$(SolutionDir)\FormatParser.PE\bin\$(Configuration)\$(TargetFramework)\FormatParser.PE.dll" DestinationFiles="$(OutputPath)\plugins\FormatParser.PE.dll" ContinueOnError="false" OverwriteReadOnlyFiles="true"/>
+</Target>
+</Project>

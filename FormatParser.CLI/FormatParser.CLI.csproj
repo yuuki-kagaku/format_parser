@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
+    <Import Project="..\copy-plugins.props" />
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>net7.0</TargetFramework>
@@ -8,10 +9,18 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\FormatParser.ELF\FormatParser.ELF.csproj" />
-      <ProjectReference Include="..\FormatParser.MachO\FormatParser.MachO.csproj" />
-      <ProjectReference Include="..\FormatParser.PE\FormatParser.PE.csproj" />
+      <ProjectReference Include="..\FormatParser.ELF\FormatParser.ELF.csproj">
+          <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      </ProjectReference>
+      <ProjectReference Include="..\FormatParser.MachO\FormatParser.MachO.csproj">
+            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      </ProjectReference>
+      <ProjectReference Include="..\FormatParser.PE\FormatParser.PE.csproj">
+            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      </ProjectReference>
       <ProjectReference Include="..\FormatParser\FormatParser.csproj" />
     </ItemGroup>
+
+
 
 </Project>
