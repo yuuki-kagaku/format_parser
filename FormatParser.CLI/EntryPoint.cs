@@ -38,7 +38,7 @@ public class EntryPoint
             textParserSettings);
 
         var runner = new CLIRunner(
-            new FileDiscoverer(), 
+            new FileDiscoverer(new FileDiscovererSettings()), 
             new FormatDecoder(binaryDecoders, 
                 new TextFileProcessor(textBasedFormatDetectors, compositeTextFormatDecoder), 
                 new FormatDecoderSettings(textParserSettings, 8192)

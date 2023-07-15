@@ -5,15 +5,21 @@ namespace FormatParser.CLI;
 
 public class FileDiscoverer
 {
-    public async Task DiscoverFiles(string directory, Channel<string> channel)
+    private readonly FileDiscovererSettings settings;
+
+    public FileDiscoverer(FileDiscovererSettings settings)
     {
-        await DiscoverFilesInternal(directory, channel);
+        this.settings = settings;
+    }
+
+    public async Task DiscoverFilesAsync(string directory, Channel<string> channel)
+    {
+        await DiscoverFilesInternalAsync(directory, channel);
         channel.Writer.Complete();
     }
     
-    private async Task DiscoverFilesInternal(string directory, Channel<string> channel)
+    private async Task DiscoverFilesInternalAsync(string directory, Channel<string> channel)
     {
-
         try
         {
             foreach (var file in Directory.GetFiles(directory))
@@ -26,6 +32,13 @@ public class FileDiscoverer
         }
         catch (UnauthorizedAccessException)
         {
+            if (settings.FallOnUnauthorizedException)
+                throw;
+        }
+        catch (System.IO.IOException)
+        {
+            if (settings.FallOnIOException)
+                throw;
         }
 
         try
@@ -35,11 +48,18 @@ public class FileDiscoverer
                 if (new FileInfo(subDirectory).IsSymlink())
                     continue;
 
-                await DiscoverFilesInternal(subDirectory, channel);
+                await DiscoverFilesInternalAsync(subDirectory, channel);
             }
         }
         catch (UnauthorizedAccessException)
         {
+            if (settings.FallOnUnauthorizedException)
+                throw;
+        }
+        catch (System.IO.IOException)
+        {
+            if (settings.FallOnIOException)
+                throw;
         }
     }
 
