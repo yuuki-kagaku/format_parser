@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Threading.Channels;
 
 namespace FormatParser.CLI;
@@ -13,18 +14,39 @@ public class CLIRunner
         this.formatDecoder = formatDecoder;
     }
 
-    public async Task Run(FormatParserCliSettings settings, ForamatParserCliState state, CancellationToken cancellationToken)
+    public async Task Run(FormatParserCliSettings settings, FormatParserCliState state, CancellationToken cancellationToken)
     {
         var channel = Channel.CreateUnbounded<string>();
 
-        await fileDiscoverer.DiscoverFiles(settings.Directory, channel);
-       
+        state.Stopwatch = Stopwatch.StartNew();
+        var discovererTask = RunFileDiscovererWithProcessorContinuation(settings, state, channel, cancellationToken);
+        var processorTasks = RunProcessors(settings, state, channel, cancellationToken);
+
+        await Task.WhenAll(processorTasks.Concat(new[] { discovererTask }));
+    }
+
+    private List<Task> RunProcessors(FormatParserCliSettings settings, FormatParserCliState state, Channel<string> channel, CancellationToken cancellationToken)
+    {
+        var list = new List<Task>();
+        
+        for (var i = 0; i < settings.DegreeOfParallelism - 1; i++)
+            list.Add(RunParsingProcessor(channel.Reader, state, cancellationToken));
+        
+        return list;
+    }
+    
+    private async Task RunFileDiscovererWithProcessorContinuation(FormatParserCliSettings settings, FormatParserCliState state, Channel<string> channel, CancellationToken cancellationToken)
+    {
+        await Task.Yield();
+        await fileDiscoverer.DiscoverFilesAsync(settings.Directory, channel);
+        state.FileDiscoveryFinished = true;
         await RunParsingProcessor(channel.Reader, state, cancellationToken);
     }
 
-    private Task RunParsingProcessor(ChannelReader<string> channelReader, ForamatParserCliState state, CancellationToken cancellationToken)
+    private async Task RunParsingProcessor(ChannelReader<string> channelReader, FormatParserCliState state, CancellationToken cancellationToken)
     {
         var processor = new ParsingProcessor(formatDecoder, channelReader, state, cancellationToken);
-        return processor.ProcessFiles();
+        await Task.Yield();
+        await processor.ProcessFiles();
     }
 }
