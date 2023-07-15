@@ -12,10 +12,9 @@ public class Windows1251Decoder_Tests
     [SetUp]
     public void SetUp()
     {
-        var codepointChecker = new CodepointChecker();
         var textParserSettings = TextParserSettings.Default;
         
-        decoder = new Windows1251Decoder(codepointChecker, textParserSettings);
+        decoder = new Windows1251Decoder(textParserSettings);
     }
     
     [Test]
@@ -26,10 +25,10 @@ public class Windows1251Decoder_Tests
         var deserializer = new InMemoryBinaryReader(content);
         var sb = new StringBuilder();
 
-        var isSuccessful = decoder.TryDecode(deserializer, sb, out var encoding, out var probability);
+        var isSuccessful = decoder.TryDecode(deserializer, sb, out var encoding);
 
         isSuccessful.Should().Be(true);
-        encoding.Should().BeEquivalentTo(Windows1251Decoder.Encoding);
+        encoding.Should().BeEquivalentTo(decoder.Encoding);
         sb.ToString().Should().Be(TextSamples.RussianLanguageSample);
     }
 }
