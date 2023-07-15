@@ -29,7 +29,7 @@ public abstract class Utf16Decoder : IUtfDecoder
     protected bool TryParseInternal(InMemoryBinaryReader binaryReader, StringBuilder stringBuilder, Endianness endianness, out bool foundBom)
     {
         foundBom = false;
-        if (settings.CrashIfUtf16InputIsNotEven && ((binaryReader.Length - binaryReader.Offset) / 2 == 1))
+        if (settings.CrashIfUtf16InputIsNotEven && ((binaryReader.Length - binaryReader.Offset) % 2 == 1))
             return false;
         
         binaryReader.SetEndianness(endianness);
