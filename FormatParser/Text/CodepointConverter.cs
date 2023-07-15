@@ -6,7 +6,7 @@ public class CodepointConverter
 {
     public void Convert(ulong codepoint, StringBuilder stringBuilder)
     {
-        if (codepoint < 0xD800 || (codepoint > 0xDFFF && codepoint < 0x10000))
+        if ((codepoint < 0xD800 || (codepoint > 0xDFFF) && codepoint < 0x10000))
         {
             stringBuilder.Append((char)(ushort)(codepoint));
             return;
