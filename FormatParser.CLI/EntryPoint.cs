@@ -7,21 +7,17 @@ public class EntryPoint
 {
     public static void Main(string[] args)
     {
-        var directory = args[0];
-
-        var codepointConverter = new CodepointConverter();
-        var textParserSettings = TextParserSettings.Default;
-        var formatParserSetting = new FormatParserCliSettings
-        {
-            Directory = directory
-        };
+        var formatParserSetting = ParseSettings(args);
 
         LoadPlugins();
         
         var binaryDecoders = GetAllInstancesOf<IBinaryFormatDecoder>().ToArray();
         
+        var codepointConverter = new CodepointConverter();
+        var textParserSettings = TextParserSettings.Default with {SampleSize = 16096};
+        
         var nonUnicodeDecoders = new ITextDecoder[] {new Windows1251Decoder(textParserSettings)};
-        var languageAnalyzers = new ILanguageAnalyzer[] {new RussianLanguageAnalyzer()};
+        var languageAnalyzers = new ITextAnalyzer[] {new RuDictionaryTextAnalyzer()};
         
         var utfDecoders = new IUtfDecoder[]
         {
@@ -50,8 +46,11 @@ public class EntryPoint
         );
 
         var cts = new CancellationTokenSource();
-        var state = new ForamatParserCliState();
+        var state = new FormatParserCliState();
         runner.Run(formatParserSetting, state, cts.Token).GetAwaiter().GetResult();
+
+        Console.WriteLine($"Run complete. Elapsed: {state.Stopwatch!.Elapsed.TotalMilliseconds}");
+        Console.WriteLine();
         
         foreach (var (formatInfo, occurence) in state.Occurence.OrderByDescending(x => x.Value.Read()))
         {
@@ -59,17 +58,26 @@ public class EntryPoint
         }
     }
 
+    private static FormatParserCliSettings ParseSettings(string[] args)
+    {
+        var argsParser = new ArgumentParser<FormatParserCliSettings>()
+            .WithPositionalArgument((settings, arg) => settings.Directory = arg)
+            .OnNamedParameter("parallel", ((settings, arg) => settings.DegreeOfParallelism = arg), false);
+
+        return argsParser.Parse(args);
+    }
+
     private static void LoadPlugins()
     {
         const string pluginDirectory = "./plugins/";
-        
-        if (Directory.Exists(pluginDirectory))
+
+        if (!Directory.Exists(pluginDirectory))
             return;
 
         var plugins = Directory
             .EnumerateFiles(pluginDirectory)
             .Where(x => x.EndsWith(".dll"));
-        
+
         foreach (var dll in plugins)
         {
             var a = Assembly.LoadFrom(dll);
