@@ -23,6 +23,7 @@ public class UTF16Heuristics : IDefaultTextAnalyzer
                 {
                     nonBmpChars++;
                     i++;
+                    continue;
                 }
 
                 if (CommonChars.Contains(c))
