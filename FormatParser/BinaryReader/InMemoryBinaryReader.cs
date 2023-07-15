@@ -1,3 +1,5 @@
+using System.Buffers.Binary;
+
 namespace FormatParser;
 
 public class InMemoryBinaryReader
@@ -15,6 +17,8 @@ public class InMemoryBinaryReader
         length = buffer.Length;
     }
     
+    public int Length => length;
+
     public InMemoryBinaryReader(ArraySegment<byte> arraySegment)
     {
         if (arraySegment.Offset == 0)
@@ -63,6 +67,23 @@ public class InMemoryBinaryReader
             result = *(ushort*) ptr;
         
         offset += sizeof (ushort);
+        
+        result = ReverseEndiannessIfNeeded(result);
+        return true;
+    }
+    
+    public unsafe bool TryReadUInt(out uint result)
+    {
+        result = 0;
+        if (!CanRead(sizeof(ushort)))
+            return false;
+        
+        fixed (void* ptr = &buffer[offset])
+            result = *(uint*) ptr;
+        
+        offset += sizeof(uint);
+        
+        result = ReverseEndiannessIfNeeded(result);
         return true;
     }
     
@@ -89,11 +110,24 @@ public class InMemoryBinaryReader
             result = *(ushort*) ptr;
         
         offset += sizeof (ushort);
-        
-        if (endianness == RunningCpuEndianness)
-            return result;
 
-        return ReverseEndianness(result);
+        result = ReverseEndiannessIfNeeded(result);
+        return result;
+    }
+    
+    public unsafe uint ReadUInt()
+    {
+        if (!CanRead(sizeof(uint)))
+            throw new BinaryReaderException("Does not have enough capacity to read.");
+
+        uint result;
+        fixed (void* ptr = &buffer[offset])
+            result = *(uint*) ptr;
+        
+        offset += sizeof (uint);
+
+        result = ReverseEndiannessIfNeeded(result);
+        return result;
     }
     
     public unsafe byte ReadByte()
@@ -109,13 +143,11 @@ public class InMemoryBinaryReader
         return result;
     }
 
-    private static ushort ReverseEndianness(ushort val)
-    {
-        ushort movedLeft = (ushort)(val << 8);
-        ushort movedRight = (ushort)(val >> 8);
-
-        return (ushort)(movedLeft | movedRight);
-    }
+    private ushort ReverseEndiannessIfNeeded(ushort val) => 
+        endianness == RunningCpuEndianness ? val : BinaryPrimitives.ReverseEndianness(val);
     
+    private uint ReverseEndiannessIfNeeded(uint val) => 
+        endianness == RunningCpuEndianness ? val : BinaryPrimitives.ReverseEndianness(val);
+
     public bool CanRead(int size) => offset + size <= length;
 }

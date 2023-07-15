@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using System.Text;
 
 namespace FormatParser;
@@ -41,6 +42,7 @@ public class StreamingBinaryReader
     {
         var array = new byte[count];
         var readBytes = await ReadInternalAsync(count, array, false);
+        
         return new ArraySegment<byte>(array, 0, readBytes);
     }
 
@@ -63,7 +65,7 @@ public class StreamingBinaryReader
         await ReadInternalAsync(size, array, true);
 
         if (array[^1] != 0)
-            throw new Exception();
+            throw new BinaryReaderException("Expected to read null terminating string, but string does not terminates with \\0 at expected length.");
 
         return Encoding.ASCII.GetString(new ArraySegment<byte>(array, 0, array.Length - 1));
     }
@@ -104,85 +106,15 @@ public class StreamingBinaryReader
         return ConvertULong();
     }
     
-    private unsafe short ConvertShort()
-    {
-        if (endianness != RunningCpuEndianness)
-            InvertByteForShort();
-        
-        fixed (byte* ptr = defaultBuffer)
-            return *(short*)ptr;
-    }
-    
-    private unsafe ushort ConvertUShort()
-    {
-        if (endianness != RunningCpuEndianness)
-            InvertByteForShort();
-        
-        fixed (byte* ptr = defaultBuffer)
-            return *(ushort*)ptr;
-    }
-    
-    private unsafe int ConvertInt()
-    {
-        if (endianness != RunningCpuEndianness)
-            InvertByteForInt();
-        
-        fixed (byte* ptr = defaultBuffer)
-            return *(int*)ptr;
-    }
-    
-    private unsafe uint ConvertUInt()
-    {
-        if (endianness != RunningCpuEndianness)
-            InvertByteForInt();
-        
-        fixed (byte* ptr = defaultBuffer)
-            return *(uint*)ptr;
-    }
-    
-    private unsafe ulong ConvertULong()
-    {
-        if (endianness != RunningCpuEndianness)
-            InvertBytesForLong();
-        
-        fixed (byte* ptr = defaultBuffer)
-            return *(ulong*)ptr;
-    }
-    
-    private unsafe long ConvertLong()
-    {
-        if (endianness != RunningCpuEndianness)
-            InvertBytesForLong();
-        
-        fixed (byte* ptr = defaultBuffer)
-            return *(long*)ptr;
-    }
-    
-    private void InvertByteForShort()
-    {
-        (defaultBuffer[0], defaultBuffer[1]) = (defaultBuffer[1], defaultBuffer[0]);
-    }
-    
-    private void InvertByteForInt()
-    {
-        (defaultBuffer[0], defaultBuffer[3]) = (defaultBuffer[3], defaultBuffer[0]);
-        (defaultBuffer[1], defaultBuffer[2]) = (defaultBuffer[2], defaultBuffer[1]);
-    }
-
-    private void InvertBytesForLong()
-    {
-        (defaultBuffer[0], defaultBuffer[7]) = (defaultBuffer[7], defaultBuffer[0]);
-        (defaultBuffer[1], defaultBuffer[6]) = (defaultBuffer[6], defaultBuffer[1]);
-        (defaultBuffer[2], defaultBuffer[5]) = (defaultBuffer[5], defaultBuffer[2]);
-        (defaultBuffer[3], defaultBuffer[4]) = (defaultBuffer[4], defaultBuffer[3]);
-    }
-    
     public async Task<ulong> ReadPointer(Bitness bitness)
     {
-        if (bitness == Bitness.Bitness32)
-            return await ReadUInt();
-
-        return await ReadULong();
+        return bitness switch
+        {
+            Bitness.Bitness16 => await ReadUShort(),
+            Bitness.Bitness32 => await ReadUInt(),
+            Bitness.Bitness64 => await ReadULong(),
+            _ => throw new ArgumentOutOfRangeException(nameof(bitness))
+        };
     }
     
     public void SkipPointer(Bitness bitness)
@@ -202,6 +134,60 @@ public class StreamingBinaryReader
                 throw new ArgumentOutOfRangeException(nameof(bitness));
         }
     }
+    
+    private unsafe short ConvertShort()
+    {
+        fixed (void* ptr = defaultBuffer)
+            return ReverseEndiannessIfNeeded(*(short*)ptr);
+    }
+    
+    private unsafe ushort ConvertUShort()
+    {
+        fixed (void* ptr = defaultBuffer)
+            return ReverseEndiannessIfNeeded(*(ushort*)ptr);
+    }
+    
+    private unsafe int ConvertInt()
+    {
+        fixed (void* ptr = defaultBuffer)
+            return ReverseEndiannessIfNeeded(*(int*)ptr);
+    }
+    
+    private unsafe uint ConvertUInt()
+    {
+        fixed (void* ptr = defaultBuffer)
+            return ReverseEndiannessIfNeeded(*(uint*)ptr);
+    }
+    
+    private unsafe ulong ConvertULong()
+    {
+        fixed (void* ptr = defaultBuffer)
+            return ReverseEndiannessIfNeeded(*(ulong*)ptr);
+    }
+    
+    private unsafe long ConvertLong()
+    {
+        fixed (void* ptr = defaultBuffer)
+            return ReverseEndiannessIfNeeded(*(long*)ptr);
+    }
+
+    private ushort ReverseEndiannessIfNeeded(ushort val) => 
+        endianness == RunningCpuEndianness ? val : BinaryPrimitives.ReverseEndianness(val);
+    
+    private uint ReverseEndiannessIfNeeded(uint val) => 
+        endianness == RunningCpuEndianness ? val : BinaryPrimitives.ReverseEndianness(val);
+    
+    private ulong ReverseEndiannessIfNeeded(ulong val) => 
+        endianness == RunningCpuEndianness ? val : BinaryPrimitives.ReverseEndianness(val);
+    
+    private short ReverseEndiannessIfNeeded(short val) => 
+        endianness == RunningCpuEndianness ? val : BinaryPrimitives.ReverseEndianness(val);
+    
+    private int ReverseEndiannessIfNeeded(int val) => 
+        endianness == RunningCpuEndianness ? val : BinaryPrimitives.ReverseEndianness(val);
+    
+    private long ReverseEndiannessIfNeeded(long val) => 
+        endianness == RunningCpuEndianness ? val : BinaryPrimitives.ReverseEndianness(val);
 
     private Task ReadInternalAsync(int count) => ReadInternalAsync(count, defaultBuffer, true);
 
@@ -214,7 +200,7 @@ public class StreamingBinaryReader
             var bytesRead = await ReadInternalAsync(buffer, totalBytesRead, count - totalBytesRead);
 
             if (bytesRead == 0)
-                return ensureAllBytesRead ? throw new BinaryReaderException("Not enough data in stream.") : bytesRead;
+                return ensureAllBytesRead ? throw new BinaryReaderException("Not enough data in stream.") : totalBytesRead;
 
             totalBytesRead += bytesRead;
         }
