@@ -1,4 +1,6 @@
+using System.Text;
 using System.Threading.Channels;
+using FormatParser.Text;
 
 namespace FormatParser.CLI;
 
@@ -7,9 +9,9 @@ public class ParsingProcessor
     public CancellationToken CancellationToken { get; }
     private readonly FormatDecoder formatDecoder;
     private readonly ChannelReader<string> channel;
-    private readonly ForamatParserCliState state;
+    private readonly FormatParserCliState state;
 
-    public ParsingProcessor(FormatDecoder formatDecoder, ChannelReader<string> channel, ForamatParserCliState state, CancellationToken cancellationToken)
+    public ParsingProcessor(FormatDecoder formatDecoder, ChannelReader<string> channel, FormatParserCliState state, CancellationToken cancellationToken)
     {
         CancellationToken = cancellationToken;
         this.formatDecoder = formatDecoder;
