@@ -115,9 +115,10 @@ public class Utf8Decoder : IUtfDecoder
                     throw new Exception();
                 else
                     return false;
-                        
+
             result <<= 6;
-            result |= (uint)b & 0x6F;
+
+            result |= (uint)b & 0b111111;
         }
 
         return true;
