@@ -2,13 +2,7 @@ namespace FormatParser;
 
 public record UnknownFileFormatInfo : IFileFormatInfo
 {
-    public bool Equals(IFileFormatInfo? other)
-    {
-        return other is UnknownFileFormatInfo;
-    }
+    public bool Equals(IFileFormatInfo? other) => other is UnknownFileFormatInfo;
 
-    public string ToPrettyString()
-    {
-        return "unknown";
-    }
+    public string ToPrettyString() => "Unknown";
 }
