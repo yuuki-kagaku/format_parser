@@ -1,7 +1,22 @@
 <Project TreatAsLocalProperty="Target">
-<Target Name="CustomAfterBuild" AfterTargets="PostBuildEvent">
-            <Copy SourceFiles="$(SolutionDir)\FormatParser.ELF\bin\$(Configuration)\$(TargetFramework)\FormatParser.ELF.dll" DestinationFiles="$(OutputPath)\plugins\FormatParser.ELF.dll" ContinueOnError="false" OverwriteReadOnlyFiles="true"/>
-            <Copy SourceFiles="$(SolutionDir)\FormatParser.MachO\bin\$(Configuration)\$(TargetFramework)\FormatParser.MachO.dll" DestinationFiles="$(OutputPath)\plugins\FormatParser.MachO.dll" ContinueOnError="false" OverwriteReadOnlyFiles="true"/>
-            <Copy SourceFiles="$(SolutionDir)\FormatParser.PE\bin\$(Configuration)\$(TargetFramework)\FormatParser.PE.dll" DestinationFiles="$(OutputPath)\plugins\FormatParser.PE.dll" ContinueOnError="false" OverwriteReadOnlyFiles="true"/>
-</Target>
+    <Target Name="CustomAfterBuild" AfterTargets="PostBuildEvent">
+        <ItemGroup>
+            <PluginElf Include="$(SolutionDir)\FormatParser.ELF\bin\$(Configuration)\$(TargetFramework)\*" />
+        </ItemGroup>
+        <ItemGroup>
+            <PluginMacho Include="$(SolutionDir)\FormatParser.MachO\bin\$(Configuration)\$(TargetFramework)\*" />
+        </ItemGroup>
+        <ItemGroup>
+            <PluginPE Include="$(SolutionDir)\FormatParser.PE\bin\$(Configuration)\$(TargetFramework)\*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(PluginElf)" DestinationFiles="@(PluginElf->'$(OutputPath)\plugins\ELF\%(RecursiveDir)%(Filename)%(Extension)')"
+              ContinueOnError="false"
+              OverwriteReadOnlyFiles="true"/>
+        <Copy SourceFiles="@(PluginMacho)" DestinationFiles="@(PluginMacho->'$(OutputPath)\plugins\MachO\%(RecursiveDir)%(Filename)%(Extension)')"
+              ContinueOnError="false"
+              OverwriteReadOnlyFiles="true"/>
+        <Copy SourceFiles="@(PluginPE)" DestinationFiles="@(PluginPE->'$(OutputPath)\plugins\PE\%(RecursiveDir)%(Filename)%(Extension)')"
+              ContinueOnError="false"
+              OverwriteReadOnlyFiles="true"/>
+    </Target>
 </Project>

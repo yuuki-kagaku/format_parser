@@ -74,14 +74,17 @@ public class EntryPoint
         if (!Directory.Exists(pluginDirectory))
             return;
 
-        var plugins = Directory
-            .EnumerateFiles(pluginDirectory)
-            .Where(x => x.EndsWith(".dll"));
-
-        foreach (var dll in plugins)
+        foreach (var directory in Directory.GetDirectories(pluginDirectory))
         {
-            var a = Assembly.LoadFrom(dll);
-            AppDomain.CurrentDomain.Load(a.GetName());
+            var plugins = Directory
+                .EnumerateFiles(directory)
+                .Where(x => x.EndsWith(".dll"));
+
+            foreach (var dll in plugins)
+            {
+                var a = Assembly.LoadFrom(dll);
+                AppDomain.CurrentDomain.Load(a.GetName());
+            }
         }
     }
 
