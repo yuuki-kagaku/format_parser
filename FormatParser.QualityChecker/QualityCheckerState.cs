@@ -6,5 +6,6 @@ public class QualityCheckerState
     public int TextFilesAccordingToFormatParser { get; set; } = 0;
 
     public int FalseNegativesOfFileCommand { get; set; } = 0;
+    public int FalsePositivesOfFileCommand { get; set; } = 0;
     public int MatchMismatches { get; set; } = 0;
 }

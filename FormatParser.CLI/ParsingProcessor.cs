@@ -6,17 +6,19 @@ namespace FormatParser.CLI;
 
 public class ParsingProcessor
 {
-    public CancellationToken CancellationToken { get; }
     private readonly FormatDecoder formatDecoder;
     private readonly ChannelReader<string> channel;
     private readonly FormatParserCliState state;
+    private readonly FormatParserCliSettings settings;
+    private readonly CancellationToken cancellationToken;
 
-    public ParsingProcessor(FormatDecoder formatDecoder, ChannelReader<string> channel, FormatParserCliState state, CancellationToken cancellationToken)
+    public ParsingProcessor(FormatDecoder formatDecoder, ChannelReader<string> channel, FormatParserCliState state, FormatParserCliSettings settings, CancellationToken cancellationToken)
     {
-        CancellationToken = cancellationToken;
         this.formatDecoder = formatDecoder;
         this.channel = channel;
         this.state = state;
+        this.settings = settings;
+        this.cancellationToken = cancellationToken;
     }
 
     public async Task ProcessFiles()
@@ -25,11 +27,17 @@ public class ParsingProcessor
         {
             while (channel.TryRead(out var file))
             {
-                var fileInfo = await formatDecoder.DecodeFile(file);
-                AddInfoToState(fileInfo);
+                try
+                {
+                    var fileInfo = await formatDecoder.DecodeFile(file);
+                    AddInfoToState(fileInfo);
+                }
+                catch (UnauthorizedAccessException)
+                {
+                }
             }
             
-            var hasMoreDate = await channel.WaitToReadAsync(CancellationToken);
+            var hasMoreDate = await channel.WaitToReadAsync(cancellationToken);
             
             if (!hasMoreDate)
                 return;

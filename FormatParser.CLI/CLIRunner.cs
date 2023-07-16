@@ -30,7 +30,7 @@ public class CLIRunner
         var list = new List<Task>();
         
         for (var i = 0; i < settings.DegreeOfParallelism - 1; i++)
-            list.Add(RunParsingProcessor(channel.Reader, state, cancellationToken));
+            list.Add(RunParsingProcessor(channel.Reader, state, settings, cancellationToken));
         
         return list;
     }
@@ -40,12 +40,12 @@ public class CLIRunner
         await Task.Yield();
         await fileDiscoverer.DiscoverFilesAsync(settings.Directory, channel);
         state.FileDiscoveryFinished = true;
-        await RunParsingProcessor(channel.Reader, state, cancellationToken);
+        await RunParsingProcessor(channel.Reader, state, settings, cancellationToken);
     }
 
-    private async Task RunParsingProcessor(ChannelReader<string> channelReader, FormatParserCliState state, CancellationToken cancellationToken)
+    private async Task RunParsingProcessor(ChannelReader<string> channelReader, FormatParserCliState state, FormatParserCliSettings settings, CancellationToken cancellationToken)
     {
-        var processor = new ParsingProcessor(formatDecoder, channelReader, state, cancellationToken);
+        var processor = new ParsingProcessor(formatDecoder, channelReader, state, settings, cancellationToken);
         await Task.Yield();
         await processor.ProcessFiles();
     }
