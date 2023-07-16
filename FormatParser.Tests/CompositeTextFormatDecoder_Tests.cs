@@ -48,6 +48,19 @@ public class CompositeTextFormatDecoder_Tests
     }
     
     [Test]
+    public async Task Should_read_utf8_without_bom_with_japanese_characters_inside_bmp()
+    {
+        var file = @"./TestData/text/utf8_bmp";
+        var binaryReader = await CreateBinaryReaderAsync(file);
+
+        var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
+
+        isSuccessful.Should().BeTrue();
+        text.Should().Be(ReadFileAsUtf8(file));
+        encoding.Should().BeEquivalentTo(WellKnownEncodings.Utf8NoBOM);
+    }
+        
+    [Test]
     public async Task Should_read_utf16_be_no_bom()
     {
         var binaryReader = await CreateBinaryReaderAsync(@"./TestData/text/loren_utf16_be_nobom");
@@ -211,6 +224,11 @@ public class CompositeTextFormatDecoder_Tests
         text.Should().Be(ReadFileAsUtf16Be(filename));
     }
 
+    private static string ReadFileAsUtf8(string file)
+    {
+        return Encoding.UTF8.GetString(File.ReadAllBytes(file));
+    }
+    
     private static string ReadFileAsUtf16Le(string file)
     {
         return Encoding.Unicode.GetString(File.ReadAllBytes(file));
