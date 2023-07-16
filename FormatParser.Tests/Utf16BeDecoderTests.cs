@@ -1,13 +1,14 @@
 using System.Text;
 using FluentAssertions;
+using FormatParser.Tests.TestData;
 using FormatParser.Text;
 using NUnit.Framework;
 
 namespace FormatParser.Tests;
 
-public class Utf16BeDecoder_Tests
+public class Utf16BeDecoder_Tests : TestBase
 {
-    private Utf16BeDecoder decoder;
+    private Utf16BeDecoder decoder = null!;
 
     [SetUp]
     public void SetUp()
@@ -19,9 +20,9 @@ public class Utf16BeDecoder_Tests
     }
     
     [Test]
-    public async Task Should_read_utf16_be_no_bom()
+    public void Should_read_utf16_be_no_bom()
     {
-        var content = File.ReadAllBytes(@"./TestData/text/loren_utf16_be_nobom");
+        var content = File.ReadAllBytes(GetFile(TestFileCategory.Text, "loren_utf16_be_nobom"));
     
         var deserializer = new InMemoryBinaryReader(content);
         var sb = new StringBuilder();

@@ -1,10 +1,11 @@
 using FluentAssertions;
 using FormatParser.PE;
+using FormatParser.Tests.TestData;
 using NUnit.Framework;
 
 namespace FormatParser.Tests;
 
-public class PEDecoder_Tests
+public class PEDecoder_Tests : TestBase
 {
     private PEDecoder peDecoder = null!;
 
@@ -17,7 +18,7 @@ public class PEDecoder_Tests
     [Test]
     public async Task PEParser_ShouldParse_Amd64Exe()
     {
-        var fileInfo = await DecodeAsync(@"./TestData/pe/windows/procdump64.exe");
+        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.PeWindows, "procdump64.exe"));
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
@@ -28,7 +29,7 @@ public class PEDecoder_Tests
     [Test]
     public async Task PEParser_ShouldParse_i386Exe()
     {
-        var fileInfo = await DecodeAsync(@"./TestData/pe/windows/procdump.exe");
+        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.PeWindows, "procdump.exe"));
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
@@ -39,7 +40,7 @@ public class PEDecoder_Tests
     [Test]
     public async Task PEParser_ShouldParse_ArmExe()
     {
-        var fileInfo = await DecodeAsync(@"./TestData/pe/windows/procexp64a.exe");
+        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.PeWindows, "procexp64a.exe"));
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
@@ -50,7 +51,7 @@ public class PEDecoder_Tests
     [Test]
     public async Task PEParser_ShouldParse_Managed_AnyCPUDll()
     {
-        var fileInfo = await DecodeAsync(@"./TestData/pe/managed/HelloWorld.Core.AnyCpu.dll");
+        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.PeManaged, "HelloWorld.Core.AnyCpu.dll"));
         
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
@@ -61,7 +62,7 @@ public class PEDecoder_Tests
     [Test]
     public async Task PEParser_ShouldParse_Managed_amd64_Dll()
     {
-        var fileInfo = await DecodeAsync(@"./TestData/pe/managed/HelloWorld.Core.amd64.dll");
+        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.PeManaged, "HelloWorld.Core.amd64.dll"));
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
@@ -72,7 +73,7 @@ public class PEDecoder_Tests
     [Test]
     public async Task PEParser_ShouldParse_Managed_arm64_Dll()
     {
-        var fileInfo = await DecodeAsync(@"./TestData/pe/managed/HelloWorldCore.arm64.dll");
+        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.PeManaged, "HelloWorldCore.arm64.dll"));
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
@@ -83,7 +84,7 @@ public class PEDecoder_Tests
     [Test]
     public async Task PEParser_ShouldParse_Managed_x86_Dll()
     {
-        var fileInfo = await DecodeAsync(@"./TestData/pe/managed/HelloWorld.Core.86.dll");
+        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.PeManaged, "HelloWorld.Core.86.dll"));
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);

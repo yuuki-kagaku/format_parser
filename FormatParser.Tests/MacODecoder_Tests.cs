@@ -1,10 +1,11 @@
 ﻿using FluentAssertions;
 using FormatParser.MachO;
+using FormatParser.Tests.TestData;
 using NUnit.Framework;
 
 namespace FormatParser.Tests;
 
-public class MacODecoder_Tests
+public class MacODecoder_Tests : TestBase
 {
     private MachODecoder machODecoder = null!;
 
@@ -17,7 +18,7 @@ public class MacODecoder_Tests
     [Test]
     public async Task MachDecoder_ShouldParseMacExecutable()
     {
-        var fileInfo = await DecodeAsync(@"./TestData/mac/VLC") as MachOFileFormatInfo;
+        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.Mac, "VLC")) as MachOFileFormatInfo;
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
@@ -29,7 +30,7 @@ public class MacODecoder_Tests
     [Test]
     public async Task MachDecoder_ShouldParse_fat_file()
     {
-        var fileInfo = await DecodeAsync(@"./TestData/mac_fat/DOSBox") as FatMachOFileFormatInfo;;
+        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.MacFat, "DOSBox")) as FatMachOFileFormatInfo;;
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
@@ -55,7 +56,7 @@ public class MacODecoder_Tests
     [Test]
     public async Task MachDecoder_ShouldParse_signed_amd64_file()
     {
-        var fileInfo = await DecodeAsync(@"./TestData/mac/Read_Before_You_Install_iTunes") as MachOFileFormatInfo;
+        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.Mac, "Read_Before_You_Install_iTunes")) as MachOFileFormatInfo;
     
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
@@ -67,7 +68,7 @@ public class MacODecoder_Tests
     [Test]
     public async Task MachDecoder_ShouldParse_signed_arm_file()
     {
-        var fileInfo = await DecodeAsync(@"./TestData/mac/MachO-iOS-armv7s-Helloworld") as MachOFileFormatInfo;
+        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.Mac, "MachO-iOS-armv7s-Helloworld")) as MachOFileFormatInfo;
     
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
@@ -79,7 +80,7 @@ public class MacODecoder_Tests
     [Test]
     public async Task MachDecoder_ShouldParse_unsigned_file()
     {
-        var fileInfo = await DecodeAsync(@"./TestData/mac//hello_world") as MachOFileFormatInfo;
+        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.Mac, "hello_world")) as MachOFileFormatInfo;
     
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);

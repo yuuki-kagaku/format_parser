@@ -1,11 +1,12 @@
 using System.Text;
 using FluentAssertions;
+using FormatParser.Tests.TestData;
 using FormatParser.Text;
 using NUnit.Framework;
 
 namespace FormatParser.Tests;
 
-public class CompositeTextFormatDecoder_Tests
+public class CompositeTextFormatDecoder_Tests : TestBase
 {
     private CompositeTextFormatDecoder decoder = null!;
 
@@ -38,7 +39,7 @@ public class CompositeTextFormatDecoder_Tests
     [Test]
     public async Task Should_read_ascii()
     {
-        var binaryReader = await CreateBinaryReaderAsync(@"./TestData/text/loren_utf8_no_bom");
+        var binaryReader = await CreateBinaryReaderAsync(GetFile(TestFileCategory.Text, "loren_utf8_no_bom"));
 
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
 
@@ -50,7 +51,7 @@ public class CompositeTextFormatDecoder_Tests
     [Test]
     public async Task Should_read_utf8_without_bom_with_japanese_characters_inside_bmp()
     {
-        var file = @"./TestData/text/utf8_bmp";
+        var file = GetFile(TestFileCategory.Text, "utf8_bmp");
         var binaryReader = await CreateBinaryReaderAsync(file);
 
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
@@ -63,7 +64,7 @@ public class CompositeTextFormatDecoder_Tests
     [Test]
     public async Task Should_read_utf16_be_no_bom()
     {
-        var binaryReader = await CreateBinaryReaderAsync(@"./TestData/text/loren_utf16_be_nobom");
+        var binaryReader = await CreateBinaryReaderAsync(GetFile(TestFileCategory.Text, "loren_utf16_be_nobom"));
 
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
 
@@ -75,7 +76,7 @@ public class CompositeTextFormatDecoder_Tests
     [Test]
     public async Task Should_read_utf16_le_no_bom()
     {
-        var binaryReader = await CreateBinaryReaderAsync(@"./TestData/text/loren_utf16_le_nobom");
+        var binaryReader = await CreateBinaryReaderAsync(GetFile(TestFileCategory.Text, "loren_utf16_le_nobom"));
 
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
 
@@ -87,7 +88,7 @@ public class CompositeTextFormatDecoder_Tests
     [Test]
     public async Task Should_read_windows1251()
     {
-        var binaryReader = await CreateBinaryReaderAsync(@"./TestData/text/bsd_windows1251");
+        var binaryReader = await CreateBinaryReaderAsync(GetFile(TestFileCategory.Text, "bsd_windows1251"));
     
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
 
@@ -99,7 +100,7 @@ public class CompositeTextFormatDecoder_Tests
     [Test]
     public async Task Should_not_read_pseudo_utf16be_file_when_there_is_a_lot_of_uncommon_cjk_chars_and_no_chars_outside_bmp()
     {
-        var binaryReader = await CreateBinaryReaderAsync(@"./TestData/text_pseudo_utf16/be_tasks.svgz");
+        var binaryReader = await CreateBinaryReaderAsync(GetFile(TestFileCategory.PseudoText, "be_tasks.svgz"));
     
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
 
@@ -111,7 +112,7 @@ public class CompositeTextFormatDecoder_Tests
     [Test]
     public async Task Should_not_read_pseudo_utf16le_file_when_there_is_a_lot_of_uncommon_cjk_chars_and_no_chars_outside_bmp()
     {
-        var binaryReader = await CreateBinaryReaderAsync(@"./TestData/text_pseudo_utf16/le_apport.svgz");
+        var binaryReader = await CreateBinaryReaderAsync(GetFile(TestFileCategory.PseudoText, "le_apport.svgz"));
     
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
 
@@ -123,7 +124,7 @@ public class CompositeTextFormatDecoder_Tests
     [Test]
     public async Task Should_read_utf16le_with_regular_japanese_text()
     {
-        var filename = @"./TestData/text_utf16/Japanese_language_sample_le";
+        var filename = GetFile(TestFileCategory.TextUtf16, "Japanese_language_sample_le");
         var binaryReader = await CreateBinaryReaderAsync(filename);
 
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
@@ -136,7 +137,7 @@ public class CompositeTextFormatDecoder_Tests
     [Test]
     public async Task Should_read_utf16be_with_regular_japanese_text()
     {
-        var filename = @"./TestData/text_utf16/Japanese_language_sample_be";
+        var filename = GetFile(TestFileCategory.TextUtf16, "Japanese_language_sample_be");
         var binaryReader = await CreateBinaryReaderAsync(filename);
 
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
@@ -147,9 +148,9 @@ public class CompositeTextFormatDecoder_Tests
     }
 
     [Test]
-    public async Task Should_read_utf16be_with_classical_chinise_text()
+    public async Task Should_read_utf16be_with_classical_chinese_text()
     {
-        var filename = @"./TestData/text_utf16/literary_chinese_utf16be";
+        var filename = GetFile(TestFileCategory.TextUtf16, "literary_chinese_utf16be");
         var binaryReader = await CreateBinaryReaderAsync(filename);
 
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
@@ -160,9 +161,9 @@ public class CompositeTextFormatDecoder_Tests
     }
     
     [Test]
-    public async Task Should_read_utf16le_with_classical_chinise_text()
+    public async Task Should_read_utf16le_with_classical_chinese_text()
     {
-        var filename = @"./TestData/text_utf16/literary_chinese_utf16le";
+        var filename = GetFile(TestFileCategory.TextUtf16, "literary_chinese_utf16le");
         var binaryReader = await CreateBinaryReaderAsync(filename);
 
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
@@ -175,7 +176,7 @@ public class CompositeTextFormatDecoder_Tests
     [Test]
     public async Task Should_read_utf16le_with_cuneiform_text_with_characters_outside_bmp()
     {
-        var filename = @"./TestData/text_utf16/cuneiform_le";
+        var filename = GetFile(TestFileCategory.TextUtf16, "cuneiform_le");
         var binaryReader = await CreateBinaryReaderAsync(filename);
 
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
@@ -188,7 +189,7 @@ public class CompositeTextFormatDecoder_Tests
     [Test]
     public async Task Should_read_utf16be_with_cuneiform_text_with_characters_outside_bmp()
     {
-        var filename = @"./TestData/text_utf16/cuneiform_be";
+        var filename = GetFile(TestFileCategory.TextUtf16, "cuneiform_be");
         var binaryReader = await CreateBinaryReaderAsync(filename);
 
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
@@ -201,7 +202,7 @@ public class CompositeTextFormatDecoder_Tests
     [Test]
     public async Task Should_read_utf16le_with_mixed_thai_and_chinese_characters()
     {
-        var filename = @"./TestData/text_utf16/thai_mixed_with_chinese_le";
+        var filename = GetFile(TestFileCategory.TextUtf16, "thai_mixed_with_chinese_le");
         var binaryReader = await CreateBinaryReaderAsync(filename);
 
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
@@ -214,7 +215,7 @@ public class CompositeTextFormatDecoder_Tests
     [Test]
     public async Task Should_read_utf16be_with_mixed_thai_and_chinese_characters()
     {
-        var filename = @"./TestData/text_utf16/thai_mixed_with_chinese_be";
+        var filename = GetFile(TestFileCategory.TextUtf16, "thai_mixed_with_chinese_be");
         var binaryReader = await CreateBinaryReaderAsync(filename);
 
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
