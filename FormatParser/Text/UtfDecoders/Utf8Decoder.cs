@@ -1,10 +1,18 @@
+using System.Text;
 using FormatParser.Text.Encoding;
 
-namespace FormatParser.Text;
+namespace FormatParser.Text.UtfDecoders;
 
 public class Utf8Decoder : DecoderBase, IUtfDecoder
 {
-    protected override System.Text.Decoder GetDecoder(int inputSize)
+    private readonly CodepointValidatorSettings settings;
+
+    public Utf8Decoder(TextFileParsingSettings settings)
+    {
+        this.settings = new CodepointValidatorSettings(settings.AllowEscapeChar, settings.AllowFormFeed, settings.AllowC1ControlsForUtf, false);
+    }
+
+    protected override Decoder GetDecoder(int inputSize)
     {
         var encoding = (System.Text.Encoding) System.Text.Encoding.UTF8.Clone();
         var decoder = encoding.GetDecoder();
@@ -12,8 +20,8 @@ public class Utf8Decoder : DecoderBase, IUtfDecoder
         return encoding.GetDecoder();
     }
 
-    public override HashSet<uint> GetInvalidCharacters { get; } = CodepointChecker
-        .IllegalC0Controls(CodepointCheckerSettings.Default)
+    public override HashSet<char> GetInvalidCharacters => CodepointValidator
+        .GetForbiddenChars(settings)
         .ToHashSet();
 
     public override int MinimalSizeOfInput { get; } = 0;

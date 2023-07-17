@@ -3,6 +3,7 @@ using FormatParser;
 using FormatParser.Helpers;
 using FormatParser.Text;
 using FormatParser.Text.Encoding;
+using FormatParser.Text.UtfDecoders;
 using FormatParser.Windows1251;
 
 public class EntryPoint
@@ -15,14 +16,16 @@ public class EntryPoint
 
         var nonUnicodeDecoders = new ITextDecoder[] {new Windows1251Decoder(settings.TextFileParsingSettings)};
         var languageAnalyzers = new ITextAnalyzer[] {new RuDictionaryTextAnalyzer()};
+
+        var textFileParsingSettings = new TextFileParsingSettings();
         
         var utfDecoders = new IUtfDecoder[]
         {
-            new Utf8Decoder(),
-            new Utf16LeDecoder(),
-            new Utf16BeDecoder(),
-            new Utf32LeDecoder(),
-            new Utf32BeDecoder(),
+            new Utf8Decoder(textFileParsingSettings),
+            new Utf16LeDecoder(textFileParsingSettings),
+            new Utf16BeDecoder(textFileParsingSettings),
+            new Utf32LeDecoder(textFileParsingSettings),
+            new Utf32BeDecoder(textFileParsingSettings),
         };
         
         var compositeTextFormatDecoder = new CompositeTextFormatDecoder(

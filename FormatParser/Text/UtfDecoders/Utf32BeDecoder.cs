@@ -5,6 +5,13 @@ namespace FormatParser.Text;
 
 public class Utf32BeDecoder : DecoderBase, IUtfDecoder
 {
+    private readonly CodepointValidatorSettings settings;
+
+    public Utf32BeDecoder(TextFileParsingSettings settings)
+    {
+        this.settings = new CodepointValidatorSettings(settings.AllowEscapeChar, settings.AllowFormFeed, settings.AllowC1ControlsForUtf, false);
+    }
+    
     protected override System.Text.Decoder GetDecoder(int inputSize)
     {
         var encoding = (System.Text.Encoding) new UTF32Encoding(true, true, true).Clone();
@@ -13,8 +20,8 @@ public class Utf32BeDecoder : DecoderBase, IUtfDecoder
         return encoding.GetDecoder();
     }
 
-    public override HashSet<uint> GetInvalidCharacters { get; } = CodepointChecker
-        .IllegalC0Controls(CodepointCheckerSettings.Default)
+    public override HashSet<char> GetInvalidCharacters => CodepointValidator
+        .GetForbiddenChars(settings)
         .ToHashSet();
     
     public override int MinimalSizeOfInput { get; } = 8;

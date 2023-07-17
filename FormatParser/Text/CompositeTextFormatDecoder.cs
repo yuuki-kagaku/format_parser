@@ -8,7 +8,7 @@ public class CompositeTextFormatDecoder
     private readonly TextFileParsingSettings settings;
     private readonly Encoding.ITextDecoder[] decoders;
     private readonly Dictionary<Encoding.ITextDecoder, IEnumerable<ITextAnalyzer>> encodingAnalyzersDictionary;
-    private readonly Dictionary<Encoding.ITextDecoder, CodepointChecker> invalidCharactersCheckers;
+    private readonly Dictionary<Encoding.ITextDecoder, CodepointValidator> invalidCharactersCheckers;
 
     public CompositeTextFormatDecoder(
         IUtfDecoder[] utfDecoders,
@@ -23,7 +23,7 @@ public class CompositeTextFormatDecoder
             .ToDictionary(x => x.Language, x => x.Analyzer);
 
         encodingAnalyzersDictionary = decoders.ToDictionary(x => x, x => GetEncodingAnalyzers(x, encodingAnalyzersByLanguage));
-        invalidCharactersCheckers = decoders.ToDictionary(x => x, x => new CodepointChecker(x.GetInvalidCharacters));
+        invalidCharactersCheckers = decoders.ToDictionary(x => x, x => new CodepointValidator(x.GetInvalidCharacters));
         this.settings = settings;
     }
 

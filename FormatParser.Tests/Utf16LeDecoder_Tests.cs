@@ -3,6 +3,7 @@ using FluentAssertions;
 using FormatParser.Helpers;
 using FormatParser.Tests.TestData;
 using FormatParser.Text;
+using FormatParser.Text.UtfDecoders;
 using NUnit.Framework;
 
 namespace FormatParser.Tests;
@@ -16,7 +17,7 @@ public class Utf16LeDecoder_Tests : TestBase
     {
         var textParserSettings = new TextFileParsingSettings();
         
-        decoder = new Utf16LeDecoder();
+        decoder = new Utf16LeDecoder(textParserSettings);
     }
     
     [Test]

@@ -7,5 +7,5 @@ public interface ITextDecoder
     string? RequiredEncodingAnalyzer { get; }
     DetectionProbability DefaultDetectionProbability { get; }
 
-    HashSet<uint> GetInvalidCharacters { get; }
+    HashSet<char>  GetInvalidCharacters { get; }
 }

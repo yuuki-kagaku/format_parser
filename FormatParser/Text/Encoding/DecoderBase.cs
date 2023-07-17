@@ -25,7 +25,7 @@ public abstract class DecoderBase : ITextDecoder
         }
     }
 
-    protected abstract System.Text.Decoder GetDecoder(int inputSize);
+    protected abstract Decoder GetDecoder(int inputSize);
     
     public abstract int MinimalSizeOfInput { get; }
 
@@ -35,7 +35,7 @@ public abstract class DecoderBase : ITextDecoder
     
     public abstract string EncodingWithoutBom { get; }
 
-    public abstract HashSet<uint> GetInvalidCharacters { get; }
+    public abstract HashSet<char> GetInvalidCharacters { get; }
 
     public abstract string? RequiredEncodingAnalyzer { get; }
     

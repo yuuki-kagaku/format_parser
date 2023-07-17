@@ -1,12 +1,18 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using FormatParser.Text.Encoding;
 
-namespace FormatParser.Text;
+namespace FormatParser.Text.UtfDecoders;
 
 public class Utf32LeDecoder : DecoderBase, IUtfDecoder
 {
-    protected override System.Text.Decoder GetDecoder(int inputSize)
+    private readonly CodepointValidatorSettings settings;
+
+    public Utf32LeDecoder(TextFileParsingSettings settings)
+    {
+        this.settings = new CodepointValidatorSettings(settings.AllowEscapeChar, settings.AllowFormFeed, settings.AllowC1ControlsForUtf, false);
+    }
+    
+    protected override Decoder GetDecoder(int inputSize)
     {
         var encoding = (System.Text.Encoding) new UTF32Encoding(false, true, true).Clone();
         var decoder = encoding.GetDecoder();
@@ -14,8 +20,8 @@ public class Utf32LeDecoder : DecoderBase, IUtfDecoder
         return encoding.GetDecoder();
     }
 
-    public override HashSet<uint> GetInvalidCharacters { get; } = CodepointChecker
-        .IllegalC0Controls(CodepointCheckerSettings.Default)
+    public override HashSet<char> GetInvalidCharacters => CodepointValidator
+        .GetForbiddenChars(settings)
         .ToHashSet();
     
     public override bool SupportBom { get; } = true;

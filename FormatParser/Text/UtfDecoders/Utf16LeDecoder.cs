@@ -1,11 +1,16 @@
-using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using FormatParser.Text.Encoding;
 
-namespace FormatParser.Text;
+namespace FormatParser.Text.UtfDecoders;
 
 public class Utf16LeDecoder : DecoderBase, IUtfDecoder
 {
+    private readonly CodepointValidatorSettings settings;
+
+    public Utf16LeDecoder(TextFileParsingSettings settings)
+    {
+        this.settings = new CodepointValidatorSettings(settings.AllowEscapeChar, settings.AllowFormFeed, settings.AllowC1ControlsForUtf, false);
+    }
+    
     protected override System.Text.Decoder GetDecoder(int inputSize)
     {
         var encoding = (System.Text.Encoding) System.Text.Encoding.Unicode.Clone();
@@ -14,8 +19,8 @@ public class Utf16LeDecoder : DecoderBase, IUtfDecoder
         return encoding.GetDecoder();
     }
 
-    public override HashSet<uint> GetInvalidCharacters { get; } = CodepointChecker
-        .IllegalC0Controls(CodepointCheckerSettings.Default)
+    public override HashSet<char> GetInvalidCharacters => CodepointValidator
+        .GetForbiddenChars(settings)
         .ToHashSet();
     
     public override int MinimalSizeOfInput { get; } = 8;

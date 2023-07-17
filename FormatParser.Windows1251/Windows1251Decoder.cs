@@ -6,20 +6,20 @@ namespace FormatParser.Windows1251;
 
 public class Windows1251Decoder : DecoderBase
 {
+    private readonly CodepointValidatorSettings settings;
+
     public Windows1251Decoder(TextFileParsingSettings settings)
     {
-        this.settings = settings;
+        this.settings = new CodepointValidatorSettings(settings.AllowEscapeChar, settings.AllowFormFeed, true, false);
     }
-    
-    private readonly TextFileParsingSettings settings;
     
     protected override Decoder GetDecoder(int inputSize) => Decoder;
 
     private static readonly Decoder Decoder = GetDecoder();
 
-    public override HashSet<uint> GetInvalidCharacters { get; } = CodepointChecker
-        .IllegalC0Controls(CodepointCheckerSettings.Default)
-        .Concat(new uint[] { 152 })
+    public override HashSet<char> GetInvalidCharacters => CodepointValidator
+        .GetForbiddenChars(settings)
+        .Concat(new char[] { (char)152 })
         .ToHashSet();
 
     private static Decoder GetDecoder()

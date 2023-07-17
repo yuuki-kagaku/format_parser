@@ -3,6 +3,7 @@ using FluentAssertions;
 using FormatParser.Tests.TestData;
 using FormatParser.Text;
 using FormatParser.Text.Encoding;
+using FormatParser.Text.UtfDecoders;
 using FormatParser.Windows1251;
 using NUnit.Framework;
 
@@ -25,11 +26,11 @@ public class CompositeTextFormatDecoder_Tests : TestBase
 
         var utfDecoders = new IUtfDecoder[]
         {
-            new Utf8Decoder(),
-            new Utf16LeDecoder(),
-            new Utf16BeDecoder(),
-            new Utf32LeDecoder(),
-            new Utf32BeDecoder(),
+            new Utf8Decoder(textParserSettings),
+            new Utf16LeDecoder(textParserSettings),
+            new Utf16BeDecoder(textParserSettings),
+            new Utf32LeDecoder(textParserSettings),
+            new Utf32BeDecoder(textParserSettings),
         };
 
         decoder = new CompositeTextFormatDecoder(
