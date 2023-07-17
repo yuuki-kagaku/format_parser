@@ -7,12 +7,12 @@ namespace FormatParser.Tests;
 
 public class ElfDecoder_Tests : TestBase
 {
-    private ElfDecoder elfDecoder = null!;
+    private ElfDetector elfDetector = null!;
 
     [SetUp]
     public void SetUp()
     {
-        elfDecoder = new ElfDecoder();
+        elfDetector = new ElfDetector();
     }
     
     [Test]
@@ -141,6 +141,6 @@ public class ElfDecoder_Tests : TestBase
         await using var stream = new FileStream(filename, FileMode.Open, FileAccess.Read);
         var binaryReader = new StreamingBinaryReader(stream);
 
-        return await elfDecoder.TryDecodeAsync(binaryReader) as ElfFileFormatInfo;
+        return await elfDetector.TryDetectAsync(binaryReader) as ElfFileFormatInfo;
     }
 }

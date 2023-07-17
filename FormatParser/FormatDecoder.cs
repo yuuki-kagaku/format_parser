@@ -4,11 +4,11 @@ namespace FormatParser;
 
 public class FormatDecoder
 {
-    private readonly IBinaryFormatDecoder[] binaryDecoders;
+    private readonly IBinaryFormatDetector[] binaryDecoders;
     private readonly TextFileProcessor textFileProcessor;
     private readonly TextFileParsingSettings settings;
 
-    public FormatDecoder(IBinaryFormatDecoder[] binaryDecoders, TextFileProcessor textFileProcessor, TextFileParsingSettings settings)
+    public FormatDecoder(IBinaryFormatDetector[] binaryDecoders, TextFileProcessor textFileProcessor, TextFileParsingSettings settings)
     {
         this.binaryDecoders = binaryDecoders;
         this.textFileProcessor = textFileProcessor;
@@ -45,7 +45,7 @@ public class FormatDecoder
             try
             {
                 binaryReader.Offset = 0;
-                var result = await binaryFormatDecoder.TryDecodeAsync(binaryReader);
+                var result = await binaryFormatDecoder.TryDetectAsync(binaryReader);
                 
                 if (result != null)
                     return result;

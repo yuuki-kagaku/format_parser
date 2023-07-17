@@ -7,12 +7,12 @@ namespace FormatParser.Tests;
 
 public class PEDecoder_Tests : TestBase
 {
-    private PEDecoder peDecoder = null!;
+    private PeDetector peDetector = null!;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        peDecoder = new PEDecoder();
+        peDetector = new PeDetector();
     }
     
     [Test]
@@ -97,6 +97,6 @@ public class PEDecoder_Tests : TestBase
         await using var stream = new FileStream(filename, FileMode.Open, FileAccess.Read);
         var binaryReader = new StreamingBinaryReader(stream);
 
-        return await peDecoder.TryDecodeAsync(binaryReader) as PeFileFormatInfo;
+        return await peDetector.TryDetectAsync(binaryReader) as PeFileFormatInfo;
     }
 }

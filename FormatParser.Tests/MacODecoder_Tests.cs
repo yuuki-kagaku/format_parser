@@ -7,12 +7,12 @@ namespace FormatParser.Tests;
 
 public class MacODecoder_Tests : TestBase
 {
-    private MachODecoder machODecoder = null!;
+    private MachODetector machODetector = null!;
 
     [SetUp]
     public void SetUp()
     {
-        machODecoder = new MachODecoder();
+        machODetector = new MachODetector();
     }
     
     [Test]
@@ -95,6 +95,6 @@ public class MacODecoder_Tests : TestBase
         await using var stream = new FileStream(filename, FileMode.Open, FileAccess.Read);
         var binaryReader = new StreamingBinaryReader(stream);
 
-        return await machODecoder.TryDecodeAsync(binaryReader);
+        return await machODetector.TryDetectAsync(binaryReader);
     }
 }

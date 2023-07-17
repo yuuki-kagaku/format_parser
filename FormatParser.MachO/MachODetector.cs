@@ -3,9 +3,9 @@ using FormatParser.Helpers;
 
 namespace FormatParser.MachO;
 
-public class MachODecoder : IBinaryFormatDecoder
+public class MachODetector : IBinaryFormatDetector
 {
-    public async Task<IFileFormatInfo?> TryDecodeAsync(StreamingBinaryReader binaryReader)
+    public async Task<IFileFormatInfo?> TryDetectAsync(StreamingBinaryReader binaryReader)
     {
         if (binaryReader.Length < 4)
             return null;

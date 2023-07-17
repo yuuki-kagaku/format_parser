@@ -1,8 +1,8 @@
 ﻿namespace FormatParser.PE;
 
-public class PEDecoder : IBinaryFormatDecoder
+public class PeDetector : IBinaryFormatDetector
 {
-    public async Task<IFileFormatInfo?> TryDecodeAsync(StreamingBinaryReader binaryReader)
+    public async Task<IFileFormatInfo?> TryDetectAsync(StreamingBinaryReader binaryReader)
     {
         binaryReader.SetEndianness(Endianness.LittleEndian);
         var dosHeader = await TryReadDosHeader(binaryReader);

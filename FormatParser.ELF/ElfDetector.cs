@@ -2,9 +2,9 @@ using FormatParser.Helpers;
 
 namespace FormatParser.ELF;
 
-public class ElfDecoder : IBinaryFormatDecoder
+public class ElfDetector : IBinaryFormatDetector
 {
-    public async Task<IFileFormatInfo?> TryDecodeAsync(StreamingBinaryReader binaryReader)
+    public async Task<IFileFormatInfo?> TryDetectAsync(StreamingBinaryReader binaryReader)
     {
         var elfHeader = await TryReadElfHeaderAsync(binaryReader);
 

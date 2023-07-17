@@ -15,7 +15,7 @@ public class EntryPoint
 
         LoadPlugins();
         
-        var binaryDecoders = GetAllInstancesOf<IBinaryFormatDecoder>().ToArray();
+        var binaryDecoders = GetAllInstancesOf<IBinaryFormatDetector>().ToArray();
         
         var nonUnicodeDecoders = new ITextDecoder[] {new Windows1251Decoder(settings.TextFileParsingSettings)};
         var languageAnalyzers = new ITextAnalyzer[] {new RuDictionaryTextAnalyzer()};
