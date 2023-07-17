@@ -28,6 +28,8 @@ public class TestBase
             _ => throw new ArgumentOutOfRangeException(nameof(testFileCategory), testFileCategory, null)
         };
         
-        return $"./TestData/{subDirectory}/{filename}";
+        return $"{TestDir}{Path.DirectorySeparatorChar}{subDirectory}{Path.DirectorySeparatorChar}{filename}";
     }
+
+    protected string TestDir = "TestData";
 }

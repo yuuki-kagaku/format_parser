@@ -17,9 +17,11 @@
 
 
     <ItemGroup>
+      <ProjectReference Include="..\FormatParser.CLI\FormatParser.CLI.csproj" />
       <ProjectReference Include="..\FormatParser.ELF\FormatParser.ELF.csproj" />
       <ProjectReference Include="..\FormatParser.MachO\FormatParser.MachO.csproj" />
       <ProjectReference Include="..\FormatParser.PE\FormatParser.PE.csproj" />
+      <ProjectReference Include="..\FormatParser.Test.Helpers\FormatParser.Test.Helpers.csproj" />
       <ProjectReference Include="..\FormatParser.Text\FormatParser.Text.csproj" />
     </ItemGroup>
 
@@ -149,6 +151,27 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="TestData\text\utf8_bmp2">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\for_cli\be_tasks.svgz">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\for_cli\le_apport.svgz">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\for_cli\loren_utf16_be_nobom">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\for_cli\loren_utf16_le_bom">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\for_cli\apport.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\for_cli\loren_utf16_le_nobom">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\for_cli\cuneiform_le">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>
