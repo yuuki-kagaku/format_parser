@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace FormatParser.Tests;
 
-public class PEDecoder_Tests : TestBase
+public class PEDetector_Tests : TestBase
 {
     private PeDetector peDetector = null!;
 

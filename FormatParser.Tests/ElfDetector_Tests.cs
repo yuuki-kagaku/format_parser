@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace FormatParser.Tests;
 
-public class ElfDecoder_Tests : TestBase
+public class ElfDetector_Tests : TestBase
 {
     private ElfDetector elfDetector = null!;
 

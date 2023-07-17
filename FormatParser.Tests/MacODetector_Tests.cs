@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace FormatParser.Tests;
 
-public class MacODecoder_Tests : TestBase
+public class MacODetector_Tests : TestBase
 {
     private MachODetector machODetector = null!;
 

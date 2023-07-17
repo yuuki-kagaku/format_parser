@@ -7,7 +7,7 @@ using NUnit.Framework;
 
 namespace FormatParser.Tests;
 
-public class Windows1251Decoder_Tests : TestBase
+public class Windows1251Detector_Tests : TestBase
 {
     private Windows1251Decoder decoder = null!;
 
