@@ -12,7 +12,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.MachO", "Forma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.PE", "FormatParser.PE\FormatParser.PE.csproj", "{5039F189-1602-48F8-8B86-34F1E0D3D40E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.Text", "FormatParser.Text\FormatParser.Text.csproj", "{FD4BA4AD-5DE9-417B-A6C7-2B83040D3EC1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.Utf", "FormatParser.Utf\FormatParser.Utf.csproj", "{FD4BA4AD-5DE9-417B-A6C7-2B83040D3EC1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.QualityChecker", "FormatParser.QualityChecker\FormatParser.QualityChecker.csproj", "{41ED9CD7-5682-4BA6-A111-024C62EABFD6}"
 EndProject
