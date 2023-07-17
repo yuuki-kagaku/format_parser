@@ -1,4 +1,4 @@
-namespace FormatParser.Text;
+namespace FormatParser.Text.EncodingAnalyzers;
 
 public class UTF16Heuristics : IDefaultTextAnalyzer
 {
@@ -29,9 +29,6 @@ public class UTF16Heuristics : IDefaultTextAnalyzer
 
             if (IsUnusualCJKCharacter(c))
                 unusualCjkBmpChars++;
-
-            if (HighlyUnusualCharacters.Contains(c))
-                return DetectionProbability.No;
         }
 
         var nonBmpCharsFrequency = (double)nonBmpChars / (double)totalChars;
@@ -64,13 +61,6 @@ public class UTF16Heuristics : IDefaultTextAnalyzer
         .Concat(CommonlyUsedCharacters.CommonSpecialCharacters)
         .Concat(CommonlyUsedCharacters.CommonPunctuation)            
         .ToHashSet();
-    
-    private static readonly HashSet<char> HighlyUnusualCharacters =
-        new char[]
-            {
-                (char)0xFFFF
-            }
-            .ToHashSet();
 
     private static readonly HashSet<char> CommonCjkBmpCharacters =
         CommonCJKChars.MostCommonHangul
