@@ -5,7 +5,7 @@ namespace FormatParser.Text;
 
 public class CompositeTextFormatDecoder
 {
-    private readonly TextParserSettings settings;
+    private readonly TextFileParsingSettings settings;
     private readonly ITextDecoder[] decoders;
     private readonly Dictionary<ITextDecoder, IEnumerable<ITextAnalyzer>> encodingAnalyzersDictionary;
 
@@ -13,7 +13,7 @@ public class CompositeTextFormatDecoder
         IUtfDecoder[] utfDecoders,
         ITextDecoder[] nonUtfDecoders, 
         ITextAnalyzer[] encodingAnalyzers,
-        TextParserSettings settings)
+        TextFileParsingSettings settings)
     {
         decoders = utfDecoders.Concat(nonUtfDecoders).ToArray();
         

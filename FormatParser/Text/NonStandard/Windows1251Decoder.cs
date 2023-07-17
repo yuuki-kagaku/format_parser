@@ -2,7 +2,7 @@ namespace FormatParser.Text;
 
 public class Windows1251Decoder : OneByteEncodingTextDecoder
 {
-    public Windows1251Decoder( TextParserSettings settings) 
+    public Windows1251Decoder( TextFileParsingSettings settings) 
         : base(CodepointChecker.IllegalC0Controls(CodepointCheckerSettings.Default with {AdditionalInvalidCodepoints = new uint []{152}}), settings)
     {
 

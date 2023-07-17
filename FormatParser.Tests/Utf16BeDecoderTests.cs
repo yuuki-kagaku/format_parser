@@ -14,7 +14,7 @@ public class Utf16BeDecoder_Tests : TestBase
     public void SetUp()
     {
         var codepointConverter = new CodepointConverter();
-        var textParserSettings = TextParserSettings.Default;
+        var textParserSettings = new TextFileParsingSettings();
         
         decoder = new Utf16BeDecoder(codepointConverter, textParserSettings);
     }

@@ -6,9 +6,9 @@ public class FormatDecoder
 {
     private readonly IBinaryFormatDecoder[] binaryDecoders;
     private readonly TextFileProcessor textFileProcessor;
-    private readonly FormatDecoderSettings settings;
+    private readonly TextFileParsingSettings settings;
 
-    public FormatDecoder(IBinaryFormatDecoder[] binaryDecoders, TextFileProcessor textFileProcessor, FormatDecoderSettings settings)
+    public FormatDecoder(IBinaryFormatDecoder[] binaryDecoders, TextFileProcessor textFileProcessor, TextFileParsingSettings settings)
     {
         this.binaryDecoders = binaryDecoders;
         this.textFileProcessor = textFileProcessor;
@@ -17,15 +17,19 @@ public class FormatDecoder
 
     public async Task<IFileFormatInfo> DecodeFile(string file)
     {
-        await using var fileStream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, settings.BufferSize);
+        await using var fileStream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, settings.FileStreamBufferSize);
+
         var binaryReader = new StreamingBinaryReader(fileStream);
 
         var result = await TryDecodeAsBinaryAsync(binaryReader);
-        
+
         if (result != null)
             return result;
 
-        var buffer = await binaryReader.TryReadArraySegment(settings.TextParserSettings.SampleSize);
+        binaryReader.Offset = 0;
+        
+        var buffer = await binaryReader.TryReadArraySegment(settings.SampleSize);
+
         var inMemoryBinaryReader = new InMemoryBinaryReader(buffer);
         result = textFileProcessor.TryProcess(inMemoryBinaryReader);
 
@@ -35,18 +39,19 @@ public class FormatDecoder
         return new UnknownFileFormatInfo();
     }
 
-    private async Task<IFileFormatInfo?> TryDecodeAsBinaryAsync(StreamingBinaryReader streamingBinaryReader)
+    private async Task<IFileFormatInfo?> TryDecodeAsBinaryAsync(StreamingBinaryReader binaryReader)
     {
         foreach (var binaryFormatDecoder in binaryDecoders)
         {
             try
             {
-                streamingBinaryReader.Offset = 0;
-                var result = await binaryFormatDecoder.TryDecodeAsync(streamingBinaryReader);
+                binaryReader.Offset = 0;
+                var result = await binaryFormatDecoder.TryDecodeAsync(binaryReader);
+                
                 if (result != null)
                     return result;
             }
-            catch (Exception e)
+            catch
             {
             }
         }

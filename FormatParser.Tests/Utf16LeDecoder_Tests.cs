@@ -1,27 +1,28 @@
 using System.Text;
 using FluentAssertions;
+using FormatParser.Tests.TestData;
 using FormatParser.Text;
 using NUnit.Framework;
 
 namespace FormatParser.Tests;
 
-public class Utf16LeDecoder_Tests
+public class Utf16LeDecoder_Tests : TestBase
 {
-    private Utf16LeDecoder decoder;
+    private Utf16LeDecoder decoder = null!;
 
     [SetUp]
     public void SetUp()
     {
         var codepointConverter = new CodepointConverter();
-        var textParserSettings = TextParserSettings.Default;
+        var textParserSettings = new TextFileParsingSettings();
         
         decoder = new Utf16LeDecoder(codepointConverter, textParserSettings);
     }
     
     [Test]
-    public async Task Should_read_utf16_le_no_bom()
+    public void Should_read_utf16_le_no_bom()
     {
-        var content = File.ReadAllBytes(@"./TestData/text//loren_utf16_le_nobom");
+        var content = File.ReadAllBytes(GetFile(TestFileCategory.Text, "loren_utf16_le_nobom"));
     
         var deserializer = new InMemoryBinaryReader(content);
         var sb = new StringBuilder();

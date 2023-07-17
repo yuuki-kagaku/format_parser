@@ -6,9 +6,9 @@ namespace FormatParser.Text;
 public abstract class OneByteEncodingTextDecoder : ITextDecoder
 {
     private readonly CodepointChecker codepointChecker;
-    private readonly TextParserSettings settings;
+    private readonly TextFileParsingSettings settings;
 
-    protected OneByteEncodingTextDecoder(CodepointChecker codepointChecker, TextParserSettings settings)
+    protected OneByteEncodingTextDecoder(CodepointChecker codepointChecker, TextFileParsingSettings settings)
     {
         this.codepointChecker = codepointChecker;
         this.settings = settings;

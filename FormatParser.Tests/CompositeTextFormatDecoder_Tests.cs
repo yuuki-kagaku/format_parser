@@ -14,7 +14,7 @@ public class CompositeTextFormatDecoder_Tests : TestBase
     public void SetUp()
     {
         var codepointConverter = new CodepointConverter();
-        var textParserSettings = TextParserSettings.Default;
+        var textParserSettings = new TextFileParsingSettings();
         
         var nonUnicodeDecoders = new ITextDecoder[]
         {
@@ -93,7 +93,7 @@ public class CompositeTextFormatDecoder_Tests : TestBase
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
 
         isSuccessful.Should().BeTrue();
-        encoding.Should().BeEquivalentTo(new Windows1251Decoder(TextParserSettings.Default).Encoding);
+        encoding.Should().BeEquivalentTo(new Windows1251Decoder(new TextFileParsingSettings()).Encoding);
         text.Should().Be(TextSamples.RussianLanguageSample);
     }
     

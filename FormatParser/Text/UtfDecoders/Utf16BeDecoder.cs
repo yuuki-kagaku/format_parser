@@ -5,7 +5,7 @@ namespace FormatParser.Text;
 
 public class Utf16BeDecoder : Utf16Decoder
 {
-    public Utf16BeDecoder(CodepointConverter codepointConverter, TextParserSettings settings)
+    public Utf16BeDecoder(CodepointConverter codepointConverter, TextFileParsingSettings settings)
         : base(codepointConverter, settings)
     {
     }

@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Text.Json;
 using FormatParser.Text;
 
 namespace FormatParser.CLI;
@@ -7,23 +8,22 @@ public class EntryPoint
 {
     public static void Main(string[] args)
     {
-        var formatParserSetting = ParseSettings(args);
+        var settings = ParseSettings(args);
 
         LoadPlugins();
         
         var binaryDecoders = GetAllInstancesOf<IBinaryFormatDecoder>().ToArray();
         
         var codepointConverter = new CodepointConverter();
-        var textParserSettings = TextParserSettings.Default with {SampleSize = 16096};
         
-        var nonUnicodeDecoders = new ITextDecoder[] {new Windows1251Decoder(textParserSettings)};
+        var nonUnicodeDecoders = new ITextDecoder[] {new Windows1251Decoder(settings.TextFileParsingSettings)};
         var languageAnalyzers = new ITextAnalyzer[] {new RuDictionaryTextAnalyzer()};
         
         var utfDecoders = new IUtfDecoder[]
         {
-            new Utf8Decoder(codepointConverter, textParserSettings),
-            new Utf16LeDecoder(codepointConverter, textParserSettings),
-            new Utf16BeDecoder(codepointConverter, textParserSettings),
+            new Utf8Decoder(codepointConverter, settings.TextFileParsingSettings),
+            new Utf16LeDecoder(codepointConverter, settings.TextFileParsingSettings),
+            new Utf16BeDecoder(codepointConverter, settings.TextFileParsingSettings),
         };
         
         var textBasedFormatDetectors = new ITextBasedFormatDetector[]
@@ -35,19 +35,19 @@ public class EntryPoint
             utfDecoders, 
             nonUnicodeDecoders,
             languageAnalyzers,
-            textParserSettings);
+            settings.TextFileParsingSettings);
 
         var runner = new CLIRunner(
             new FileDiscoverer(new FileDiscovererSettings()), 
             new FormatDecoder(binaryDecoders, 
                 new TextFileProcessor(textBasedFormatDetectors, compositeTextFormatDecoder), 
-                new FormatDecoderSettings(textParserSettings, 8192)
+                settings.TextFileParsingSettings
             )
         );
 
         var cts = new CancellationTokenSource();
         var state = new FormatParserCliState();
-        runner.Run(formatParserSetting, state, cts.Token).GetAwaiter().GetResult();
+        runner.Run(settings, state, cts.Token).GetAwaiter().GetResult();
 
         Console.WriteLine($"Run complete. Elapsed: {state.Stopwatch!.Elapsed.TotalMilliseconds}");
         Console.WriteLine();
@@ -99,8 +99,6 @@ public class EntryPoint
             .Where(t => !t.IsInterface || !t.IsAbstract);
 
         foreach (var t in types)
-        {
             yield return (T)Activator.CreateInstance(t)!;
-        }
     }
 }

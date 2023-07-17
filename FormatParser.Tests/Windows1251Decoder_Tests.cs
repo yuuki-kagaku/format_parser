@@ -12,7 +12,7 @@ public class Windows1251Decoder_Tests
     [SetUp]
     public void SetUp()
     {
-        var textParserSettings = TextParserSettings.Default;
+        var textParserSettings = new TextFileParsingSettings();
         
         decoder = new Windows1251Decoder(textParserSettings);
     }

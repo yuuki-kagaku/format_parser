@@ -1,3 +1,5 @@
+using FormatParser.Text;
+
 namespace ConsoleApp1;
 
 public class QualityCheckerSettings
@@ -6,4 +8,6 @@ public class QualityCheckerSettings
     public string UtilityArgs { get; set; } = "-bi";
     public bool PrintMismatchedFilesInfo { get; set; } = true;
     public int BufferSize { get; set; } = 4096;
+    
+    public TextFileParsingSettings TextFileParsingSettings { get; set; } = new();
 }

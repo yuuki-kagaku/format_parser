@@ -7,9 +7,9 @@ public abstract class Utf16Decoder : IUtfDecoder
 {
     private readonly CodepointChecker codepointChecker;
     private readonly CodepointConverter codepointConverter;
-    private readonly TextParserSettings settings;
+    private readonly TextFileParsingSettings settings;
 
-    protected Utf16Decoder(CodepointConverter codepointConverter, TextParserSettings settings)
+    protected Utf16Decoder(CodepointConverter codepointConverter, TextFileParsingSettings settings)
     {
         this.codepointChecker = CodepointChecker.IllegalC0AndC1Controls(CodepointCheckerSettings.Default);
         this.codepointConverter = codepointConverter;

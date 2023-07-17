@@ -7,11 +7,11 @@ public class Utf8Decoder : IUtfDecoder
 {
     private readonly CodepointChecker codepointChecker;
     private readonly CodepointConverter codepointConverter;
-    private readonly TextParserSettings settings;
+    private readonly TextFileParsingSettings settings;
 
     private static readonly byte[] bom = { 0xEF, 0xBB, 0xBF };
 
-    public Utf8Decoder(CodepointConverter codepointConverter, TextParserSettings settings)
+    public Utf8Decoder(CodepointConverter codepointConverter, TextFileParsingSettings settings)
     {
         this.codepointChecker = CodepointChecker.IllegalC0AndC1Controls(CodepointCheckerSettings.Default);
         this.codepointConverter = codepointConverter;
