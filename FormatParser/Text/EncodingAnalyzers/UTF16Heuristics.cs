@@ -11,30 +11,27 @@ public class UTF16Heuristics : IDefaultTextAnalyzer
         var unusualCjkBmpChars = 0;
         var commonAsciiChars= 0;
 
-        foreach (var chunk in text.GetChunkEnumerator())
+        var chars = text.GetChars();
+        for (var i = 0; i < chars.Count; i++)
         {
-            var span = chunk.Span;
-            for (var i = 0; i < span.Length; i++)
+            var c = chars[i];
+            totalChars++;
+
+            if (Char.IsSurrogate(c))
             {
-                var c = span[i];
-                totalChars++;
-
-                if (Char.IsSurrogate(c))
-                {
-                    nonBmpChars++;
-                    i++;
-                    continue;
-                }
-
-                if (CommonChars.Contains(c))
-                    commonAsciiChars++;
-
-                if (IsUnusualCJKCharacter(c))
-                    unusualCjkBmpChars++;
-
-                if (HighlyUnusualCharacters.Contains(c))
-                    return DetectionProbability.No;
+                nonBmpChars++;
+                i++;
+                continue;
             }
+
+            if (CommonChars.Contains(c))
+                commonAsciiChars++;
+
+            if (IsUnusualCJKCharacter(c))
+                unusualCjkBmpChars++;
+
+            if (HighlyUnusualCharacters.Contains(c))
+                return DetectionProbability.No;
         }
 
         var nonBmpCharsFrequency = (double)nonBmpChars / (double)totalChars;

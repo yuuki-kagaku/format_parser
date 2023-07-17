@@ -33,8 +33,7 @@ public class TextDetectionComparer
             if (ShouldSkip(commandOutput, size))
                 return;
             
-            var inMemoryBinaryReader = new InMemoryBinaryReader(buffer.Take(size).ToArray());
-            var isTextAccordingToFormatParser = IsTextAccordingToFormatParser(inMemoryBinaryReader);
+            var isTextAccordingToFormatParser = IsTextAccordingToFormatParser(new ArraySegment<byte>(buffer, 0, size));
 
             var isTextFileAccordingToFileCommand = IsTextFile(commandOutput, file);
 
@@ -44,12 +43,22 @@ public class TextDetectionComparer
             if (isTextAccordingToFormatParser)
                 state.TextFilesAccordingToFormatParser++;
 
+            var correctedIsTextFileAccordingToFileCommand = isTextFileAccordingToFileCommand;
             var isFalseNegative = IsFalseNegativeTextDetection(buffer, size);
             if (isFalseNegative)
+            {
+                correctedIsTextFileAccordingToFileCommand = false;
                 state.FalseNegativesOfFileCommand++;
-                
+            }
 
-            if (isTextFileAccordingToFileCommand != isTextAccordingToFormatParser && !isFalseNegative)
+            var isFalsePositive = IsFalsePositiveTextDetection(buffer, size, file);
+            if (isFalsePositive)
+            {
+                correctedIsTextFileAccordingToFileCommand = true;
+                state.FalsePositivesOfFileCommand++;
+            }
+
+            if (correctedIsTextFileAccordingToFileCommand != isTextAccordingToFormatParser)
             {
                 state.MatchMismatches++;
                 if (settings.PrintMismatchedFilesInfo)
@@ -73,9 +82,17 @@ public class TextDetectionComparer
         return false;
     }
     
-    private bool IsTextAccordingToFormatParser(InMemoryBinaryReader deserializer)
+    private static bool IsFalsePositiveTextDetection(byte[] buffer, int size, string filename)
     {
-        return compositeTextFormatDecoder.TryDecode(deserializer, out _, out _);
+        if (filename.StartsWith("/usr/lib/firmware/rtl_bt/") && filename.EndsWith(".bin"))
+            return true;
+            
+        return false;
+    }
+    
+    private bool IsTextAccordingToFormatParser(ArraySegment<byte> buffer)
+    {
+        return compositeTextFormatDecoder.TryDecode(buffer, out _, out _);
     }
 
     private static bool IsTextFile(string commandFileOutput, string file)
@@ -99,6 +116,15 @@ public class TextDetectionComparer
             return true;
         
         if (commandFileOutput.Contains("image/x-portable-bitmap", StringComparison.InvariantCultureIgnoreCase))
+            return true;
+        
+        if (commandFileOutput.Contains("image/x-portable-graymap", StringComparison.InvariantCultureIgnoreCase))
+            return true;
+        
+        if (commandFileOutput.Contains("image/x-portable-pixmap", StringComparison.InvariantCultureIgnoreCase))
+            return true;
+        
+        if (commandFileOutput.Contains("application/pgp-keys", StringComparison.InvariantCultureIgnoreCase))
             return true;
         
         if (commandFileOutput.Contains("image/x-xpmi", StringComparison.InvariantCultureIgnoreCase))
