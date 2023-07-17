@@ -1,4 +1,6 @@
-﻿namespace FormatParser;
+﻿using FormatParser.BinaryReader;
+
+namespace FormatParser;
 
 public interface IBinaryFormatDetector
 {

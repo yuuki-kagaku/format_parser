@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using FormatParser.BinaryReader;
 using FormatParser.ELF;
 using FormatParser.Tests.TestData;
 using NUnit.Framework;

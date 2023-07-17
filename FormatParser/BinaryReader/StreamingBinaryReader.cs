@@ -1,7 +1,7 @@
 using System.Buffers.Binary;
 using System.Text;
 
-namespace FormatParser;
+namespace FormatParser.BinaryReader;
 
 public class StreamingBinaryReader
 {
@@ -15,12 +15,12 @@ public class StreamingBinaryReader
         this.stream = stream;
     }
 
-    public void SetEndianness(Endianness endianness)
+    public void SetEndianness(Endianness e)
     {
-        if (endianness is not (Endianness.BigEndian or Endianness.LittleEndian))
-            throw new ArgumentOutOfRangeException(nameof(endianness));
+        if (e is not (Endianness.BigEndian or Endianness.LittleEndian))
+            throw new ArgumentOutOfRangeException(nameof(e));
         
-        this.endianness = endianness;
+        endianness = e;
     }
 
     public long Offset
@@ -197,7 +197,7 @@ public class StreamingBinaryReader
 
         while (totalBytesRead != count)
         {
-            var bytesRead = await ReadInternalAsync(buffer, totalBytesRead, count - totalBytesRead);
+            var bytesRead = await stream.ReadAsync(buffer, totalBytesRead, count - totalBytesRead);
 
             if (bytesRead == 0)
                 return ensureAllBytesRead ? throw new BinaryReaderException("Not enough data in stream.") : totalBytesRead;
@@ -207,6 +207,4 @@ public class StreamingBinaryReader
 
         return count;
     }
-    
-    private Task<int> ReadInternalAsync(byte[] dest, int offset, int count) => stream.ReadAsync(dest, offset, count);
 }

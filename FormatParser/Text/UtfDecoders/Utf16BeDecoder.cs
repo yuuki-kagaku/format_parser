@@ -15,8 +15,7 @@ public class Utf16BeDecoder : DecoderBase, IUtfDecoder
     protected override Decoder GetDecoder(int inputSize)
     {
         var encoding = (System.Text.Encoding) System.Text.Encoding.BigEndianUnicode.Clone();
-        var decoder = encoding.GetDecoder();
-        decoder.Fallback = FormatParserDecoderFallback.DoNotFailAtEndOfInput(inputSize, 4);
+        encoding.DecoderFallback = FormatParserDecoderFallback.DoNotFailAtEndOfInput(inputSize, 4);
         return encoding.GetDecoder();
     }
 

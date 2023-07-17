@@ -12,11 +12,10 @@ public class Utf32BeDecoder : DecoderBase, IUtfDecoder
         this.settings = new CodepointValidatorSettings(settings.AllowEscapeChar, settings.AllowFormFeed, settings.AllowC1ControlsForUtf, false);
     }
     
-    protected override System.Text.Decoder GetDecoder(int inputSize)
+    protected override Decoder GetDecoder(int inputSize)
     {
         var encoding = (System.Text.Encoding) new UTF32Encoding(true, true, true).Clone();
-        var decoder = encoding.GetDecoder();
-        decoder.Fallback = DecoderFallback.ExceptionFallback;
+        encoding.DecoderFallback = FormatParserDecoderFallback.DoNotFailAtEndOfInput(inputSize, 4);
         return encoding.GetDecoder();
     }
 

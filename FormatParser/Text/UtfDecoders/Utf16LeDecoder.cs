@@ -1,3 +1,4 @@
+using System.Text;
 using FormatParser.Text.Encoding;
 
 namespace FormatParser.Text.UtfDecoders;
@@ -11,11 +12,10 @@ public class Utf16LeDecoder : DecoderBase, IUtfDecoder
         this.settings = new CodepointValidatorSettings(settings.AllowEscapeChar, settings.AllowFormFeed, settings.AllowC1ControlsForUtf, false);
     }
     
-    protected override System.Text.Decoder GetDecoder(int inputSize)
+    protected override Decoder GetDecoder(int inputSize)
     {
         var encoding = (System.Text.Encoding) System.Text.Encoding.Unicode.Clone();
-        var decoder = encoding.GetDecoder();
-        decoder.Fallback = FormatParserDecoderFallback.DoNotFailAtEndOfInput(inputSize, 4);
+        encoding.DecoderFallback = FormatParserDecoderFallback.DoNotFailAtEndOfInput(inputSize, 4);
         return encoding.GetDecoder();
     }
 

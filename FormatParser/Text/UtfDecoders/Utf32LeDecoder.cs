@@ -15,8 +15,7 @@ public class Utf32LeDecoder : DecoderBase, IUtfDecoder
     protected override Decoder GetDecoder(int inputSize)
     {
         var encoding = (System.Text.Encoding) new UTF32Encoding(false, true, true).Clone();
-        var decoder = encoding.GetDecoder();
-        decoder.Fallback = DecoderFallback.ExceptionFallback;
+        encoding.DecoderFallback = FormatParserDecoderFallback.DoNotFailAtEndOfInput(inputSize, 4);
         return encoding.GetDecoder();
     }
 

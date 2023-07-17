@@ -1,4 +1,6 @@
-﻿namespace FormatParser.PE;
+﻿using FormatParser.BinaryReader;
+
+namespace FormatParser.PE;
 
 public class PeDetector : IBinaryFormatDetector
 {
