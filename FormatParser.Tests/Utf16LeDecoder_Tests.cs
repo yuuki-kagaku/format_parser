@@ -31,7 +31,7 @@ public class Utf16LeDecoder_Tests : TestBase
         var textDecodingResult = decoder.TryDecodeText(content, chars);
         textDecodingResult.Should().NotBeNull();
 
-        textDecodingResult!.Encoding.Should().BeEquivalentTo(WellKnownEncodings.UTF16LeNoBom);
+        textDecodingResult!.Encoding.Should().BeEquivalentTo(EncodingData.UTF16LeNoBom);
         BuildString(textDecodingResult.Chars).Should().BeEquivalentTo(ReadFileAsUtf16Le(filename));
     }
 }

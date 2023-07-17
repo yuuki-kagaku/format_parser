@@ -26,8 +26,8 @@ public class Utf32BeDecoder : DecoderBase, IUtfDecoder
     public override int MinimalSizeOfInput { get; } = 8;
 
     public override bool SupportBom { get; } = true;
-    public override string EncodingWithBom { get; } = WellKnownEncodings.UTF32BeBom;
-    public override string EncodingWithoutBom { get; } = WellKnownEncodings.UTF32BeNoBom;
+    public override EncodingData EncodingWithBom { get; } = EncodingData.UTF32BeBom;
+    public override EncodingData EncodingWithoutBom { get; } = EncodingData.UTF32BeNoBom;
 
     public override string? RequiredEncodingAnalyzer { get; } = null;
     

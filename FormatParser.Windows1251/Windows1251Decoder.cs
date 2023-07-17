@@ -34,8 +34,8 @@ public class Windows1251Decoder : DecoderBase
     public override int MinimalSizeOfInput { get; } = 0;
     
     public override bool SupportBom { get; } = false;
-    public override string EncodingWithBom => throw new NotSupportedException();
-    public override string EncodingWithoutBom { get; } = "Windows-1251";
+    public override EncodingData EncodingWithBom => throw new NotSupportedException();
+    public override EncodingData EncodingWithoutBom { get; } = new ("Windows-1251", Endianness.NotAllowed, false);
 
     public override DetectionProbability DefaultDetectionProbability { get; } = DetectionProbability.Lowest;
     public override string? RequiredEncodingAnalyzer { get; } = "ru";

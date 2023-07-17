@@ -7,7 +7,7 @@ public class RuDictionaryTextAnalyzer : ITextAnalyzer
 {
     private static readonly Regex pattern = new (string.Join('|', MostUsedRussianWords.Words), RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
-    public DetectionProbability AnalyzeProbability(TextSample text, string encoding, out string? clarifiedEncoding)
+    public DetectionProbability AnalyzeProbability(TextSample text, EncodingData encoding, out EncodingData? clarifiedEncoding)
     {
         clarifiedEncoding = null;
         return pattern.IsMatch(text.Text) ? DetectionProbability.High : DetectionProbability.No;

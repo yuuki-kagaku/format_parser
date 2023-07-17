@@ -11,7 +11,7 @@ public class RuFrequencyTextAnalyzer : ITextAnalyzer
         .Concat(CommonlyUsedCharacters.RussianPunctuation)
         .ToHashSet();
 
-    public DetectionProbability AnalyzeProbability(TextSample text, string encoding, out string? clarifiedEncoding)
+    public DetectionProbability AnalyzeProbability(TextSample text, EncodingData encoding, out EncodingData? clarifiedEncoding)
     {
         clarifiedEncoding = null;
         var totalChars = 0;

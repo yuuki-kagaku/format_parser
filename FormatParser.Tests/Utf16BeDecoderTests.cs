@@ -31,7 +31,7 @@ public class Utf16BeDecoder_Tests : TestBase
         var textDecodingResult = decoder.TryDecodeText(content, chars);
         textDecodingResult.Should().NotBeNull();
         
-        textDecodingResult!.Encoding.Should().BeEquivalentTo(WellKnownEncodings.UTF16BeNoBom);
+        textDecodingResult!.Encoding.Should().BeEquivalentTo(EncodingData.UTF16BeNoBom);
         BuildString(textDecodingResult.Chars).Should().BeEquivalentTo(ReadFileAsUtf16Be(filename));
     }
 }

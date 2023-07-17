@@ -24,8 +24,8 @@ public class Utf32LeDecoder : DecoderBase, IUtfDecoder
         .ToHashSet();
     
     public override bool SupportBom { get; } = true;
-    public override string EncodingWithBom { get; } = WellKnownEncodings.UTF32LeBom;
-    public override string EncodingWithoutBom { get; } = WellKnownEncodings.UTF32LeNoBom;
+    public override EncodingData EncodingWithBom { get; } = EncodingData.UTF32LeBom;
+    public override EncodingData EncodingWithoutBom { get; } = EncodingData.UTF32LeNoBom;
 
     public override string? RequiredEncodingAnalyzer { get; } = null;
     

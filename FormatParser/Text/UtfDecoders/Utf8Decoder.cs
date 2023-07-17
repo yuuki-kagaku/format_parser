@@ -26,8 +26,8 @@ public class Utf8Decoder : DecoderBase, IUtfDecoder
     public override int MinimalSizeOfInput { get; } = 0;
 
     public override bool SupportBom { get; } = true;
-    public override string EncodingWithBom { get; } = WellKnownEncodings.Utf8BOM;
-    public override string EncodingWithoutBom { get; } = WellKnownEncodings.Utf8NoBOM;
+    public override EncodingData EncodingWithBom { get; } = EncodingData.Utf8BOM;
+    public override EncodingData EncodingWithoutBom { get; } = EncodingData.Utf8NoBOM;
 
     public override string? RequiredEncodingAnalyzer { get; } = null;
     

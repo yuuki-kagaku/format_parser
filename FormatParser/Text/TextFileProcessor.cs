@@ -21,7 +21,7 @@ public class TextFileProcessor
                 return null;
             
             if (TryMatchTextBasedFormat(textSample, out var type, out var formatEncoding))
-                return new TextFileFormatInfo(type, formatEncoding ?? encoding.ToString());
+                return new TextFileFormatInfo(type, encoding with {Name = formatEncoding ?? encoding.Name});
 
             return new TextFileFormatInfo(DefaultTextType, encoding);
         }

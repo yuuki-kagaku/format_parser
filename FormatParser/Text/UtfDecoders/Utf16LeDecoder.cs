@@ -26,8 +26,8 @@ public class Utf16LeDecoder : DecoderBase, IUtfDecoder
     public override int MinimalSizeOfInput { get; } = 8;
     
     public override bool SupportBom { get; } = true;
-    public override string EncodingWithBom { get; } = WellKnownEncodings.UTF16LeBom;
-    public override string EncodingWithoutBom { get; } = WellKnownEncodings.UTF16LeNoBom;
+    public override EncodingData EncodingWithBom { get; } = EncodingData.UTF16LeBom;
+    public override EncodingData EncodingWithoutBom { get; } = EncodingData.UTF16LeNoBom;
 
     public override string? RequiredEncodingAnalyzer { get; } = null;
     

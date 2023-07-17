@@ -31,9 +31,9 @@ public abstract class DecoderBase : ITextDecoder
 
     public abstract bool SupportBom { get; }
     
-    public abstract string EncodingWithBom { get; }
+    public abstract EncodingData EncodingWithBom { get; }
     
-    public abstract string EncodingWithoutBom { get; }
+    public abstract EncodingData EncodingWithoutBom { get; }
 
     public abstract HashSet<char> GetInvalidCharacters { get; }
 

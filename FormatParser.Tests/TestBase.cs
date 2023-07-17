@@ -25,6 +25,7 @@ public class TestBase
             TestFileCategory.PeWindows => "pe/windows",
             TestFileCategory.PeManaged => "pe/managed",
             TestFileCategory.Text => "text",
+            TestFileCategory.Xml => "xml",
             TestFileCategory.PseudoText => "text_pseudo_utf16",
             TestFileCategory.TextUtf16 => "text_utf16",
             _ => throw new ArgumentOutOfRangeException(nameof(testFileCategory), testFileCategory, null)

@@ -28,7 +28,7 @@ public class CompositeTextFormatDecoder
         this.settings = settings;
     }
 
-    public bool TryDecode(ArraySegment<byte> bytes, [NotNullWhen(true)] out string? resultEncoding, [NotNullWhen(true)] out string? resultTextSample)
+    public bool TryDecode(ArraySegment<byte> bytes, [NotNullWhen(true)] out EncodingData? resultEncoding, [NotNullWhen(true)] out string? resultTextSample)
     {
         var bestMatchProbability = DetectionProbability.No;
         resultEncoding = null;

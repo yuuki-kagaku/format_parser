@@ -33,7 +33,7 @@ public class Utf8EncodingDecoder_Tests : TestBase
         var result = decoder.TryDecodeText(bytes, charBuffer);
 
         result.Should().NotBeNull();
-        var str = GetString(result!.Chars);
+        var str = BuildString(result!.Chars);
         str.Should().Be(expectedString[..^1]);
     }
     
@@ -46,7 +46,7 @@ public class Utf8EncodingDecoder_Tests : TestBase
         var result = decoder.TryDecodeText(bytes, charBuffer);
 
         result.Should().NotBeNull();
-        var str = GetString(result!.Chars);
+        var str = BuildString(result!.Chars);
         str.Should().Be(expectedString);
     }
     
@@ -59,12 +59,5 @@ public class Utf8EncodingDecoder_Tests : TestBase
         var result = decoder.TryDecodeText(bytes, charBuffer);
 
         result.Should().BeNull();
-    }
-
-    private static string GetString(ArraySegment<char> arraySegment)
-    {
-        var memory = new Memory<char>(arraySegment.Array!, arraySegment.Offset, arraySegment.Count);
-        var sb = new StringBuilder().Append(memory);
-        return sb.ToString();
     }
 }

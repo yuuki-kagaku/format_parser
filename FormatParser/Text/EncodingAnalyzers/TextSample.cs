@@ -1,4 +1,5 @@
 using System.Text;
+using FormatParser.Helpers;
 
 namespace FormatParser.Text;
 
@@ -13,7 +14,7 @@ public class TextSample
         text = new Lazy<string>(() =>
         {
             var stringBuilder = new StringBuilder(chars.Count);
-            stringBuilder.Append(new Memory<char>(chars.Array, chars.Offset, chars.Count));
+            stringBuilder.Append(chars.ToMemory());
             
             return stringBuilder.ToString();
         }, LazyThreadSafetyMode.None);
