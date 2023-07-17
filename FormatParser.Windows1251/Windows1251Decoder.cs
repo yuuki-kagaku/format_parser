@@ -17,7 +17,7 @@ public class Windows1251Decoder : DecoderBase
 
     private static readonly Decoder Decoder = GetDecoder();
 
-    public override HashSet<char> GetInvalidCharacters => CodepointValidator
+    public override HashSet<char> GetInvalidCharacters => InvalidCharacterHelper
         .GetForbiddenChars(settings)
         .Concat(new char[] { (char)152 })
         .ToHashSet();

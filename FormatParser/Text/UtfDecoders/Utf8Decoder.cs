@@ -19,7 +19,7 @@ public class Utf8Decoder : DecoderBase, IUtfDecoder
         return encoding.GetDecoder();
     }
 
-    public override HashSet<char> GetInvalidCharacters => CodepointValidator
+    public override HashSet<char> GetInvalidCharacters => InvalidCharacterHelper
         .GetForbiddenChars(settings)
         .ToHashSet();
 
