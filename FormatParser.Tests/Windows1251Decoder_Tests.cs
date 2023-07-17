@@ -21,14 +21,13 @@ public class Windows1251Decoder_Tests
     public async Task Should_read_windows1251()
     {
         var content = File.ReadAllBytes(@"./TestData/text/bsd_windows1251");
-    
-        var deserializer = new InMemoryBinaryReader(content);
-        var sb = new StringBuilder();
+        var chars = new char[content.Length];
+        
+        var textDecodingResult = decoder.TryDecodeText(content, chars);
+        var text = new StringBuilder().Append(new Memory<char>(textDecodingResult.Chars.Array, textDecodingResult.Chars.Offset, textDecodingResult.Chars.Count)).ToString();
 
-        var isSuccessful = decoder.TryDecode(deserializer, sb, out var encoding);
-
-        isSuccessful.Should().Be(true);
-        encoding.Should().BeEquivalentTo(decoder.Encoding);
-        sb.ToString().Should().Be(TextSamples.RussianLanguageSample);
+        textDecodingResult.Should().NotBeNull();
+        textDecodingResult.Encoding.Should().BeEquivalentTo(decoder.EncodingWithoutBom);
+        text.Should().Be(TextSamples.RussianLanguageSample);
     }
 }

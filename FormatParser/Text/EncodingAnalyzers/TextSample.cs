@@ -4,20 +4,22 @@ namespace FormatParser.Text;
 
 public class TextSample
 {
-    private readonly StringBuilder stringBuilder;
     private readonly Lazy<string> text;
-    private readonly Lazy<string> textInLowerCase;
+    private readonly ArraySegment<char> chars;
 
-    public TextSample(StringBuilder stringBuilder)
+    public TextSample(ArraySegment<char> chars)
     {
-        this.stringBuilder = stringBuilder;
-        text = new Lazy<string>(() => stringBuilder.ToString(), LazyThreadSafetyMode.None);
-        textInLowerCase = new Lazy<string>(() => text.Value.ToLower(), LazyThreadSafetyMode.None);
+        this.chars = chars;
+        text = new Lazy<string>(() =>
+        {
+            var stringBuilder = new StringBuilder(chars.Count);
+            stringBuilder.Append(new Memory<char>(chars.Array, chars.Offset, chars.Count));
+            
+            return stringBuilder.ToString();
+        }, LazyThreadSafetyMode.None);
     }
 
     public string Text => text.Value;
-
-    public string TextInLowerCase => textInLowerCase.Value;
-
-    public StringBuilder.ChunkEnumerator GetChunkEnumerator() => stringBuilder.GetChunks();
+    
+    public ArraySegment<char> GetChars() => chars;
 }

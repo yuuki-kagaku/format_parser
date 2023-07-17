@@ -30,9 +30,8 @@ public class FormatDecoder
         
         var buffer = await binaryReader.TryReadArraySegment(settings.SampleSize);
 
-        var inMemoryBinaryReader = new InMemoryBinaryReader(buffer);
-        result = textFileProcessor.TryProcess(inMemoryBinaryReader);
-
+        result = textFileProcessor.TryProcess(buffer);
+  
         if (result != null)
             return result;
 

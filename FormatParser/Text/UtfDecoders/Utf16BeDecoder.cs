@@ -1,26 +1,30 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using FormatParser.Text.Encoding;
 
 namespace FormatParser.Text;
 
-public class Utf16BeDecoder : Utf16Decoder
+public class Utf16BeDecoder : DecoderBase, IUtfDecoder
 {
-    public Utf16BeDecoder(CodepointConverter codepointConverter, TextFileParsingSettings settings)
-        : base(codepointConverter, settings)
+    protected override System.Text.Decoder GetDecoder(int inputSize)
     {
+        var encoding = (System.Text.Encoding) System.Text.Encoding.BigEndianUnicode.Clone();
+        var decoder = encoding.GetDecoder();
+        decoder.Fallback = FormatParserDecoderFallback.DoNotFailAtEndOfInput(inputSize, 4);
+        return encoding.GetDecoder();
     }
+
+    public override HashSet<uint> GetInvalidCharacters { get; } = CodepointChecker
+        .IllegalC0Controls(CodepointCheckerSettings.Default)
+        .ToHashSet();
     
-    public override string[] CanReadEncodings { get; } = { WellKnownEncodings.UTF16BeBom, WellKnownEncodings.UTF16BeNoBom };
+    public override int MinimalSizeOfInput { get; } = 8;
+    
+    public override bool SupportBom { get; } = true;
+    public override string EncodingWithBom { get; } = WellKnownEncodings.UTF16BeBom;
+    public override string EncodingWithoutBom { get; } = WellKnownEncodings.UTF16BeNoBom;
 
-    public override bool TryDecode(InMemoryBinaryReader binaryReader, StringBuilder stringBuilder, [NotNullWhen(true)]  out string? encoding)
-    {
-        if (TryParseInternal(binaryReader, stringBuilder, Endianness.BigEndian, out var foundBom))
-        {
-            encoding = foundBom ? WellKnownEncodings.UTF16BeBom : WellKnownEncodings.UTF16BeNoBom;
-            return true;
-        }
-
-        encoding = null;
-        return false;
-    }
+    public override string? RequiredEncodingAnalyzer { get; } = null;
+    
+    public override DetectionProbability DefaultDetectionProbability { get; } = DetectionProbability.No;
 }

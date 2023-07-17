@@ -5,15 +5,11 @@ public class AsciiCharactersTextAnalyzer : IDefaultTextAnalyzer
     public DetectionProbability AnalyzeProbability(TextSample text, string encoding, out string? clarifiedEncoding)
     {
         clarifiedEncoding = null;
-        foreach (var chunk in text.GetChunkEnumerator())
+        
+        foreach (var c in text.GetChars())
         {
-            var span = chunk.Span;
-
-            foreach (var c in span)
-            {
-                if (c > (char)127)
-                    return DetectionProbability.No;
-            }
+            if (c > (char)127)
+                return DetectionProbability.No;
         }
         
         if (IsUtf8(encoding))

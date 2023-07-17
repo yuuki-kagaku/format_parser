@@ -1,25 +1,30 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using FormatParser.Text.Encoding;
 
 namespace FormatParser.Text;
 
-public class Utf16LeDecoder : Utf16Decoder
+public class Utf16LeDecoder : DecoderBase, IUtfDecoder
 {
-    public Utf16LeDecoder(CodepointConverter codepointConverter, TextFileParsingSettings settings) : base(codepointConverter, settings)
+    protected override System.Text.Decoder GetDecoder(int inputSize)
     {
+        var encoding = (System.Text.Encoding) System.Text.Encoding.Unicode.Clone();
+        var decoder = encoding.GetDecoder();
+        decoder.Fallback = FormatParserDecoderFallback.DoNotFailAtEndOfInput(inputSize, 4);
+        return encoding.GetDecoder();
     }
 
-    public override string[] CanReadEncodings { get; } = { WellKnownEncodings.UTF16LeBom, WellKnownEncodings.UTF16LeNoBom };
+    public override HashSet<uint> GetInvalidCharacters { get; } = CodepointChecker
+        .IllegalC0Controls(CodepointCheckerSettings.Default)
+        .ToHashSet();
     
-    public override bool TryDecode(InMemoryBinaryReader binaryReader, StringBuilder stringBuilder, [NotNullWhen(true)]  out string? encoding)
-    {
-        if (TryParseInternal(binaryReader, stringBuilder, Endianness.LittleEndian, out var foundBom))
-        {
-            encoding = foundBom ? WellKnownEncodings.UTF16LeBom : WellKnownEncodings.UTF16LeNoBom;
-            return true;
-        }
+    public override int MinimalSizeOfInput { get; } = 8;
+    
+    public override bool SupportBom { get; } = true;
+    public override string EncodingWithBom { get; } = WellKnownEncodings.UTF16LeBom;
+    public override string EncodingWithoutBom { get; } = WellKnownEncodings.UTF16LeNoBom;
 
-        encoding = null;
-        return false;
-    }
+    public override string? RequiredEncodingAnalyzer { get; } = null;
+    
+    public override DetectionProbability DefaultDetectionProbability { get; } = DetectionProbability.No;
 }

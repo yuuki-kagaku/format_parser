@@ -16,7 +16,7 @@ public class Utf16BeDecoder_Tests : TestBase
         var codepointConverter = new CodepointConverter();
         var textParserSettings = new TextFileParsingSettings();
         
-        decoder = new Utf16BeDecoder(codepointConverter, textParserSettings);
+        decoder = new Utf16BeDecoder();
     }
     
     [Test]
@@ -24,13 +24,13 @@ public class Utf16BeDecoder_Tests : TestBase
     {
         var content = File.ReadAllBytes(GetFile(TestFileCategory.Text, "loren_utf16_be_nobom"));
     
-        var deserializer = new InMemoryBinaryReader(content);
-        var sb = new StringBuilder();
+        var chars = new char[content.Length];
+        
+        var textDecodingResult = decoder.TryDecodeText(content, chars);
+        var text = new StringBuilder().Append(new Memory<char>(textDecodingResult.Chars.Array, textDecodingResult.Chars.Offset, textDecodingResult.Chars.Count)).ToString();
 
-        var isSuccessful = decoder.TryDecode(deserializer, sb, out var encoding);
-
-        isSuccessful.Should().Be(true);
-        encoding.Should().BeEquivalentTo(WellKnownEncodings.UTF16BeNoBom);
-        sb.ToString().Should().BeEquivalentTo(TextSamples.TextWithOnlyAsciiChars);
+        textDecodingResult.Should().NotBeNull();
+        textDecodingResult.Encoding.Should().BeEquivalentTo(WellKnownEncodings.UTF16BeNoBom);
+        text.Should().BeEquivalentTo(TextSamples.TextWithOnlyAsciiChars);
     }
 }

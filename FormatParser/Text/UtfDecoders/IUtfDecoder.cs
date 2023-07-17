@@ -1,6 +1,7 @@
+using FormatParser.Text.Encoding;
+
 namespace FormatParser.Text;
 
-public interface IUtfDecoder : ITextDecoder
+public interface IUtfDecoder : Encoding.ITextDecoder
 {
-    string[] CanReadEncodings { get; }
 }

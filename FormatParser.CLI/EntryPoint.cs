@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using System.Text.Json;
 using FormatParser.Text;
+using FormatParser.Text.Encoding;
+using ITextDecoder = FormatParser.Text.Encoding.ITextDecoder;
 
 namespace FormatParser.CLI;
 
@@ -21,9 +23,11 @@ public class EntryPoint
         
         var utfDecoders = new IUtfDecoder[]
         {
-            new Utf8Decoder(codepointConverter, settings.TextFileParsingSettings),
-            new Utf16LeDecoder(codepointConverter, settings.TextFileParsingSettings),
-            new Utf16BeDecoder(codepointConverter, settings.TextFileParsingSettings),
+            new Utf8Decoder(),
+            new Utf16LeDecoder(),
+            new Utf16BeDecoder(),
+            new Utf32LeDecoder(),
+            new Utf32BeDecoder(),
         };
         
         var textBasedFormatDetectors = new ITextBasedFormatDetector[]

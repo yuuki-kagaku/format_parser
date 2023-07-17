@@ -13,13 +13,13 @@ public class TextFileProcessor
         this.compositeTextFormatDecoder = compositeTextFormatDecoder;
     }
 
-    public IFileFormatInfo? TryProcess(InMemoryBinaryReader binaryReader)
+    public IFileFormatInfo? TryProcess(ArraySegment<byte> buffer)
     {
         try
         {
-            if (!compositeTextFormatDecoder.TryDecode(binaryReader, out var encoding, out var textSample))
+            if (!compositeTextFormatDecoder.TryDecode(buffer, out var encoding, out var textSample))
                 return null;
-
+            
             if (TryMatchTextBasedFormat(textSample, out var type, out var formatEncoding))
                 return new TextFileFormatInfo(type, formatEncoding ?? encoding.ToString());
 

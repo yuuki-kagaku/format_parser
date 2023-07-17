@@ -18,4 +18,6 @@ public static class UnicodeHelper
         
         return false;
     }
+
+    public static char Bom = (char)0xFEFF;
 }

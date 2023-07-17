@@ -15,16 +15,11 @@ public class RuFrequencyTextAnalyzer : ITextAnalyzer
         var totalChars = 0;
         var commonChars = 0;
         
-        foreach (var chunk in text.GetChunkEnumerator())
+        foreach (var c in text.GetChars())
         {
-            var span = chunk.Span;
-
-            foreach (var c in span)
-            {
-                totalChars++;
-                if (commonCharacters.Contains(c))
-                    commonChars++;
-            }
+            totalChars++;
+            if (commonCharacters.Contains(c))
+                commonChars++;
         }
 
         if (totalChars < MinimalCharsCount)

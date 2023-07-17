@@ -3,6 +3,8 @@ using FormatParser;
 using FormatParser.Helpers;
 using FormatParser.Test.Helpers;
 using FormatParser.Text;
+using FormatParser.Text.Encoding;
+using ITextDecoder = FormatParser.Text.Encoding.ITextDecoder;
 
 public class EntryPoint
 {
@@ -19,9 +21,11 @@ public class EntryPoint
         
         var utfDecoders = new IUtfDecoder[]
         {
-            new Utf8Decoder(codepointConverter, settings.TextFileParsingSettings),
-            new Utf16LeDecoder(codepointConverter, settings.TextFileParsingSettings),
-            new Utf16BeDecoder(codepointConverter, settings.TextFileParsingSettings),
+            new Utf8Decoder(),
+            new Utf16LeDecoder(),
+            new Utf16BeDecoder(),
+            new Utf32LeDecoder(),
+            new Utf32BeDecoder(),
         };
         
         var compositeTextFormatDecoder = new CompositeTextFormatDecoder(
@@ -77,7 +81,7 @@ public class EntryPoint
     {
         Console.WriteLine("");
         Console.WriteLine("");
-        Console.WriteLine($"Total amount of mismatch (excluding false detections of '{settings.Utility}') : {state.MatchMismatches}");
+        Console.WriteLine($"Total amount of mismatches (excluding false detections of '{settings.Utility}') : {state.MatchMismatches}");
         Console.WriteLine($"Text files according '{settings.Utility}' : {state.TextFilesAccordingToFileCommand}");
         Console.WriteLine($"Text files according to FormatParser : {state.TextFilesAccordingToFormatParser}");
         Console.WriteLine();

@@ -16,7 +16,7 @@ public class Utf16LeDecoder_Tests : TestBase
         var codepointConverter = new CodepointConverter();
         var textParserSettings = new TextFileParsingSettings();
         
-        decoder = new Utf16LeDecoder(codepointConverter, textParserSettings);
+        decoder = new Utf16LeDecoder();
     }
     
     [Test]
@@ -24,13 +24,13 @@ public class Utf16LeDecoder_Tests : TestBase
     {
         var content = File.ReadAllBytes(GetFile(TestFileCategory.Text, "loren_utf16_le_nobom"));
     
-        var deserializer = new InMemoryBinaryReader(content);
-        var sb = new StringBuilder();
-
-        var isSuccessful = decoder.TryDecode(deserializer, sb, out var encoding);
+        var chars = new char[content.Length];
         
-        isSuccessful.Should().Be(true);
-        encoding.Should().BeEquivalentTo(WellKnownEncodings.UTF16LeNoBom);
-        sb.ToString().Should().BeEquivalentTo(TextSamples.TextWithOnlyAsciiChars);
+        var textDecodingResult = decoder.TryDecodeText(content, chars);
+        var text = new StringBuilder().Append(new Memory<char>(textDecodingResult.Chars.Array, textDecodingResult.Chars.Offset, textDecodingResult.Chars.Count)).ToString();
+
+        textDecodingResult.Should().NotBeNull();
+        textDecodingResult.Encoding.Should().BeEquivalentTo(WellKnownEncodings.UTF16LeNoBom);
+        text.Should().BeEquivalentTo(TextSamples.TextWithOnlyAsciiChars);
     }
 }

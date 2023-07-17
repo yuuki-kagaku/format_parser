@@ -4,19 +4,32 @@ public class CodepointChecker
 {
     private readonly HashSet<uint> invalidCharacters;
 
-    private CodepointChecker(IEnumerable<uint> invalidCharacters)
+    public CodepointChecker(IEnumerable<uint> invalidCharacters)
     {
         this.invalidCharacters = invalidCharacters.ToHashSet();
     }
 
-    public static CodepointChecker IllegalC0Controls(CodepointCheckerSettings settings)
-        => new(ControlCharacters.NonTextC0Controls.Except(GetCharactersToAllow(settings)).Concat(GetCharactersToForbid(settings)));
+    public bool AllCharactersIsValid(ArraySegment<char> chars)
+    {
+        foreach (var c in chars)
+        {
+            if (!IsValidCodepoint(c))
+                return false;
+            
+         
+        }
 
-    public static CodepointChecker IllegalC0AndC1Controls(CodepointCheckerSettings settings)
-        => new(ControlCharacters.NonTextC0Controls.Concat(ControlCharacters.C1Controls).Except(GetCharactersToAllow(settings)).Concat(GetCharactersToForbid(settings)));
-
-
+        return true;
+    }
+    
     public bool IsValidCodepoint(uint codepoint) => !invalidCharacters.Contains(codepoint);
+    
+    public static IEnumerable<uint> IllegalC0Controls(CodepointCheckerSettings settings)
+        => ControlCharacters.NonTextC0Controls.Except(GetCharactersToAllow(settings)).Concat(GetCharactersToForbid(settings));
+
+    public static IEnumerable<uint> IllegalC0AndC1Controls(CodepointCheckerSettings settings)
+        => ControlCharacters.NonTextC0Controls.Concat(ControlCharacters.C1Controls).Except(GetCharactersToAllow(settings)).Concat(GetCharactersToForbid(settings));
+
     
     private static IEnumerable<uint> GetCharactersToAllow(CodepointCheckerSettings settings)
     {

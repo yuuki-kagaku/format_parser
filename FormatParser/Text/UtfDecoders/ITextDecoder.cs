@@ -7,6 +7,5 @@ public interface ITextDecoder
 {
     bool TryDecode(InMemoryBinaryReader binaryReader, StringBuilder stringBuilder, [NotNullWhen(true)] out string? encoding);
     string? RequiredEncodingAnalyzer { get; }
-    
     DetectionProbability DefaultDetectionProbability { get; }
 }

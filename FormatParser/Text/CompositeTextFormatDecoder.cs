@@ -1,17 +1,18 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
+using FormatParser.Text.Encoding;
 
 namespace FormatParser.Text;
 
 public class CompositeTextFormatDecoder
 {
     private readonly TextFileParsingSettings settings;
-    private readonly ITextDecoder[] decoders;
-    private readonly Dictionary<ITextDecoder, IEnumerable<ITextAnalyzer>> encodingAnalyzersDictionary;
+    private readonly Encoding.ITextDecoder[] decoders;
+    private readonly Dictionary<Encoding.ITextDecoder, IEnumerable<ITextAnalyzer>> encodingAnalyzersDictionary;
+    private readonly Dictionary<Encoding.ITextDecoder, CodepointChecker> invalidCharactersCheckers;
 
     public CompositeTextFormatDecoder(
         IUtfDecoder[] utfDecoders,
-        ITextDecoder[] nonUtfDecoders, 
+        Encoding.ITextDecoder[] nonUtfDecoders, 
         ITextAnalyzer[] encodingAnalyzers,
         TextFileParsingSettings settings)
     {
@@ -22,39 +23,41 @@ public class CompositeTextFormatDecoder
             .ToDictionary(x => x.Language, x => x.Analyzer);
 
         encodingAnalyzersDictionary = decoders.ToDictionary(x => x, x => GetEncodingAnalyzers(x, encodingAnalyzersByLanguage));
-            
+        invalidCharactersCheckers = decoders.ToDictionary(x => x, x => new CodepointChecker(x.GetInvalidCharacters));
         this.settings = settings;
     }
 
-    public bool TryDecode(InMemoryBinaryReader binaryReader, [NotNullWhen(true)] out string? resultEncoding, [NotNullWhen(true)] out string? resultTextSample)
+    public bool TryDecode(ArraySegment<byte> bytes, [NotNullWhen(true)] out string? resultEncoding, [NotNullWhen(true)] out string? resultTextSample)
     {
         var bestMatchProbability = DetectionProbability.No;
         resultEncoding = null;
         resultTextSample = null;
-        var stringBuilder = new StringBuilder(settings.SampleSize);
+        var charsBuffer = new char[settings.SampleSize];
         
         foreach (var decoder in decoders)
         {
             try
             {
-                binaryReader.Offset = 0;
-                stringBuilder.Clear();
-
-                if (decoder.TryDecode(binaryReader, stringBuilder, out var encoding))
+                var decodeResult = decoder.TryDecodeText(bytes, charsBuffer);
+                if (decodeResult != null)
                 {
-                    var textSample = new TextSample(stringBuilder);
+                    var invalidCharactersChecker = invalidCharactersCheckers[decoder];
+                    if (!invalidCharactersChecker.AllCharactersIsValid(decodeResult.Chars))
+                        continue;
+                    
+                    var textSample = new TextSample(decodeResult.Chars);
 
                     var defaultDetectionProbability = decoder.DefaultDetectionProbability;
                     if (defaultDetectionProbability > bestMatchProbability)
-                        (bestMatchProbability, resultEncoding, resultTextSample) = (defaultDetectionProbability, encoding, textSample.Text);
+                        (bestMatchProbability, resultEncoding, resultTextSample) = (defaultDetectionProbability, decodeResult.Encoding, textSample.Text);
                     
                     foreach (var encodingAnalyzer in encodingAnalyzersDictionary[decoder])
                     {
-                        var detectionProbability = encodingAnalyzer.AnalyzeProbability(textSample, encoding, out var clarifiedEncoding);
+                        var detectionProbability = encodingAnalyzer.AnalyzeProbability(textSample, decodeResult.Encoding, out var clarifiedEncoding);
 
                         if (detectionProbability > bestMatchProbability)
                         {
-                            (bestMatchProbability, resultEncoding, resultTextSample) = (detectionProbability, clarifiedEncoding ?? encoding, textSample.Text);
+                            (bestMatchProbability, resultEncoding, resultTextSample) = (detectionProbability, clarifiedEncoding ?? decodeResult.Encoding, textSample.Text);
                             
                             if (bestMatchProbability >= DetectionProbability.High)
                                 return true;
@@ -70,7 +73,8 @@ public class CompositeTextFormatDecoder
         return bestMatchProbability > DetectionProbability.No;
     }
     
-    private static IEnumerable<ITextAnalyzer> GetEncodingAnalyzers(ITextDecoder decoder, Dictionary<string, ITextAnalyzer> encodingAnalyzersByLanguage)
+    
+    private static IEnumerable<ITextAnalyzer> GetEncodingAnalyzers(Encoding.ITextDecoder decoder, Dictionary<string, ITextAnalyzer> encodingAnalyzersByLanguage)
     {
         yield return new AsciiCharactersTextAnalyzer();
         yield return new UTF16Heuristics();
