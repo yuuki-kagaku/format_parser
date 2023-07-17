@@ -1,3 +1,5 @@
+using System.Text;
+using FormatParser.Helpers;
 using FormatParser.Tests.TestData;
 
 namespace FormatParser.Tests;
@@ -32,4 +34,21 @@ public class TestBase
     }
 
     protected string TestDir = "TestData";
+
+    protected string BuildString(ArraySegment<char> chars) => new StringBuilder().Append(chars.ToMemory()).ToString();
+    
+    protected static string ReadFileAsUtf8(string file)
+    {
+        return Encoding.UTF8.GetString(File.ReadAllBytes(file));
+    }
+    
+    protected static string ReadFileAsUtf16Le(string file)
+    {
+        return Encoding.Unicode.GetString(File.ReadAllBytes(file));
+    }
+    
+    protected static string ReadFileAsUtf16Be(string file)
+    {
+        return Encoding.BigEndianUnicode.GetString(File.ReadAllBytes(file));
+    }
 }

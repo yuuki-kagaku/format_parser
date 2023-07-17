@@ -58,17 +58,12 @@ public class UTF16Heuristics : IDefaultTextAnalyzer
         return false;
     }
 
-    public TextAnalyzerType Type { get; } = TextAnalyzerType.Frequency;
     public string[] SupportedLanguages { get; } = {"*"};
     
     private static readonly HashSet<char> CommonChars = CommonlyUsedCharacters.EnglishChars
         .Concat(CommonlyUsedCharacters.CommonSpecialCharacters)
         .Concat(CommonlyUsedCharacters.CommonPunctuation)            
         .ToHashSet();
-
-    private static readonly HashSet<char> CJKPunctiationCharacters =
-        CommonCJKChars.CommonCJKPunctuation
-            .ToHashSet();
     
     private static readonly HashSet<char> HighlyUnusualCharacters =
         new char[]

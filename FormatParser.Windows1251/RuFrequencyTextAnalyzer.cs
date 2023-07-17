@@ -1,4 +1,6 @@
-namespace FormatParser.Text;
+using FormatParser.Text;
+
+namespace FormatParser.Windows1251;
 
 public class RuFrequencyTextAnalyzer : ITextAnalyzer
 {
@@ -37,6 +39,5 @@ public class RuFrequencyTextAnalyzer : ITextAnalyzer
     
     private double Threshold { get; } = 0.98;
 
-    public TextAnalyzerType Type { get; } = TextAnalyzerType.Frequency;
     public string[] SupportedLanguages { get; } = new[] { "ru" };
 }

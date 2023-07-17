@@ -3,8 +3,8 @@ using FluentAssertions;
 using FormatParser.Tests.TestData;
 using FormatParser.Text;
 using FormatParser.Text.Encoding;
+using FormatParser.Windows1251;
 using NUnit.Framework;
-using ITextDecoder = FormatParser.Text.Encoding.ITextDecoder;
 
 namespace FormatParser.Tests;
 
@@ -15,7 +15,6 @@ public class CompositeTextFormatDecoder_Tests : TestBase
     [SetUp]
     public void SetUp()
     {
-        var codepointConverter = new CodepointConverter();
         var textParserSettings = new TextFileParsingSettings();
         
         var nonUnicodeDecoders = new ITextDecoder[]
@@ -227,21 +226,6 @@ public class CompositeTextFormatDecoder_Tests : TestBase
         isSuccessful.Should().BeTrue();
         encoding.Should().BeEquivalentTo(WellKnownEncodings.UTF16BeNoBom);
         text.Should().Be(ReadFileAsUtf16Be(filename));
-    }
-
-    private static string ReadFileAsUtf8(string file)
-    {
-        return Encoding.UTF8.GetString(File.ReadAllBytes(file));
-    }
-    
-    private static string ReadFileAsUtf16Le(string file)
-    {
-        return Encoding.Unicode.GetString(File.ReadAllBytes(file));
-    }
-    
-    private static string ReadFileAsUtf16Be(string file)
-    {
-        return Encoding.BigEndianUnicode.GetString(File.ReadAllBytes(file));
     }
 
     private static async Task<ArraySegment<byte>> GetBufferAsync(string filename)

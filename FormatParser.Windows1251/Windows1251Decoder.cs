@@ -1,7 +1,8 @@
 using System.Text;
+using FormatParser.Text;
 using FormatParser.Text.Encoding;
 
-namespace FormatParser.Text;
+namespace FormatParser.Windows1251;
 
 public class Windows1251Decoder : DecoderBase
 {
@@ -23,8 +24,8 @@ public class Windows1251Decoder : DecoderBase
 
     private static Decoder GetDecoder()
     {
-        System.Text.Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-        var encoding = (System.Text.Encoding) System.Text.Encoding.GetEncoding("windows-1251").Clone();
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        var encoding = (Encoding) Encoding.GetEncoding("windows-1251").Clone();
         var decoder = encoding.GetDecoder();
         decoder.Fallback = DecoderFallback.ExceptionFallback;
         return encoding.GetDecoder();

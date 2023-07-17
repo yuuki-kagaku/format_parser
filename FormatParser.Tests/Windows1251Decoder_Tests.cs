@@ -1,13 +1,15 @@
 using System.Text;
 using FluentAssertions;
+using FormatParser.Tests.TestData;
 using FormatParser.Text;
+using FormatParser.Windows1251;
 using NUnit.Framework;
 
 namespace FormatParser.Tests;
 
-public class Windows1251Decoder_Tests
+public class Windows1251Decoder_Tests : TestBase
 {
-    private Windows1251Decoder decoder;
+    private Windows1251Decoder decoder = null!;
 
     [SetUp]
     public void SetUp()
@@ -18,16 +20,15 @@ public class Windows1251Decoder_Tests
     }
     
     [Test]
-    public async Task Should_read_windows1251()
+    public void Should_read_windows1251()
     {
-        var content = File.ReadAllBytes(@"./TestData/text/bsd_windows1251");
+        var content = File.ReadAllBytes(GetFile(TestFileCategory.Text, "bsd_windows1251"));
         var chars = new char[content.Length];
         
         var textDecodingResult = decoder.TryDecodeText(content, chars);
-        var text = new StringBuilder().Append(new Memory<char>(textDecodingResult.Chars.Array, textDecodingResult.Chars.Offset, textDecodingResult.Chars.Count)).ToString();
-
         textDecodingResult.Should().NotBeNull();
-        textDecodingResult.Encoding.Should().BeEquivalentTo(decoder.EncodingWithoutBom);
-        text.Should().Be(TextSamples.RussianLanguageSample);
+        
+        textDecodingResult!.Encoding.Should().BeEquivalentTo(decoder.EncodingWithoutBom);
+        BuildString(chars).Should().Be(TextSamples.RussianLanguageSample);
     }
 }

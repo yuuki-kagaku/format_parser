@@ -1,10 +1,9 @@
 ﻿using ConsoleApp1;
 using FormatParser;
 using FormatParser.Helpers;
-using FormatParser.Test.Helpers;
 using FormatParser.Text;
 using FormatParser.Text.Encoding;
-using ITextDecoder = FormatParser.Text.Encoding.ITextDecoder;
+using FormatParser.Windows1251;
 
 public class EntryPoint
 {
@@ -14,8 +13,6 @@ public class EntryPoint
         
         var directory = args[0];
 
-        var codepointConverter = new CodepointConverter();
-        
         var nonUnicodeDecoders = new ITextDecoder[] {new Windows1251Decoder(settings.TextFileParsingSettings)};
         var languageAnalyzers = new ITextAnalyzer[] {new RuDictionaryTextAnalyzer()};
         

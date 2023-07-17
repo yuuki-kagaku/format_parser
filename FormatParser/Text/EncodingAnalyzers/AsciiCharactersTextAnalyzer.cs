@@ -23,6 +23,5 @@ public class AsciiCharactersTextAnalyzer : IDefaultTextAnalyzer
 
     private bool IsUtf8(string encoding) => encoding is WellKnownEncodings.Utf8BOM or WellKnownEncodings.Utf8NoBOM;
 
-    public TextAnalyzerType Type { get; } = TextAnalyzerType.Frequency;
     public string[] SupportedLanguages { get; } = {"*"};
 }

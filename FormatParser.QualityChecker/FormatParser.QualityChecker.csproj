@@ -11,6 +11,7 @@
     <ItemGroup>
       <ProjectReference Include="..\FormatParser.Test.Helpers\FormatParser.Test.Helpers.csproj" />
       <ProjectReference Include="..\FormatParser.Utf\FormatParser.Utf.csproj" />
+      <ProjectReference Include="..\FormatParser.Windows1251\FormatParser.Windows1251.csproj" />
       <ProjectReference Include="..\FormatParser\FormatParser.csproj" />
     </ItemGroup>
 

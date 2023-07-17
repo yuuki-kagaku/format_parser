@@ -2,7 +2,7 @@
 using System.Text.Json;
 using FormatParser.Text;
 using FormatParser.Text.Encoding;
-using ITextDecoder = FormatParser.Text.Encoding.ITextDecoder;
+using FormatParser.Windows1251;
 
 namespace FormatParser.CLI;
 
@@ -15,8 +15,6 @@ public class EntryPoint
         LoadPlugins();
         
         var binaryDecoders = GetAllInstancesOf<IBinaryFormatDecoder>().ToArray();
-        
-        var codepointConverter = new CodepointConverter();
         
         var nonUnicodeDecoders = new ITextDecoder[] {new Windows1251Decoder(settings.TextFileParsingSettings)};
         var languageAnalyzers = new ITextAnalyzer[] {new RuDictionaryTextAnalyzer()};

@@ -1,5 +1,6 @@
 using System.Text;
 using FluentAssertions;
+using FormatParser.Helpers;
 using FormatParser.Tests.TestData;
 using FormatParser.Text;
 using NUnit.Framework;
@@ -13,7 +14,6 @@ public class Utf16LeDecoder_Tests : TestBase
     [SetUp]
     public void SetUp()
     {
-        var codepointConverter = new CodepointConverter();
         var textParserSettings = new TextFileParsingSettings();
         
         decoder = new Utf16LeDecoder();
@@ -22,15 +22,15 @@ public class Utf16LeDecoder_Tests : TestBase
     [Test]
     public void Should_read_utf16_le_no_bom()
     {
-        var content = File.ReadAllBytes(GetFile(TestFileCategory.Text, "loren_utf16_le_nobom"));
+        var filename = GetFile(TestFileCategory.Text, "loren_utf16_le_nobom");
+        var content = File.ReadAllBytes(filename);
     
         var chars = new char[content.Length];
         
         var textDecodingResult = decoder.TryDecodeText(content, chars);
-        var text = new StringBuilder().Append(new Memory<char>(textDecodingResult.Chars.Array, textDecodingResult.Chars.Offset, textDecodingResult.Chars.Count)).ToString();
-
         textDecodingResult.Should().NotBeNull();
-        textDecodingResult.Encoding.Should().BeEquivalentTo(WellKnownEncodings.UTF16LeNoBom);
-        text.Should().BeEquivalentTo(TextSamples.TextWithOnlyAsciiChars);
+
+        textDecodingResult!.Encoding.Should().BeEquivalentTo(WellKnownEncodings.UTF16LeNoBom);
+        BuildString(textDecodingResult.Chars).Should().BeEquivalentTo(ReadFileAsUtf16Le(filename));
     }
 }

@@ -9,4 +9,6 @@ public static class ArraySegmentExtensions
 
         return new ArraySegment<T>(arraySegment.Array!, arraySegment.Offset, count);
     }
+
+    public static Memory<T> ToMemory<T>(this ArraySegment<T> arraySegment) => new (arraySegment.Array, arraySegment.Offset, arraySegment.Count);
 }

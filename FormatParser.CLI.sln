@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.Domain", "Form
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.PerformanceTest", "FormatParser.PerformanceTest\FormatParser.PerformanceTest.csproj", "{83CA3EBF-704D-4058-BA78-D161F1565637}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.Windows1251", "FormatParser.Windows1251\FormatParser.Windows1251.csproj", "{5286ABE9-3CCE-4ED1-A9D3-EC130FF08CC2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,5 +74,9 @@ Global
 		{83CA3EBF-704D-4058-BA78-D161F1565637}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83CA3EBF-704D-4058-BA78-D161F1565637}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83CA3EBF-704D-4058-BA78-D161F1565637}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5286ABE9-3CCE-4ED1-A9D3-EC130FF08CC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5286ABE9-3CCE-4ED1-A9D3-EC130FF08CC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5286ABE9-3CCE-4ED1-A9D3-EC130FF08CC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5286ABE9-3CCE-4ED1-A9D3-EC130FF08CC2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

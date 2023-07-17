@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
+using FormatParser.Text;
 
-namespace FormatParser.Text;
+namespace FormatParser.Windows1251;
 
 public class RuDictionaryTextAnalyzer : ITextAnalyzer
 {
@@ -11,8 +12,6 @@ public class RuDictionaryTextAnalyzer : ITextAnalyzer
         clarifiedEncoding = null;
         return pattern.IsMatch(text.Text) ? DetectionProbability.High : DetectionProbability.No;
     }
-
-    public TextAnalyzerType Type { get; } = TextAnalyzerType.Dictionary;
 
     public string[] SupportedLanguages { get; } = {"ru"};
 }
