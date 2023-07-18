@@ -1,7 +1,7 @@
 <Project TreatAsLocalProperty="Target">
     <Target Name="CustomAfterBuild" AfterTargets="PostBuildEvent">
         <ItemGroup>
-            <Dictionaries Include="$(SolutionDir)\resources\most_used_hangul;$(SolutionDir)\resources\most_used_kanji;$(SolutionDir)\resources\most_used_chinese_characters"/>
+            <Dictionaries Include="$(SolutionDir)\resources\*"/>
         </ItemGroup>
 
         <Copy
