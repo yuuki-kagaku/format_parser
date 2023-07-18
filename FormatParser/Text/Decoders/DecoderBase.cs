@@ -5,7 +5,7 @@ namespace FormatParser.Text.Decoders;
 
 public abstract class DecoderBase : ITextDecoder
 {
-    public TextDecodingResult? TryDecodeText(ArraySegment<byte> bytes, char[] chars)
+    public TextDecodingResult? TryDecodeText(ArraySegment<byte> bytes)
     {
         if (bytes.Count < MinimalSizeOfInput)
             return null;
@@ -13,6 +13,7 @@ public abstract class DecoderBase : ITextDecoder
         var decoder = GetDecoder(bytes.Count);
         try
         {
+            var chars = new char[bytes.Count];
             var numberOfChars = decoder.GetChars(bytes, chars, true);
 
             if (SupportBom && chars[0] == UnicodeHelper.Bom)
@@ -36,7 +37,7 @@ public abstract class DecoderBase : ITextDecoder
     
     public abstract EncodingInfo EncodingWithoutBom { get; }
 
-    public abstract HashSet<char> GetInvalidCharacters { get; }
+    public abstract IEnumerable<char> GetInvalidCharacters { get; }
 
     public abstract string? RequiredEncodingAnalyzer { get; }
     

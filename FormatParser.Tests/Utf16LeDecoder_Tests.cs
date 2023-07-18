@@ -23,9 +23,7 @@ public class Utf16LeDecoder_Tests : TestBase
         var filename = GetFile(TestFileCategory.Text, "loren_utf16_le_nobom");
         var content = File.ReadAllBytes(filename);
     
-        var chars = new char[content.Length];
-        
-        var textDecodingResult = decoder.TryDecodeText(content, chars);
+        var textDecodingResult = decoder.TryDecodeText(content);
         textDecodingResult.Should().NotBeNull();
 
         textDecodingResult!.Encoding.Should().BeEquivalentTo(EncodingInfo.UTF16LeNoBom);

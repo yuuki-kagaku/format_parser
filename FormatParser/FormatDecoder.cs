@@ -1,4 +1,5 @@
 using FormatParser.BinaryReader;
+using FormatParser.Domain;
 using FormatParser.Text;
 
 namespace FormatParser;
@@ -20,7 +21,7 @@ public class FormatDecoder
     {
         await using var fileStream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, settings.FileStreamBufferSize);
 
-        var binaryReader = new StreamingBinaryReader(fileStream);
+        var binaryReader = new StreamingBinaryReader(fileStream, Endianness.NotAllowed);
 
         var result = await TryDecodeAsBinaryAsync(binaryReader);
 

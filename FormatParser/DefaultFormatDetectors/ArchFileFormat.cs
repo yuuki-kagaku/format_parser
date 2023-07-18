@@ -1,4 +1,4 @@
-namespace FormatParser.DefaultDecoders;
+namespace FormatParser.DefaultFormatDetectors;
 
 public record ArchFileFormat : IFileFormatInfo
 {

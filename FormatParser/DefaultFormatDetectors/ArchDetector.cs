@@ -1,11 +1,11 @@
 using FormatParser.BinaryReader;
 using FormatParser.Helpers;
 
-namespace FormatParser.DefaultDecoders;
+namespace FormatParser.DefaultFormatDetectors;
 
 public class ArchDetector : IBinaryFormatDetector
 {
-    private static byte[] MagicNumbers = "!<arch>\n"u8.ToArray();
+    private static readonly byte[] MagicNumbers = "!<arch>\n"u8.ToArray();
 
     public async Task<IFileFormatInfo?> TryDetectAsync(StreamingBinaryReader binaryReader)
     {

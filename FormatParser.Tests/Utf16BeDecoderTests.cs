@@ -25,7 +25,7 @@ public class Utf16BeDecoder_Tests : TestBase
     
         var chars = new char[content.Length];
         
-        var textDecodingResult = decoder.TryDecodeText(content, chars);
+        var textDecodingResult = decoder.TryDecodeText(content);
         textDecodingResult.Should().NotBeNull();
         
         textDecodingResult!.Encoding.Should().BeEquivalentTo(EncodingInfo.UTF16BeNoBom);

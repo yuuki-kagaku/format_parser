@@ -8,7 +8,6 @@ namespace FormatParser.Tests;
 public class Utf8EncodingDecoder_Tests : TestBase
 {
     private Utf8Decoder decoder = null!;
-    private char[] charBuffer = null!;
     private string expectedString= null!;
 
     [SetUp]
@@ -16,7 +15,6 @@ public class Utf8EncodingDecoder_Tests : TestBase
     {
         var textFileParsingSettings = new TextFileParsingSettings();
         decoder = new Utf8Decoder(textFileParsingSettings);
-        charBuffer = new char[8096];
         expectedString = ReadFileAsUtf8(GetFile(TestFileCategory.Text, "utf8_bmp"));
     }
     
@@ -26,7 +24,7 @@ public class Utf8EncodingDecoder_Tests : TestBase
         var file = GetFile(TestFileCategory.Text, "utf8_bmp_broken_at_end");
 
         var bytes = File.ReadAllBytes(file);
-        var result = decoder.TryDecodeText(bytes, charBuffer);
+        var result = decoder.TryDecodeText(bytes);
 
         result.Should().NotBeNull();
         var str = BuildString(result!.Chars);
@@ -39,7 +37,7 @@ public class Utf8EncodingDecoder_Tests : TestBase
         var file = GetFile(TestFileCategory.Text, "utf8_bmp");
 
         var bytes = File.ReadAllBytes(file);
-        var result = decoder.TryDecodeText(bytes, charBuffer);
+        var result = decoder.TryDecodeText(bytes);
 
         result.Should().NotBeNull();
         var str = BuildString(result!.Chars);
@@ -52,7 +50,7 @@ public class Utf8EncodingDecoder_Tests : TestBase
         var file = GetFile(TestFileCategory.Text, "utf8_bmp_broken_at_end_and_in_the_middle");
 
         var bytes = File.ReadAllBytes(file);
-        var result = decoder.TryDecodeText(bytes, charBuffer);
+        var result = decoder.TryDecodeText(bytes);
 
         result.Should().BeNull();
     }

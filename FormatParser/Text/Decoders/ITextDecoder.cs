@@ -2,10 +2,10 @@ namespace FormatParser.Text.Decoders;
 
 public interface ITextDecoder
 { 
-    TextDecodingResult? TryDecodeText(ArraySegment<byte> bytes, char[] chars);
+    TextDecodingResult? TryDecodeText(ArraySegment<byte> bytes);
     
     string? RequiredEncodingAnalyzer { get; }
     DetectionProbability DefaultDetectionProbability { get; }
 
-    HashSet<char> GetInvalidCharacters { get; }
+    IEnumerable<char> GetInvalidCharacters { get; }
 }

@@ -8,12 +8,13 @@ public class StreamingBinaryReader
 {
     private readonly Stream stream;
     private readonly byte[] defaultBuffer = GC.AllocateArray<byte>(16, true);
-    private Endianness endianness = Endianness.LittleEndian;
+    private Endianness endianness;
     private static readonly Endianness RunningCpuEndianness = BitConverter.IsLittleEndian ? Endianness.LittleEndian : Endianness.BigEndian;
 
-    public StreamingBinaryReader(Stream stream)
+    public StreamingBinaryReader(Stream stream, Endianness endianness)
     {
         this.stream = stream;
+        this.endianness = endianness;
     }
 
     public void SetEndianness(Endianness e)
@@ -49,16 +50,17 @@ public class StreamingBinaryReader
 
     public void SkipUlong() => SkipLong();
 
-    public void SkipLong() => Offset += sizeof(long);
+    public void SkipLong() => Skip<long>();
 
     public void SkipUInt() => SkipInt();
-    public void SkipInt() => Offset += sizeof(int);
+    public void SkipInt() => Skip<int>();
 
     public void SkipUShort() => SkipShort();
-    public void SkipShort() => Offset += sizeof(short);
-    public void SkipByte() => Offset += 1;
+    public void SkipShort() => Skip<short>();
+    public void SkipByte() => Skip<byte>();
     public void SkipBytes(int count) => Offset += count;
     public void SkipBytes(uint count) => Offset += count;
+    private unsafe void Skip<T>() where T : unmanaged => Offset += sizeof(T);
 
     public async Task<string> ReadNulTerminatingStringAsync(int size)
     {

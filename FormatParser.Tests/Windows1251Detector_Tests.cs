@@ -21,12 +21,11 @@ public class Windows1251Detector_Tests : TestBase
     public void Should_read_windows1251()
     {
         var content = File.ReadAllBytes(GetFile(TestFileCategory.Text, "bsd_windows1251"));
-        var chars = new char[content.Length];
         
-        var textDecodingResult = decoder.TryDecodeText(content, chars);
+        var textDecodingResult = decoder.TryDecodeText(content);
         textDecodingResult.Should().NotBeNull();
         
         textDecodingResult!.Encoding.Should().BeEquivalentTo(decoder.EncodingWithoutBom);
-        BuildString(chars).Should().Be(TextSamples.RussianLanguageSample);
+        BuildString(textDecodingResult.Chars).Should().Be(TextSamples.RussianLanguageSample);
     }
 }

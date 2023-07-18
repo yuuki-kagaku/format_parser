@@ -34,13 +34,12 @@ public class CompositeTextFormatDecoder
         var bestMatchProbability = DetectionProbability.No;
         resultEncoding = null;
         resultTextSample = null;
-        var charsBuffer = new char[settings.SampleSize];
         
         foreach (var decoder in decoders)
         {
             try
             {
-                var decodeResult = decoder.TryDecodeText(bytes, charsBuffer);
+                var decodeResult = decoder.TryDecodeText(bytes);
                 if (decodeResult != null)
                 {
                     var invalidCharactersChecker = invalidCharactersCheckers[decoder];

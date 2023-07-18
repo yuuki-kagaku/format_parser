@@ -94,7 +94,7 @@ public class MacODetector_Tests : TestBase
     private async Task<IFileFormatInfo?> DecodeAsync(string filename)
     {
         await using var stream = new FileStream(filename, FileMode.Open, FileAccess.Read);
-        var binaryReader = new StreamingBinaryReader(stream);
+        var binaryReader = new StreamingBinaryReader(stream, Endianness.NotAllowed);
 
         return await machODetector.TryDetectAsync(binaryReader);
     }

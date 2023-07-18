@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using System.Text.Json;
 using FormatParser.CLI.ArgumentParser;
 using FormatParser.Text;
@@ -55,6 +56,7 @@ public class EntryPoint
 
         var cts = new CancellationTokenSource();
         var state = new FormatParserCliState();
+        
         runner.Run(settings, state, cts.Token).GetAwaiter().GetResult();
 
         Console.WriteLine($"Run complete. Elapsed: {state.Stopwatch!.Elapsed.TotalMilliseconds}");
@@ -106,7 +108,7 @@ public class EntryPoint
             .Where(t => type.IsAssignableFrom(t))
             .Where(t => !t.IsInterface || !t.IsAbstract);
 
-        foreach (var t in types)
+        foreach (var t in types.OrderBy(t => t.Name))
             yield return (T)Activator.CreateInstance(t)!;
     }
 }

@@ -140,7 +140,7 @@ public class ElfDetector_Tests : TestBase
     private async Task<ElfFileFormatInfo?> DecodeAsync(string filename)
     {
         await using var stream = new FileStream(filename, FileMode.Open, FileAccess.Read);
-        var binaryReader = new StreamingBinaryReader(stream);
+        var binaryReader = new StreamingBinaryReader(stream, Endianness.BigEndian);
 
         return await elfDetector.TryDetectAsync(binaryReader) as ElfFileFormatInfo;
     }
