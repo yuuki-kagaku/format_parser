@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using FormatParser.Domain;
 using FormatParser.TextBasedFormats;
 
 namespace FormatParser.Text;

@@ -37,7 +37,7 @@ public class FileDiscoverer
         }
         catch (IOException)
         {
-            if (settings.FallOnIOException)
+            if (settings.FailOnIOException)
                 throw;
         }
 
@@ -58,7 +58,7 @@ public class FileDiscoverer
         }
         catch (IOException)
         {
-            if (settings.FallOnIOException)
+            if (settings.FailOnIOException)
                 throw;
         }
     }

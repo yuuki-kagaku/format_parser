@@ -20,7 +20,7 @@ public class Utf16LeDecoder_Tests : TestBase
     [Test]
     public void Should_read_utf16_le_no_bom()
     {
-        var filename = GetFile(TestFileCategory.Text, "loren_utf16_le_nobom");
+        var filename = GetFile(TestFileCategory.TextUtf16, "loren_utf16_le_nobom");
         var content = File.ReadAllBytes(filename);
     
         var textDecodingResult = decoder.TryDecodeText(content);

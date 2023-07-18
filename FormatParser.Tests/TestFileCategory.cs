@@ -17,7 +17,9 @@ public enum TestFileCategory
     PeManaged,
     PeWindows,
     Text,
+    TextUtf32,
     Xml,
     PseudoText,
     TextUtf16,
+    TextUtf8,
 }

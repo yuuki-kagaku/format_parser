@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using FormatParser.Domain;
 
 namespace FormatParser.CLI;
 

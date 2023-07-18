@@ -24,9 +24,11 @@ public class TestBase
             TestFileCategory.PeWindows => $"pe{Path.DirectorySeparatorChar}windows",
             TestFileCategory.PeManaged => $"pe{Path.DirectorySeparatorChar}managed",
             TestFileCategory.Text => "text",
+            TestFileCategory.TextUtf16 => "text_utf16",
+            TestFileCategory.TextUtf32 => "text_utf32",
+            TestFileCategory.TextUtf8 => "text_utf8",
             TestFileCategory.Xml => "xml",
             TestFileCategory.PseudoText => "text_pseudo_utf16",
-            TestFileCategory.TextUtf16 => "text_utf16",
             _ => throw new ArgumentOutOfRangeException(nameof(testFileCategory), testFileCategory, null)
         };
         
@@ -50,5 +52,20 @@ public class TestBase
     protected static string ReadFileAsUtf16Be(string file)
     {
         return Encoding.BigEndianUnicode.GetString(File.ReadAllBytes(file));
+    }
+    
+    protected static string ReadFileAsUtf32Be(string file)
+    {
+        return File.ReadAllText(file, new UTF32Encoding(true, true));
+    }
+    
+    protected static string ReadFileAsUtf32Le(string file)
+    {
+        return File.ReadAllText(file, new UTF32Encoding(false, true));
+    }
+    
+    protected static string ReadFileAsWindows1251(string file)
+    {
+        return File.ReadAllText(file, Encoding.GetEncoding("windows-1251"));
     }
 }

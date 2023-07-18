@@ -15,13 +15,13 @@ public class Utf8EncodingDecoder_Tests : TestBase
     {
         var textFileParsingSettings = new TextFileParsingSettings();
         decoder = new Utf8Decoder(textFileParsingSettings);
-        expectedString = ReadFileAsUtf8(GetFile(TestFileCategory.Text, "utf8_bmp"));
+        expectedString = ReadFileAsUtf8(GetFile(TestFileCategory.TextUtf8, "utf8_bmp"));
     }
     
     [Test]
     public void Should_not_throw_when_broken_character_positions_at_the_end_of_input()
     {
-        var file = GetFile(TestFileCategory.Text, "utf8_bmp_broken_at_end");
+        var file = GetFile(TestFileCategory.TextUtf8, "utf8_bmp_broken_at_end");
 
         var bytes = File.ReadAllBytes(file);
         var result = decoder.TryDecodeText(bytes);
@@ -34,7 +34,7 @@ public class Utf8EncodingDecoder_Tests : TestBase
     [Test]
     public void Should_not_throw_when_input_is_correct()
     {
-        var file = GetFile(TestFileCategory.Text, "utf8_bmp");
+        var file = GetFile(TestFileCategory.TextUtf8, "utf8_bmp");
 
         var bytes = File.ReadAllBytes(file);
         var result = decoder.TryDecodeText(bytes);
@@ -47,7 +47,7 @@ public class Utf8EncodingDecoder_Tests : TestBase
     [Test]
     public void Should_return_null_when_broken_character_positions_in_the_middle_of_the_input()
     {
-        var file = GetFile(TestFileCategory.Text, "utf8_bmp_broken_at_end_and_in_the_middle");
+        var file = GetFile(TestFileCategory.TextUtf8, "utf8_bmp_broken_at_end_and_in_the_middle");
 
         var bytes = File.ReadAllBytes(file);
         var result = decoder.TryDecodeText(bytes);

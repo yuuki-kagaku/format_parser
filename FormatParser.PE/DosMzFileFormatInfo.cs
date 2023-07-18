@@ -1,3 +1,5 @@
+using FormatParser.Domain;
+
 namespace FormatParser.PE;
 
 public record DosMzFileFormatInfo() : IFileFormatInfo

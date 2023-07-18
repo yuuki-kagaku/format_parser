@@ -1,6 +1,7 @@
+using FormatParser.Text.EncodingAnalyzers;
 using FormatParser.Text.Helpers;
 
-namespace FormatParser.Text.EncodingAnalyzers;
+namespace FormatParser.Text.TextAnalyzers;
 
 public class AsciiCharactersTextAnalyzer : ITextAnalyzer
 {

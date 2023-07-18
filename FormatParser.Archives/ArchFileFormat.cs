@@ -1,3 +1,5 @@
+using FormatParser.Domain;
+
 namespace FormatParser.Archives;
 
 public record ArchFileFormat : IFileFormatInfo

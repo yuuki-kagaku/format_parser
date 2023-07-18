@@ -1,5 +1,6 @@
 using System.Text;
 using System.Threading.Channels;
+using FormatParser.Domain;
 using FormatParser.Text;
 
 namespace FormatParser.CLI;

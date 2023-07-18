@@ -2,6 +2,7 @@
 using FormatParser.Text;
 using FormatParser.Text.Decoders;
 using FormatParser.Text.EncodingAnalyzers;
+using FormatParser.Text.TextAnalyzers;
 using FormatParser.Windows1251;
 
 namespace FormatParser.QualityChecker;

@@ -1,3 +1,5 @@
+using FormatParser.Domain;
+
 namespace FormatParser.Text;
 
 public record TextFileFormatInfo(string MimeType, EncodingInfo Encoding) : IFileFormatInfo

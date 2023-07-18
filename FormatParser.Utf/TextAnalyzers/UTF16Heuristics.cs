@@ -1,4 +1,6 @@
-namespace FormatParser.Text.EncodingAnalyzers;
+using FormatParser.Text.EncodingAnalyzers;
+
+namespace FormatParser.Text.TextAnalyzers;
 
 public class UTF16Heuristics : ITextAnalyzer
 {

@@ -1,4 +1,4 @@
-namespace FormatParser.Text.EncodingAnalyzers;
+namespace FormatParser.Text.TextAnalyzers;
 
 public class CommomCJKCharatersSettings
 {

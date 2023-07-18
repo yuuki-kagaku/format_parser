@@ -2,6 +2,7 @@ using FluentAssertions;
 using FormatParser.Text;
 using FormatParser.Text.Decoders;
 using FormatParser.Text.EncodingAnalyzers;
+using FormatParser.Text.TextAnalyzers;
 using FormatParser.TextBasedFormats;
 using FormatParser.Windows1251;
 using FormatParser.Xml;
@@ -23,7 +24,7 @@ public class TextFileProcessor_Tests : TestBase
         {
             new AsciiCharactersTextAnalyzer(),
             new UTF16Heuristics(),
-            new RuFrequencyTextAnalyzer()
+            new RuDictionaryTextAnalyzer()
         };
 
         var textDecoders = new ITextDecoder[]

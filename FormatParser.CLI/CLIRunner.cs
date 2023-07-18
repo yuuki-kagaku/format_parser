@@ -38,7 +38,7 @@ public class CLIRunner
     private async Task RunFileDiscovererWithProcessorContinuation(FormatParserCliSettings settings, FormatParserCliState state, Channel<string> channel, CancellationToken cancellationToken)
     {
         await Task.Yield();
-        await fileDiscoverer.DiscoverFilesAsync(settings.Directory, channel);
+        await fileDiscoverer.DiscoverFilesAsync(settings.Directory ?? throw new ArgumentNullException(nameof(settings.Directory)), channel);
         await RunParsingProcessor(channel.Reader, state, settings, cancellationToken);
     }
 

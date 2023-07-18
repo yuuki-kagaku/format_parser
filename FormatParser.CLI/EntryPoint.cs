@@ -19,7 +19,11 @@ public class EntryPoint
 
         var textAnalyzers = GetAllInstancesOf<ITextAnalyzer>().ToArray();
         
-        var textFileParsingSettings = new TextFileParsingSettings();
+        var textFileParsingSettings = new TextFileParsingSettings()
+        {
+            SampleSize = settings.BufferSize,
+            FileStreamBufferSize = settings.BufferSize,
+        };
         
         var textDecoders = GetAllInstancesOf<ITextDecoder, TextFileParsingSettings>(textFileParsingSettings).ToArray();
 
@@ -31,7 +35,11 @@ public class EntryPoint
             settings.TextFileParsingSettings);
 
         var runner = new CLIRunner(
-            new FileDiscoverer(new FileDiscovererSettings()), 
+            new FileDiscoverer(new FileDiscovererSettings
+            {
+                FallOnUnauthorizedException = settings.FailOnUnauthorizedAccessException,
+                FailOnIOException = settings.FailOnIOException
+            }), 
             new FormatDecoder(binaryDecoders, 
                 new TextFileProcessor(textBasedFormatDetectors, compositeTextFormatDecoder), 
                 settings.TextFileParsingSettings
@@ -41,22 +49,33 @@ public class EntryPoint
         var cts = new CancellationTokenSource();
         var state = new FormatParserCliState();
         
+        Console.CancelKeyPress += (sender, eventArgs) =>
+        {
+            PrintState(state);
+        };
+        
         runner.Run(settings, state, cts.Token).GetAwaiter().GetResult();
 
         Console.WriteLine($"Run complete. Elapsed: {state.Stopwatch!.Elapsed.TotalMilliseconds}");
         Console.WriteLine();
-        
+
+        PrintState(state);
+    }
+
+    private static void PrintState(FormatParserCliState state)
+    {
         foreach (var (formatInfo, occurence) in state.Occurence.OrderByDescending(x => x.Value.Read()))
         {
             Console.WriteLine($"[{occurence.Read().ToString(),6}] : {formatInfo.ToPrettyString()}");
         }
     }
-
+    
     private static FormatParserCliSettings ParseSettings(string[] args)
     {
         var argsParser = new ArgumentParser<FormatParserCliSettings>()
             .WithPositionalArgument((settings, arg) => settings.Directory = arg)
-            .OnNamedParameter("parallel", ((settings, arg) => settings.DegreeOfParallelism = arg), false);
+            .OnNamedParameter("parallel", (settings, arg) => settings.DegreeOfParallelism = arg, false)
+            .OnNamedParameter("buffer-size", (settings, arg) => settings.BufferSize = arg, false);
 
         return argsParser.Parse(args);
     }
