@@ -17,7 +17,7 @@ public class CompositeTextFormatDecoder_Tests : TestBase
     {
         var textParserSettings = new TextFileParsingSettings();
         
-        var languageAnalyzers = new ITextAnalyzer[]
+        var textAnalyzers = new ITextAnalyzer[]
         {
             new AsciiCharactersTextAnalyzer(),
             new UTF16Heuristics(),
@@ -34,7 +34,7 @@ public class CompositeTextFormatDecoder_Tests : TestBase
             new Windows1251Decoder(textParserSettings),
         };
 
-        decoder = new CompositeTextFormatDecoder(textDecoders, languageAnalyzers);
+        decoder = new CompositeTextFormatDecoder(textDecoders, textAnalyzers);
     }
     
     [Test]

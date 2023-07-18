@@ -18,8 +18,7 @@ public class TextFileProcessor_Tests : TestBase
     {
         var textParserSettings = new TextFileParsingSettings();
         
-  
-        var languageAnalyzers = new ITextAnalyzer[]
+        var textAnalyzers = new ITextAnalyzer[]
         {
             new AsciiCharactersTextAnalyzer(),
             new UTF16Heuristics(),
@@ -36,7 +35,7 @@ public class TextFileProcessor_Tests : TestBase
             new Windows1251Decoder(textParserSettings)
         };
 
-        var decoder = new CompositeTextFormatDecoder(textDecoders, languageAnalyzers);
+        var decoder = new CompositeTextFormatDecoder(textDecoders, textAnalyzers);
 
         var textBasedFormatDetectors = new ITextBasedFormatDetector[]
         {

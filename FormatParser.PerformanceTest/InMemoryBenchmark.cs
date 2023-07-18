@@ -35,7 +35,7 @@ public class InMemoryBenchmark
         
         var textParserSettings = new TextFileParsingSettings();
         
-        var languageAnalyzers = new ITextAnalyzer[]
+        var textAnalyzers = new ITextAnalyzer[]
         {
             new AsciiCharactersTextAnalyzer(),
             new UTF16Heuristics(),
@@ -60,7 +60,7 @@ public class InMemoryBenchmark
             new Windows1251Decoder(textParserSettings),
         };
 
-        var compositeTextFormatDecoder = new CompositeTextFormatDecoder(textDecoders, languageAnalyzers);
+        var compositeTextFormatDecoder = new CompositeTextFormatDecoder(textDecoders, textAnalyzers);
         
         var textBasedFormatDetectors = new ITextBasedFormatDetector[]
         {
