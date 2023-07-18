@@ -1,4 +1,4 @@
-namespace FormatParser.CLI.ArgumentParser;
+namespace FormatParser.ArgumentParser;
 
 public class ArgumentParser<TSettings> where TSettings : class, new()
 {

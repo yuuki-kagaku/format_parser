@@ -8,12 +8,27 @@ public class TextDetectionComparer
     private readonly CompositeTextFormatDecoder compositeTextFormatDecoder;
     private readonly QualityCheckerSettings settings;
     private readonly byte[] buffer;
+    private static readonly List<string> textFormats = new List<string>()
+    {
+        "text/",
+        "application/json",
+        "application/postscript", 
+        "image/svg+xml",
+        "application/x-wine-extension-ini",
+        "application/x-setupscript",
+        "image/x-portable-bitmap", 
+        "image/x-portable-graymap",
+        "image/x-portable-pixmap",
+        "application/pgp-keys", 
+        "image/x-xpmi",
+    };
 
     public TextDetectionComparer(CompositeTextFormatDecoder compositeTextFormatDecoder, QualityCheckerSettings settings)
     {
         this.compositeTextFormatDecoder = compositeTextFormatDecoder;
         this.settings = settings;
         buffer = new byte[settings.BufferSize];
+
     }
 
     public void ProcessFile(string file, QualityCheckerState state)
@@ -96,40 +111,7 @@ public class TextDetectionComparer
 
     private static bool IsTextFile(string commandFileOutput, string file)
     {
-        if (commandFileOutput.Contains("text/", StringComparison.InvariantCultureIgnoreCase))
-            return true;
-
-        if (commandFileOutput.Contains("application/json", StringComparison.InvariantCultureIgnoreCase))
-            return true;
-        
-        if (commandFileOutput.Contains("application/postscript", StringComparison.InvariantCultureIgnoreCase))
-            return true;
-        
-        if (commandFileOutput.Contains("image/svg+xml", StringComparison.InvariantCultureIgnoreCase))
-            return true;
-        
-        if (commandFileOutput.Contains("application/x-wine-extension-ini", StringComparison.InvariantCultureIgnoreCase))
-            return true;
-        
-        if (commandFileOutput.Contains("application/x-setupscript", StringComparison.InvariantCultureIgnoreCase))
-            return true;
-        
-        if (commandFileOutput.Contains("image/x-portable-bitmap", StringComparison.InvariantCultureIgnoreCase))
-            return true;
-        
-        if (commandFileOutput.Contains("image/x-portable-graymap", StringComparison.InvariantCultureIgnoreCase))
-            return true;
-        
-        if (commandFileOutput.Contains("image/x-portable-pixmap", StringComparison.InvariantCultureIgnoreCase))
-            return true;
-        
-        if (commandFileOutput.Contains("application/pgp-keys", StringComparison.InvariantCultureIgnoreCase))
-            return true;
-        
-        if (commandFileOutput.Contains("image/x-xpmi", StringComparison.InvariantCultureIgnoreCase))
-            return true;
-
-        return false;
+        return textFormats.Any(x => commandFileOutput.Contains(x, StringComparison.InvariantCultureIgnoreCase));
     }
     
     private static string IsText(bool isText) => isText ? "text" : "binary";

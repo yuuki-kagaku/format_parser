@@ -1,4 +1,5 @@
-﻿using FormatParser.Helpers;
+﻿using FormatParser.ArgumentParser;
+using FormatParser.Helpers;
 using FormatParser.Text;
 using FormatParser.Text.Decoders;
 using FormatParser.Text.EncodingAnalyzers;
@@ -11,11 +12,9 @@ public class EntryPoint
 {
     public static void Main(string[] args)
     {
-        var settings = new QualityCheckerSettings();
+        var settings = ParseSettings(args);
         
-        var directory = args[0];
-
-        var languageAnalyzers = new ITextAnalyzer[]
+        var textAnalyzers = new ITextAnalyzer[]
         {
             new AsciiCharactersTextAnalyzer(),
             new UTF16Heuristics(),
@@ -36,15 +35,27 @@ public class EntryPoint
         
         var compositeTextFormatDecoder = new CompositeTextFormatDecoder(
             decoders, 
-            languageAnalyzers,
+            textAnalyzers,
             settings.TextFileParsingSettings);
         
         var textDetectionComparer = new TextDetectionComparer(compositeTextFormatDecoder, settings);
         
         var state = new QualityCheckerState();
-        DiscoverFiles(directory, state, textDetectionComparer);
+        DiscoverFiles(settings.Directory, state, textDetectionComparer);
 
         PrintState(state, settings);
+    }
+    
+    private static QualityCheckerSettings ParseSettings(string[] args)
+    {
+        var argsParser = new ArgumentParser<QualityCheckerSettings>()
+            .WithPositionalArgument((settings, arg) => settings.Directory = arg)
+            .OnNamedParameter("command", (settings, arg) => settings.Utility = arg, false)
+            .OnNamedParameter("command-arg", (settings, arg) => settings.UtilityArgs = arg, false)
+            .OnNamedParameter("buffer-size", (settings, arg) => settings.BufferSize = arg, false)
+            .OnNamedParameter("not-print-mismatches", (settings) => settings.PrintMismatchedFilesInfo = false, false);
+
+        return argsParser.Parse(args);
     }
 
     private static void DiscoverFiles(string directory, QualityCheckerState state, TextDetectionComparer textDetectionComparer)
@@ -91,6 +102,5 @@ public class EntryPoint
         Console.WriteLine($"Text files according to FormatParser.Core : {state.TextFilesAccordingToFormatParser}");
         Console.WriteLine();
         Console.WriteLine($"False negative text file detections of '{settings.Utility}' (this files excluded from every statistics above) : {state.FalseNegativesOfFileCommand}");
-
     }
 }

@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\FormatParser.ArgumentParser\FormatParser.ArgumentParser.csproj" />
         <ProjectReference Include="..\FormatParser.Core\FormatParser.Core.csproj" />
       <ProjectReference Include="..\FormatParser.ELF\FormatParser.ELF.csproj">
           <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

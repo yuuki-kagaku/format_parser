@@ -54,5 +54,5 @@ public class TextFileProcessor
         return false;
     }
     
-    private static string DefaultTextType => "text/plain";
+    public static string DefaultTextType => "text/plain";
 }

@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using FormatParser.CLI.ArgumentParser;
+using FormatParser.ArgumentParser;
 using FormatParser.Text;
 using FormatParser.Text.Decoders;
 using FormatParser.Text.EncodingAnalyzers;
