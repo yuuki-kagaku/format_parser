@@ -39,16 +39,16 @@
               ContinueOnError="false"
               OverwriteReadOnlyFiles="true"/>
 
-        <Copy SourceFiles="@(PluginArchives)" DestinationFiles="@(PluginArchives->'$(OutputPath)\plugins\PE\%(RecursiveDir)%(Filename)%(Extension)')"
+        <Copy SourceFiles="@(PluginArchives)" DestinationFiles="@(PluginArchives->'$(OutputPath)\plugins\ARCH\%(RecursiveDir)%(Filename)%(Extension)')"
               ContinueOnError="false"
               OverwriteReadOnlyFiles="true"/>
-        <Copy SourceFiles="@(PluginXml)" DestinationFiles="@(PluginXml->'$(OutputPath)\plugins\PE\%(RecursiveDir)%(Filename)%(Extension)')"
+        <Copy SourceFiles="@(PluginXml)" DestinationFiles="@(PluginXml->'$(OutputPath)\plugins\XML\%(RecursiveDir)%(Filename)%(Extension)')"
               ContinueOnError="false"
               OverwriteReadOnlyFiles="true"/>
-        <Copy SourceFiles="@(PluginWin1251)" DestinationFiles="@(PluginWin1251->'$(OutputPath)\plugins\PE\%(RecursiveDir)%(Filename)%(Extension)')"
+        <Copy SourceFiles="@(PluginWin1251)" DestinationFiles="@(PluginWin1251->'$(OutputPath)\plugins\Win1251\%(RecursiveDir)%(Filename)%(Extension)')"
               ContinueOnError="false"
               OverwriteReadOnlyFiles="true"/>
-        <Copy SourceFiles="@(PluginUTF)" DestinationFiles="@(PluginUTF->'$(OutputPath)\plugins\PE\%(RecursiveDir)%(Filename)%(Extension)')"
+        <Copy SourceFiles="@(PluginUTF)" DestinationFiles="@(PluginUTF->'$(OutputPath)\plugins\UTF\%(RecursiveDir)%(Filename)%(Extension)')"
               ContinueOnError="false"
               OverwriteReadOnlyFiles="true"/>
  
