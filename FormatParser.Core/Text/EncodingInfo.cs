@@ -4,8 +4,22 @@ namespace FormatParser.Text;
 
 public record EncodingInfo(string Name, Endianness Endianness, bool ContainsBom)
 {
+    private static readonly StringComparer StringComparer = StringComparer.InvariantCultureIgnoreCase;
+
+    public virtual bool Equals(EncodingInfo? other)
+    {
+        if (ReferenceEquals(null, other)) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return StringComparer.Equals(Name, other.Name) && Endianness == other.Endianness && ContainsBom == other.ContainsBom;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(StringComparer.GetHashCode(Name), (int)Endianness, ContainsBom);
+    }
+
     public static readonly EncodingInfo ASCII = new(WellKnownEncodings.ASCII, Endianness.NotAllowed, false);
-    public static readonly EncodingInfo Utf8BOM = new(WellKnownEncodings.UTF8, Endianness.NotAllowed, false);
+    public static readonly EncodingInfo Utf8BOM = new(WellKnownEncodings.UTF8, Endianness.NotAllowed, true);
     public static readonly EncodingInfo Utf8NoBOM = new(WellKnownEncodings.UTF8, Endianness.NotAllowed, false);
     
     public static readonly EncodingInfo UTF16LeNoBom = new(WellKnownEncodings.UTF16, Endianness.LittleEndian, false);

@@ -21,7 +21,7 @@ public class CompositeTextFormatDecoder_Tests : TestBase
         {
             new AsciiCharactersTextAnalyzer(),
             new UTF16Heuristics(),
-            new RuFrequencyTextAnalyzer()
+            new RuDictionaryTextAnalyzer()
         };
 
         var textDecoders = new ITextDecoder[]
@@ -64,6 +64,20 @@ public class CompositeTextFormatDecoder_Tests : TestBase
         text.Should().Be(ReadFileAsUtf8(file));
         encoding.Should().BeEquivalentTo(EncodingInfo.Utf8NoBOM);
     }
+    
+    [Test]
+    public async Task Should_read_utf8_with_bom()
+    {
+        var file = GetFile(TestFileCategory.Text, "utf8_bom");
+        var binaryReader = await GetBufferAsync(file);
+
+        var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
+
+        isSuccessful.Should().BeTrue();
+        text.Should().Be(ReadFileAsUtf8(file));
+        encoding.Should().BeEquivalentTo(EncodingInfo.Utf8BOM);
+    }
+
         
     [Test]
     public async Task Should_read_utf16_be_no_bom()

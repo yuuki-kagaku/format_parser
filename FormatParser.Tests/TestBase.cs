@@ -39,7 +39,7 @@ public class TestBase
     
     protected static string ReadFileAsUtf8(string file)
     {
-        return Encoding.UTF8.GetString(File.ReadAllBytes(file));
+        return File.ReadAllText(file);
     }
     
     protected static string ReadFileAsUtf16Le(string file)

@@ -94,13 +94,7 @@ public class EntryPoint
 
     private static IEnumerable<T> GetAllInstancesOf<T>()
     {
-        var type = typeof(T);
-        var types = AppDomain
-            .CurrentDomain
-            .GetAssemblies()
-            .SelectMany(s => s.GetTypes())
-            .Where(t => type.IsAssignableFrom(t))
-            .Where(t => t is { IsInterface: false, IsAbstract: false });
+        var types = GetAllTypes<T>();
 
         foreach (var t in types.OrderBy(t => t.Name))
             yield return (T)Activator.CreateInstance(t)!;
@@ -108,15 +102,21 @@ public class EntryPoint
     
     private static IEnumerable<T> GetAllInstancesOf<T, TParam>(TParam param)
     {
+        var types = GetAllTypes<T>();
+        foreach (var t in types.OrderBy(t => t.Name))
+            yield return (T)Activator.CreateInstance(t, param)!;
+    }
+
+    private static IEnumerable<Type> GetAllTypes<T>()
+    {
         var type = typeof(T);
-        var types = AppDomain
+        
+        return AppDomain
             .CurrentDomain
             .GetAssemblies()
             .SelectMany(s => s.GetTypes())
             .Where(t => type.IsAssignableFrom(t))
             .Where(t => t is { IsInterface: false, IsAbstract: false });
 
-        foreach (var t in types.OrderBy(t => t.Name))
-            yield return (T)Activator.CreateInstance(t, param)!;
     }
 }

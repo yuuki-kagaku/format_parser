@@ -14,7 +14,7 @@ public class Utf8Decoder : DecoderBase, IUtfDecoder
 
     protected override Decoder GetDecoder(int inputSize)
     {
-        var encoding = (Encoding) System.Text.Encoding.UTF8.Clone();
+        var encoding = (Encoding) Encoding.UTF8.Clone();
         encoding.DecoderFallback = FormatParserDecoderFallback.DoNotFailAtEndOfInput(inputSize, 4);
         return encoding.GetDecoder();
     }
