@@ -31,4 +31,23 @@
       </None>
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Include="..\resources\most_used_chinese_characters">
+        <Link>dictionaries/most_used_chinese_characters</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="..\resources\most_used_hangul">
+        <Link>dictionaries/most_used_hangul</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="..\resources\most_used_kanji">
+        <Link>dictionaries/most_used_kanji</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="..\resources\most_used_russian_words">
+        <Link>dictionaries/most_used_russian_words</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
 </Project>

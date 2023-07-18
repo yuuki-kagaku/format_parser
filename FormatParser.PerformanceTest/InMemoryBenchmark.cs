@@ -2,7 +2,6 @@ using System.IO.Compression;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using FormatParser.Archives;
-using FormatParser.CLI;
 using FormatParser.ELF;
 using FormatParser.MachO;
 using FormatParser.PE;
