@@ -1,4 +1,5 @@
 using System.Text;
+using FormatParser.Domain;
 using FormatParser.Helpers;
 using FormatParser.Text.Helpers;
 using EncodingInfo = FormatParser.Domain.EncodingInfo;

@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using FormatParser.Domain;
 using FormatParser.Helpers;
 using FormatParser.Text.Decoders;
 using EncodingInfo = FormatParser.Domain.EncodingInfo;
@@ -37,13 +38,8 @@ public class CompositeTextFormatDecoder
                 if (decodeResult == null) 
                     continue;
                 
-                // Console.WriteLine($"text : {decodeResult.Chars.AsString()}");
-                Console.WriteLine($"tex2t : {invalidCharactersCheckers[decoder].AllCharactersIsValid(decodeResult.Chars)}");
-                
                 if (!invalidCharactersCheckers[decoder].AllCharactersIsValid(decodeResult.Chars))
                     continue;
-
-                Console.WriteLine($"encodingAnalyzersDictionary[decoder] : {encodingAnalyzersDictionary[decoder].Count()}");
 
                 var text = decodeResult.Chars.AsString();
 
@@ -51,12 +47,10 @@ public class CompositeTextFormatDecoder
                 if (defaultDetectionProbability > bestMatchProbability)
                     (bestMatchProbability, resultEncoding, resultTextSample) = (defaultDetectionProbability, decodeResult.Encoding, text);
 
-                
                 foreach (var textAnalyzer in encodingAnalyzersDictionary[decoder])
                 {
                     var detectionProbability = textAnalyzer.AnalyzeProbability(text, decodeResult.Encoding, out var clarifiedEncoding);
 
-                    Console.WriteLine($"detectionProbability : {detectionProbability} | {textAnalyzer.GetType().Name}");
                     if (detectionProbability <= bestMatchProbability)
                         continue;
                     

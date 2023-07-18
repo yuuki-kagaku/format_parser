@@ -1,4 +1,4 @@
-namespace FormatParser.Text;
+namespace FormatParser.Domain;
 
 public enum DetectionProbability
 {
