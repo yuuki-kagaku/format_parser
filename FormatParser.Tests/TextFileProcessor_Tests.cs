@@ -4,6 +4,7 @@ using FormatParser.Text.Decoders;
 using FormatParser.Text.EncodingAnalyzers;
 using FormatParser.TextBasedFormats;
 using FormatParser.Windows1251;
+using FormatParser.Xml;
 using NUnit.Framework;
 
 namespace FormatParser.Tests;

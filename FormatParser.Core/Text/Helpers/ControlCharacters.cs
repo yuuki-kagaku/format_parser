@@ -1,4 +1,4 @@
-namespace FormatParser.Text;
+namespace FormatParser.Text.Helpers;
 
 public static class ControlCharacters
 {

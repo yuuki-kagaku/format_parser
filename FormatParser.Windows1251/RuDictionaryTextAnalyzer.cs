@@ -6,12 +6,21 @@ namespace FormatParser.Windows1251;
 
 public class RuDictionaryTextAnalyzer : ITextAnalyzer
 {
-    private static readonly Regex Pattern = new (string.Join('|', MostUsedRussianWords.Words), RegexOptions.Compiled | RegexOptions.CultureInvariant);
+    private readonly Regex pattern;
+
+    public RuDictionaryTextAnalyzer(RussianWordsProvider russianWordsProvider)
+    {
+        pattern = new Regex(string.Join('|', russianWordsProvider.GetWords), RegexOptions.Compiled | RegexOptions.CultureInvariant);
+    }
+
+    public RuDictionaryTextAnalyzer() : this(new RussianWordsProvider())
+    {
+    }
 
     public DetectionProbability AnalyzeProbability(TextSample text, EncodingInfo encoding, out EncodingInfo? clarifiedEncoding)
     {
         clarifiedEncoding = null;
-        return Pattern.IsMatch(text.Text) ? DetectionProbability.High : DetectionProbability.No;
+        return pattern.IsMatch(text.Text.ToLower()) ? DetectionProbability.High : DetectionProbability.No;
     }
 
     public string[] SupportedLanguages { get; } = {"ru"};

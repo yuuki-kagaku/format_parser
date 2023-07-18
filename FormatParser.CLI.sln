@@ -26,6 +26,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.Windows1251", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.Helpers", "FormatParser.Helpers\FormatParser.Helpers.csproj", "{394CE69C-D026-4E72-A51C-0075ACE0F450}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.Archives", "FormatParser.Archives\FormatParser.Archives.csproj", "{FE0C3A35-940B-4B2E-9DEC-7CF726A81033}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.Xml", "FormatParser.Xml\FormatParser.Xml.csproj", "{02CF561E-A738-4684-AAB6-1888AC7D2548}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -84,5 +88,13 @@ Global
 		{394CE69C-D026-4E72-A51C-0075ACE0F450}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{394CE69C-D026-4E72-A51C-0075ACE0F450}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{394CE69C-D026-4E72-A51C-0075ACE0F450}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE0C3A35-940B-4B2E-9DEC-7CF726A81033}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE0C3A35-940B-4B2E-9DEC-7CF726A81033}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE0C3A35-940B-4B2E-9DEC-7CF726A81033}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE0C3A35-940B-4B2E-9DEC-7CF726A81033}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02CF561E-A738-4684-AAB6-1888AC7D2548}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02CF561E-A738-4684-AAB6-1888AC7D2548}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02CF561E-A738-4684-AAB6-1888AC7D2548}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02CF561E-A738-4684-AAB6-1888AC7D2548}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

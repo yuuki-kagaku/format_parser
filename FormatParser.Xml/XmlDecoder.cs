@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
+using FormatParser.TextBasedFormats;
 
-namespace FormatParser.TextBasedFormats;
+namespace FormatParser.Xml;
 
 public class XmlDecoder : ITextBasedFormatDetector
 {

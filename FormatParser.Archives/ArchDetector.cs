@@ -1,7 +1,7 @@
 using FormatParser.Helpers;
 using FormatParser.Helpers.BinaryReader;
 
-namespace FormatParser.DefaultFormatDetectors;
+namespace FormatParser.Archives;
 
 public class ArchDetector : IBinaryFormatDetector
 {

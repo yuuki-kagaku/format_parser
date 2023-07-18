@@ -17,6 +17,7 @@
 
 
     <ItemGroup>
+      <ProjectReference Include="..\FormatParser.Archives\FormatParser.Archives.csproj" />
       <ProjectReference Include="..\FormatParser.CLI\FormatParser.CLI.csproj" />
       <ProjectReference Include="..\FormatParser.ELF\FormatParser.ELF.csproj" />
       <ProjectReference Include="..\FormatParser.MachO\FormatParser.MachO.csproj" />

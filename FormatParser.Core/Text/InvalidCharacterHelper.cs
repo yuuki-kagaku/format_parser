@@ -1,3 +1,5 @@
+using FormatParser.Text.Helpers;
+
 namespace FormatParser.Text;
 
 public static class InvalidCharacterHelper

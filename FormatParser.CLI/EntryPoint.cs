@@ -5,6 +5,7 @@ using FormatParser.Text.Decoders;
 using FormatParser.Text.EncodingAnalyzers;
 using FormatParser.TextBasedFormats;
 using FormatParser.Windows1251;
+using FormatParser.Xml;
 
 namespace FormatParser.CLI;
 
