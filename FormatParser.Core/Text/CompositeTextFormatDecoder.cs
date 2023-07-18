@@ -8,15 +8,11 @@ namespace FormatParser.Text;
 
 public class CompositeTextFormatDecoder
 {
-    private readonly TextFileParsingSettings settings;
     private readonly ITextDecoder[] decoders;
     private readonly Dictionary<ITextDecoder, IEnumerable<ITextAnalyzer>> encodingAnalyzersDictionary;
-    private readonly Dictionary<ITextDecoder, CodepointValidator> invalidCharactersCheckers;
+    private readonly Dictionary<ITextDecoder, CharacterValidator> invalidCharactersCheckers;
 
-    public CompositeTextFormatDecoder(
-        ITextDecoder[] decoders, 
-        ITextAnalyzer[] encodingAnalyzers,
-        TextFileParsingSettings settings)
+    public CompositeTextFormatDecoder(ITextDecoder[] decoders, ITextAnalyzer[] encodingAnalyzers)
     {
         this.decoders = decoders;
         var encodingAnalyzersByLanguage = encodingAnalyzers
@@ -24,8 +20,7 @@ public class CompositeTextFormatDecoder
             .ToDictionary(x => x.Language, x => x.Analyzer);
 
         encodingAnalyzersDictionary = decoders.ToDictionary(x => x, x => GetEncodingAnalyzers(x, encodingAnalyzersByLanguage));
-        invalidCharactersCheckers = decoders.ToDictionary(x => x, x => new CodepointValidator(x.GetInvalidCharacters));
-        this.settings = settings;
+        invalidCharactersCheckers = decoders.ToDictionary(x => x, x => new CharacterValidator(x.GetInvalidCharacters));
     }
 
     public bool TryDecode(ArraySegment<byte> bytes, [NotNullWhen(true)] out EncodingInfo? resultEncoding, [NotNullWhen(true)] out string? resultTextSample)

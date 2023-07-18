@@ -1,0 +1,8 @@
+<Project TreatAsLocalProperty="Target">
+    <ItemGroup>
+        <None Include="$(SolutionDir)\resources\*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <Link>dictionaries\%(RecursiveDir)\%(Filename)%(Extension)</Link>
+        </None>
+    </ItemGroup>
+</Project>

@@ -1,10 +1,10 @@
 namespace FormatParser.Text;
 
-public class CodepointValidator
+public class CharacterValidator
 {
     private readonly HashSet<char> invalidCharacters;
 
-    public CodepointValidator(IEnumerable<char> invalidCharacters)
+    public CharacterValidator(IEnumerable<char> invalidCharacters)
     {
         this.invalidCharacters = invalidCharacters.ToHashSet();
     }

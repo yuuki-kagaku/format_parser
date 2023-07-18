@@ -5,11 +5,11 @@ namespace FormatParser.Text.Decoders;
 
 public class Utf8Decoder : DecoderBase, ITextDecoder
 {
-    private readonly CodepointValidatorSettings settings;
+    private readonly CharacterValidatorSettings settings;
 
     public Utf8Decoder(TextFileParsingSettings settings)
     {
-        this.settings = new CodepointValidatorSettings(settings.AllowEscapeChar, settings.AllowFormFeed, settings.AllowC1ControlsForUtf, false);
+        this.settings = new CharacterValidatorSettings(settings.AllowEscapeChar, settings.AllowFormFeed, settings.AllowC1ControlsForUtf, false);
     }
 
     protected override Decoder GetDecoder(int inputSize)

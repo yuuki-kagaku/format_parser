@@ -8,11 +8,11 @@ namespace FormatParser.Windows1251;
 
 public class Windows1251Decoder : DecoderBase
 {
-    private readonly CodepointValidatorSettings settings;
+    private readonly CharacterValidatorSettings settings;
 
     public Windows1251Decoder(TextFileParsingSettings settings)
     {
-        this.settings = new CodepointValidatorSettings(settings.AllowEscapeChar, settings.AllowFormFeed, true, false);
+        this.settings = new CharacterValidatorSettings(settings.AllowEscapeChar, settings.AllowFormFeed, true, false);
     }
 
     protected override Decoder GetDecoder(int inputSize) => Decoder;

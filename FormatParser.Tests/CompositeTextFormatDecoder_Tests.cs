@@ -35,10 +35,7 @@ public class CompositeTextFormatDecoder_Tests : TestBase
             new Windows1251Decoder(textParserSettings),
         };
 
-        decoder = new CompositeTextFormatDecoder(
-            textDecoders, 
-            languageAnalyzers,
-            textParserSettings);
+        decoder = new CompositeTextFormatDecoder(textDecoders, languageAnalyzers);
     }
     
     [Test]

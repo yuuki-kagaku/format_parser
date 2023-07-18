@@ -5,11 +5,11 @@ namespace FormatParser.Text.Decoders;
 
 public class Utf16BeDecoder : DecoderBase, ITextDecoder
 {
-    private readonly CodepointValidatorSettings settings;
+    private readonly CharacterValidatorSettings settings;
 
     public Utf16BeDecoder(TextFileParsingSettings settings)
     {
-        this.settings = new CodepointValidatorSettings(settings.AllowEscapeChar, settings.AllowFormFeed,
+        this.settings = new CharacterValidatorSettings(settings.AllowEscapeChar, settings.AllowFormFeed,
             settings.AllowC1ControlsForUtf, false);
     }
 

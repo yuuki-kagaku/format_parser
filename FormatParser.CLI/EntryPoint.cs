@@ -3,7 +3,6 @@ using FormatParser.ArgumentParser;
 using FormatParser.Text;
 using FormatParser.Text.Decoders;
 using FormatParser.Text.EncodingAnalyzers;
-using FormatParser.TextBasedFormats;
 
 namespace FormatParser.CLI;
 
@@ -15,14 +14,13 @@ public class EntryPoint
 
         LoadPlugins();
         
-        var binaryDecoders = GetAllInstancesOf<IBinaryFormatDetector>().ToArray();
+        var binaryFormatDetectors = GetAllInstancesOf<IBinaryFormatDetector>().ToArray();
 
         var textAnalyzers = GetAllInstancesOf<ITextAnalyzer>().ToArray();
         
         var textFileParsingSettings = new TextFileParsingSettings()
         {
             SampleSize = settings.BufferSize,
-            FileStreamBufferSize = settings.BufferSize,
         };
         
         var textDecoders = GetAllInstancesOf<ITextDecoder, TextFileParsingSettings>(textFileParsingSettings).ToArray();
@@ -31,19 +29,21 @@ public class EntryPoint
 
         var compositeTextFormatDecoder = new CompositeTextFormatDecoder(
             textDecoders, 
-            textAnalyzers,
-            settings.TextFileParsingSettings);
+            textAnalyzers);
 
+        var streamFactory = new StreamFactory(settings.BufferSize);
+        
         var runner = new CLIRunner(
             new FileDiscoverer(new FileDiscovererSettings
             {
                 FallOnUnauthorizedException = settings.FailOnUnauthorizedAccessException,
                 FailOnIOException = settings.FailOnIOException
             }), 
-            new FormatDecoder(binaryDecoders, 
+            new FormatDecoder(binaryFormatDetectors, 
                 new TextFileProcessor(textBasedFormatDetectors, compositeTextFormatDecoder), 
                 settings.TextFileParsingSettings
-            )
+            ),
+            streamFactory
         );
 
         var cts = new CancellationTokenSource();
@@ -105,6 +105,9 @@ public class EntryPoint
                     AppDomain.CurrentDomain.Load(a.GetName());
                 }
                 catch (FileLoadException)
+                {
+                }
+                catch (BadImageFormatException)
                 {
                 }
             }

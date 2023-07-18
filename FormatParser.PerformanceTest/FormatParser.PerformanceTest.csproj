@@ -1,19 +1,34 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <OutputType>Exe</OutputType>
     </PropertyGroup>
+    <Import Project="..\copy-dictionaries.props" />
 
     <ItemGroup>
       <PackageReference Include="BenchmarkDotNet" Version="0.13.6" />
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\FormatParser.Archives\FormatParser.Archives.csproj" />
       <ProjectReference Include="..\FormatParser.CLI\FormatParser.CLI.csproj" />
+      <ProjectReference Include="..\FormatParser.ELF\FormatParser.ELF.csproj" />
+      <ProjectReference Include="..\FormatParser.MachO\FormatParser.MachO.csproj" />
+      <ProjectReference Include="..\FormatParser.PE\FormatParser.PE.csproj" />
       <ProjectReference Include="..\FormatParser.Test.Helpers\FormatParser.Test.Helpers.csproj" />
+      <ProjectReference Include="..\FormatParser.Utf\FormatParser.Utf.csproj" />
+      <ProjectReference Include="..\FormatParser.Windows1251\FormatParser.Windows1251.csproj" />
+      <ProjectReference Include="..\FormatParser.Xml\FormatParser.Xml.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="data_set.zip">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

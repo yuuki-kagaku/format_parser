@@ -35,13 +35,12 @@ public class EntryPoint
         
         var compositeTextFormatDecoder = new CompositeTextFormatDecoder(
             decoders, 
-            textAnalyzers,
-            settings.TextFileParsingSettings);
+            textAnalyzers);
         
         var textDetectionComparer = new TextDetectionComparer(compositeTextFormatDecoder, settings);
         
         var state = new QualityCheckerState();
-        DiscoverFiles(settings.Directory, state, textDetectionComparer);
+        DiscoverFiles(settings.Directory ?? throw new ArgumentNullException(nameof(settings.Directory)), state, textDetectionComparer);
 
         PrintState(state, settings);
     }

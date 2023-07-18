@@ -1,24 +1,25 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
-using FormatParser.TextBasedFormats;
+using FormatParser.Text;
 
 namespace FormatParser.Xml;
 
 public class XmlDecoder : ITextBasedFormatDetector
 {
-    private static readonly Regex pattern = new (@$"^<\?xml([^>]+)encoding=""(?<encoding>[^""]+)""",
+    private static readonly Regex Pattern = new (@$"^<\?xml([^>]+)encoding=""(?<encoding>[^""]+)""",
         RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
     
-    public bool TryMatchFormat(string header, out string? encoding)
+    public bool TryMatchFormat(string header, [NotNullWhen(true)] out string? clarifiedEncoding)
     {
-        var match = pattern.Match(header);
+        var match = Pattern.Match(header);
 
         if (match.Success)
         {
-            encoding = match.Groups["encoding"].Value;
+            clarifiedEncoding = match.Groups["encoding"].Value;
             return true;
         }
         
-        encoding = null;
+        clarifiedEncoding = null;
         return false;
     }
 

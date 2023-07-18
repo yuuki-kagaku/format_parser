@@ -4,7 +4,6 @@ using FormatParser.Text;
 using FormatParser.Text.Decoders;
 using FormatParser.Text.EncodingAnalyzers;
 using FormatParser.Text.TextAnalyzers;
-using FormatParser.TextBasedFormats;
 using FormatParser.Windows1251;
 using FormatParser.Xml;
 using NUnit.Framework;
@@ -38,10 +37,7 @@ public class TextFileProcessor_Tests : TestBase
             new Windows1251Decoder(textParserSettings)
         };
 
-        var decoder = new CompositeTextFormatDecoder(
-            textDecoders, 
-            languageAnalyzers,
-            textParserSettings);
+        var decoder = new CompositeTextFormatDecoder(textDecoders, languageAnalyzers);
 
         var textBasedFormatDetectors = new ITextBasedFormatDetector[]
         {
