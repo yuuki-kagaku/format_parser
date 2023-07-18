@@ -22,13 +22,13 @@ public class Utf8Decoder : DecoderBase, ITextDecoder
     public override IEnumerable<char> GetInvalidCharacters => InvalidCharacterHelper
         .GetForbiddenChars(settings);
 
-    public override int MinimalSizeOfInput { get; } = 0;
+    protected override int MinimalSizeOfInput => 0;
 
-    public override bool SupportBom { get; } = true;
-    public override EncodingInfo EncodingWithBom { get; } = EncodingInfo.Utf8BOM;
-    public override EncodingInfo EncodingWithoutBom { get; } = EncodingInfo.Utf8NoBOM;
+    protected override bool SupportBom => true;
+    protected override EncodingInfo EncodingWithBom => EncodingInfo.Utf8Bom;
+    public override EncodingInfo EncodingWithoutBom => EncodingInfo.Utf8NoBom;
 
     public override string[]? RequiredEncodingAnalyzers { get; } = {"ASCII"};
     
-    public override DetectionProbability DefaultDetectionProbability { get; } = DetectionProbability.Lowest;
+    public override DetectionProbability DefaultDetectionProbability => DetectionProbability.Lowest;
 }

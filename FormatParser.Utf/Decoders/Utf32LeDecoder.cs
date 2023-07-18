@@ -21,14 +21,14 @@ public class Utf32LeDecoder : DecoderBase, ITextDecoder
 
     public override IEnumerable<char> GetInvalidCharacters => InvalidCharacterHelper
         .GetForbiddenChars(settings);
-    
-    public override bool SupportBom { get; } = true;
-    public override EncodingInfo EncodingWithBom { get; } = EncodingInfo.UTF32LeBom;
-    public override EncodingInfo EncodingWithoutBom { get; } = EncodingInfo.UTF32LeNoBom;
 
-    public override string[]? RequiredEncodingAnalyzers { get; } = null;
-    
-    public override int MinimalSizeOfInput { get; } = 8;
-    
-    public override DetectionProbability DefaultDetectionProbability { get; } = DetectionProbability.Lowest;
+    protected override bool SupportBom => true;
+    protected override EncodingInfo EncodingWithBom => EncodingInfo.Utf32LeBom;
+    public override EncodingInfo EncodingWithoutBom => EncodingInfo.Utf32LeNoBom;
+
+    public override string[]? RequiredEncodingAnalyzers => null;
+
+    protected override int MinimalSizeOfInput => 8;
+
+    public override DetectionProbability DefaultDetectionProbability => DetectionProbability.Lowest;
 }

@@ -2,11 +2,10 @@
 using FormatParser.ArgumentParser;
 using FormatParser.Text;
 using FormatParser.Text.Decoders;
-using FormatParser.Text.EncodingAnalyzers;
 
 namespace FormatParser.CLI;
 
-public class EntryPoint
+public static class EntryPoint
 {
     public static void Main(string[] args)
     {
@@ -14,6 +13,46 @@ public class EntryPoint
 
         LoadPlugins();
         
+        var cts = new CancellationTokenSource();
+        var state = new FormatParserCliState();
+        
+        Console.CancelKeyPress += (sender, eventArgs) =>
+        {
+            PrintState(state);
+        };
+
+        var runner = CreateRunner(settings);
+        
+        runner.Run(settings, state, cts.Token).GetAwaiter().GetResult();
+
+        Console.WriteLine($"Run complete. Elapsed: {state.Stopwatch!.Elapsed.TotalMilliseconds}");
+        Console.WriteLine();
+
+        PrintState(state);
+    }
+
+ 
+
+    private static void PrintState(FormatParserCliState state)
+    {
+        foreach (var (formatInfo, occurence) in state.Occurence.OrderByDescending(x => x.Value.Read()))
+        {
+            Console.WriteLine($"[{occurence.Read().ToString(),6}] : {formatInfo.ToPrettyString()}");
+        }
+    }
+    
+    private static FormatParserCliSettings ParseSettings(string[] args)
+    {
+        var argsParser = new ArgumentParser<FormatParserCliSettings>()
+            .WithPositionalArgument((settings, arg) => settings.Directory = arg)
+            .OnNamedParameter("parallel", (settings, arg) => settings.DegreeOfParallelism = arg, false)
+            .OnNamedParameter("buffer-size", (settings, arg) => settings.BufferSize = arg, false);
+
+        return argsParser.Parse(args);
+    }
+    
+    private static CLIRunner CreateRunner(FormatParserCliSettings settings)
+    {
         var binaryFormatDetectors = GetAllInstancesOf<IBinaryFormatDetector>().ToArray();
 
         var textAnalyzers = GetAllInstancesOf<ITextAnalyzer>().ToArray();
@@ -33,7 +72,7 @@ public class EntryPoint
 
         var streamFactory = new StreamFactory(settings.BufferSize);
         
-        var runner = new CLIRunner(
+        return new CLIRunner(
             new FileDiscoverer(new FileDiscovererSettings
             {
                 FallOnUnauthorizedException = settings.FailOnUnauthorizedAccessException,
@@ -45,39 +84,6 @@ public class EntryPoint
             ),
             streamFactory
         );
-
-        var cts = new CancellationTokenSource();
-        var state = new FormatParserCliState();
-        
-        Console.CancelKeyPress += (sender, eventArgs) =>
-        {
-            PrintState(state);
-        };
-        
-        runner.Run(settings, state, cts.Token).GetAwaiter().GetResult();
-
-        Console.WriteLine($"Run complete. Elapsed: {state.Stopwatch!.Elapsed.TotalMilliseconds}");
-        Console.WriteLine();
-
-        PrintState(state);
-    }
-
-    private static void PrintState(FormatParserCliState state)
-    {
-        foreach (var (formatInfo, occurence) in state.Occurence.OrderByDescending(x => x.Value.Read()))
-        {
-            Console.WriteLine($"[{occurence.Read().ToString(),6}] : {formatInfo.ToPrettyString()}");
-        }
-    }
-    
-    private static FormatParserCliSettings ParseSettings(string[] args)
-    {
-        var argsParser = new ArgumentParser<FormatParserCliSettings>()
-            .WithPositionalArgument((settings, arg) => settings.Directory = arg)
-            .OnNamedParameter("parallel", (settings, arg) => settings.DegreeOfParallelism = arg, false)
-            .OnNamedParameter("buffer-size", (settings, arg) => settings.BufferSize = arg, false);
-
-        return argsParser.Parse(args);
     }
 
     private static void LoadPlugins()

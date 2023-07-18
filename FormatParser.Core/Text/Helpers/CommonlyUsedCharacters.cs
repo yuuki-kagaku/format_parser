@@ -1,4 +1,4 @@
-namespace FormatParser.Text.EncodingAnalyzers;
+namespace FormatParser.Text.Helpers;
 
 public static class CommonlyUsedCharacters
 {

@@ -6,6 +6,7 @@
         <Nullable>enable</Nullable>
         <OutputType>Library</OutputType>
     </PropertyGroup>
+    <Import Project="..\copy-plugins.props" />
     <Import Project="..\copy-dictionaries.props" />
 
     <ItemGroup>

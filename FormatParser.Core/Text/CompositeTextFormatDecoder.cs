@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using FormatParser.Helpers;
 using FormatParser.Text.Decoders;
-using FormatParser.Text.EncodingAnalyzers;
 using EncodingInfo = FormatParser.Domain.EncodingInfo;
 
 namespace FormatParser.Text;
@@ -12,11 +12,11 @@ public class CompositeTextFormatDecoder
     private readonly Dictionary<ITextDecoder, IEnumerable<ITextAnalyzer>> encodingAnalyzersDictionary;
     private readonly Dictionary<ITextDecoder, CharacterValidator> invalidCharactersCheckers;
 
-    public CompositeTextFormatDecoder(ITextDecoder[] decoders, ITextAnalyzer[] encodingAnalyzers)
+    public CompositeTextFormatDecoder(ITextDecoder[] decoders, ITextAnalyzer[] textAnalyzers)
     {
         this.decoders = decoders;
-        var encodingAnalyzersByLanguage = encodingAnalyzers
-            .SelectMany(analyzer => analyzer.SupportedLanguages.Select(lang => (Language: lang, Analyzer: analyzer)))
+        var encodingAnalyzersByLanguage = textAnalyzers
+            .SelectMany(analyzer => analyzer.RequiredAnalyzers.Select(lang => (Language: lang, Analyzer: analyzer)))
             .ToDictionary(x => x.Language, x => x.Analyzer);
 
         encodingAnalyzersDictionary = decoders.ToDictionary(x => x, x => GetEncodingAnalyzers(x, encodingAnalyzersByLanguage));
@@ -34,30 +34,36 @@ public class CompositeTextFormatDecoder
             try
             {
                 var decodeResult = decoder.TryDecodeText(bytes);
-                if (decodeResult != null)
+                if (decodeResult == null) 
+                    continue;
+                
+                // Console.WriteLine($"text : {decodeResult.Chars.AsString()}");
+                Console.WriteLine($"tex2t : {invalidCharactersCheckers[decoder].AllCharactersIsValid(decodeResult.Chars)}");
+                
+                if (!invalidCharactersCheckers[decoder].AllCharactersIsValid(decodeResult.Chars))
+                    continue;
+
+                Console.WriteLine($"encodingAnalyzersDictionary[decoder] : {encodingAnalyzersDictionary[decoder].Count()}");
+
+                var text = decodeResult.Chars.AsString();
+
+                var defaultDetectionProbability = decoder.DefaultDetectionProbability;
+                if (defaultDetectionProbability > bestMatchProbability)
+                    (bestMatchProbability, resultEncoding, resultTextSample) = (defaultDetectionProbability, decodeResult.Encoding, text);
+
+                
+                foreach (var textAnalyzer in encodingAnalyzersDictionary[decoder])
                 {
-                    var invalidCharactersChecker = invalidCharactersCheckers[decoder];
-                    if (!invalidCharactersChecker.AllCharactersIsValid(decodeResult.Chars))
+                    var detectionProbability = textAnalyzer.AnalyzeProbability(text, decodeResult.Encoding, out var clarifiedEncoding);
+
+                    Console.WriteLine($"detectionProbability : {detectionProbability} | {textAnalyzer.GetType().Name}");
+                    if (detectionProbability <= bestMatchProbability)
                         continue;
                     
-                    var textSample = new TextSample(decodeResult.Chars);
-
-                    var defaultDetectionProbability = decoder.DefaultDetectionProbability;
-                    if (defaultDetectionProbability > bestMatchProbability)
-                        (bestMatchProbability, resultEncoding, resultTextSample) = (defaultDetectionProbability, decodeResult.Encoding, textSample.Text);
-                    
-                    foreach (var encodingAnalyzer in encodingAnalyzersDictionary[decoder])
-                    {
-                        var detectionProbability = encodingAnalyzer.AnalyzeProbability(textSample, decodeResult.Encoding, out var clarifiedEncoding);
-
-                        if (detectionProbability > bestMatchProbability)
-                        {
-                            (bestMatchProbability, resultEncoding, resultTextSample) = (detectionProbability, clarifiedEncoding ?? decodeResult.Encoding, textSample.Text);
+                    (bestMatchProbability, resultEncoding, resultTextSample) = (detectionProbability, clarifiedEncoding ?? decodeResult.Encoding, text);
                             
-                            if (bestMatchProbability >= DetectionProbability.High)
-                                return true;
-                        }
-                    }
+                    if (bestMatchProbability >= DetectionProbability.High)
+                        return true;
                 }
             }
             catch (DecoderFallbackException)

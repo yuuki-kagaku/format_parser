@@ -4,12 +4,21 @@ namespace FormatParser.Text;
 
 public static class InvalidCharacterHelper
 {
-    public static IEnumerable<char> GetForbiddenChars(CharacterValidatorSettings settings) =>
-        ControlCharacters.NonTextC0Controls.Except(GetC0CharactersToAllow(settings))
+    public static IEnumerable<char> GetForbiddenChars(CharacterValidatorSettings settings)
+    {
+        Console.WriteLine($"BINGO:: {((uint)ControlCharacters.LF).ToString("x8")}");
+        
+        foreach (var control in ControlCharacters.NonTextC0Controls)
+        {
+            Console.WriteLine($"invalid :  | {((uint)control).ToString("x8")}");
+        }
+        
+        return ControlCharacters.NonTextC0Controls.Except(GetC0CharactersToAllow(settings))
             .Concat(GetForbiddenNoncharacters(settings))
-            .Concat(GetForbidenC1Controls(settings));
+            .Concat(GetForbiddenC1Controls(settings));
+    }
 
-    private static IEnumerable<char> GetForbidenC1Controls(CharacterValidatorSettings settings)
+    private static IEnumerable<char> GetForbiddenC1Controls(CharacterValidatorSettings settings)
     {
         if (settings.AllowC1Controls)
             return Array.Empty<char>();

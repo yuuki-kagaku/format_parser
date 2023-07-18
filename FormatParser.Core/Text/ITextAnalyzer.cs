@@ -1,10 +1,10 @@
 using FormatParser.Domain;
 
-namespace FormatParser.Text.EncodingAnalyzers;
+namespace FormatParser.Text;
 
 public interface ITextAnalyzer
 {
-    DetectionProbability AnalyzeProbability(TextSample text, EncodingInfo encoding, out EncodingInfo? clarifiedEncoding);
+    DetectionProbability AnalyzeProbability(string text, EncodingInfo encoding, out EncodingInfo? clarifiedEncoding);
     
-    string[] SupportedLanguages { get; }
+    string[] RequiredAnalyzers { get; }
 }

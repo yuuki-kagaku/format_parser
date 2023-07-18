@@ -1,5 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace FormatParser.MachO;
 
+[SuppressMessage("ReSharper", "IdentifierTypo")]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 internal static class MachOConstants
 {
     #region Architecture

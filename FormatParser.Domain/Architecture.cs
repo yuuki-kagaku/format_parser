@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace FormatParser.Domain;
 
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 public enum Architecture
 {
     Unknown,

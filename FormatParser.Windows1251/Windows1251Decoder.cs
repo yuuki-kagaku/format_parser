@@ -10,10 +10,8 @@ public class Windows1251Decoder : DecoderBase
 {
     private readonly CharacterValidatorSettings settings;
 
-    public Windows1251Decoder(TextFileParsingSettings settings)
-    {
+    public Windows1251Decoder(TextFileParsingSettings settings) => 
         this.settings = new CharacterValidatorSettings(settings.AllowEscapeChar, settings.AllowFormFeed, true, false);
-    }
 
     protected override Decoder GetDecoder(int inputSize) => Decoder;
 
@@ -33,13 +31,13 @@ public class Windows1251Decoder : DecoderBase
         return encoding.GetDecoder();
     }
 
-    public override int MinimalSizeOfInput { get; } = 0;
+    protected override int MinimalSizeOfInput => 0;
 
-    public override bool SupportBom { get; } = false;
-    public override EncodingInfo EncodingWithBom => throw new NotSupportedException();
+    protected override bool SupportBom => false;
+    protected override EncodingInfo EncodingWithBom => throw new NotSupportedException();
     public override EncodingInfo EncodingWithoutBom { get; } = new("Windows-1251", Endianness.NotAllowed, false);
 
-    public override DetectionProbability DefaultDetectionProbability { get; } = DetectionProbability.No;
+    public override DetectionProbability DefaultDetectionProbability => DetectionProbability.No;
     public override string[]? RequiredEncodingAnalyzers { get; } = { "ru" } ;
 
 }

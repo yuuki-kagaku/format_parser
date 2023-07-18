@@ -5,7 +5,7 @@ using FormatParser.Test.Helpers;
 namespace FormatParser.PerformanceTest;
 
 [SimpleJob(RuntimeMoniker.Net70)]
-public class Benchmark
+public class BenchmarkWithDisk
 {
     [GlobalSetup]
     public void Setup()
@@ -20,6 +20,6 @@ public class Benchmark
     }
 
     [Benchmark]
-    public void VarDir() => FormatParser.CLI.EntryPoint.Main(new []{"/var/"});
+    public void VarDir() => CLI.EntryPoint.Main(new []{"/var/"});
 
 }

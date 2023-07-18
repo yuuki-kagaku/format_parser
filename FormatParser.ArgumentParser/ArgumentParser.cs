@@ -9,10 +9,6 @@ public class ArgumentParser<TSettings> where TSettings : class, new()
     private readonly List<Action<TSettings, string>> positionalArgumentsActions = new ();
     private readonly HashSet<string> requiredArguments = new();
 
-    public ArgumentParser()
-    {
-    }
-
     public ArgumentParser<TSettings> OnNamedParameter(string parameterName, Action<TSettings> action, bool required = true)
     {
         if (!allArguments.Add($"--{parameterName}"))

@@ -7,10 +7,7 @@ public class FileDiscoverer
 {
     private readonly FileDiscovererSettings settings;
 
-    public FileDiscoverer(FileDiscovererSettings settings)
-    {
-        this.settings = settings;
-    }
+    public FileDiscoverer(FileDiscovererSettings settings) => this.settings = settings;
 
     public async Task DiscoverFilesAsync(string directory, Channel<string> channel)
     {

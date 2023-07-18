@@ -1,5 +1,5 @@
 using FormatParser.Domain;
-using FormatParser.Text.EncodingAnalyzers;
+using FormatParser.Text.Helpers;
 
 namespace FormatParser.Text.TextAnalyzers;
 
@@ -16,7 +16,7 @@ public class UTF16Heuristics : ITextAnalyzer
             .ToHashSet();
     }
 
-    public DetectionProbability AnalyzeProbability(TextSample text, EncodingInfo encoding, out EncodingInfo? clarifiedEncoding)
+    public DetectionProbability AnalyzeProbability(string text, EncodingInfo encoding, out EncodingInfo? clarifiedEncoding)
     {
         clarifiedEncoding = null;
 
@@ -24,11 +24,10 @@ public class UTF16Heuristics : ITextAnalyzer
         var nonBmpChars = 0;
         var unusualCjkBmpChars = 0;
         var commonAsciiChars= 0;
-
-        var chars = text.GetChars();
-        for (var i = 0; i < chars.Count; i++)
+        
+        for (var i = 0; i < text.Length; i++)
         {
-            var c = chars[i];
+            var c = text[i];
             totalChars++;
 
             if (Char.IsSurrogate(c))
@@ -63,13 +62,13 @@ public class UTF16Heuristics : ITextAnalyzer
         if (commonCjkBmpCharacters.Contains(c))
             return false;
         
-        if (UnicodeHelper.IsCJKIdeographOrHangulSyllableFromBmp(c))
+        if (CJKBlockHelper.IsCJKIdeographOrHangulSyllableFromBmp(c))
             return true;
         
         return false;
     }
 
-    public string[] SupportedLanguages { get; } = {"UTF-16"};
+    public string[] RequiredAnalyzers { get; } = {"UTF-16"};
     
     private static readonly HashSet<char> CommonChars = CommonlyUsedCharacters.EnglishChars
         .Concat(CommonlyUsedCharacters.CommonSpecialCharacters)

@@ -112,8 +112,6 @@ public class PeDetector : IBinaryFormatDetector
     private async Task<(uint VirtualAddress, uint Size)> ReadDataDirectoryAsync(StreamingBinaryReader streamingBinaryReader) 
         => (await streamingBinaryReader.ReadUInt(), await streamingBinaryReader.ReadUInt());
 
-   
-
     private static async Task<DosHeaderInfo?> TryReadDosHeader(StreamingBinaryReader streamingBinaryReader)
     {
         if (streamingBinaryReader.Length < 44)

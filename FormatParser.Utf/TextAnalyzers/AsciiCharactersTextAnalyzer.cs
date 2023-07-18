@@ -1,16 +1,15 @@
 using FormatParser.Domain;
-using FormatParser.Text.EncodingAnalyzers;
 using FormatParser.Text.Helpers;
 
 namespace FormatParser.Text.TextAnalyzers;
 
 public class AsciiCharactersTextAnalyzer : ITextAnalyzer
 {
-    public DetectionProbability AnalyzeProbability(TextSample text, EncodingInfo encoding, out EncodingInfo? clarifiedEncoding)
+    public DetectionProbability AnalyzeProbability(string text, EncodingInfo encoding, out EncodingInfo? clarifiedEncoding)
     {
         clarifiedEncoding = null;
         
-        foreach (var c in text.GetChars())
+        foreach (var c in text)
         {
             if (c > (char)127)
                 return DetectionProbability.No;
@@ -19,14 +18,14 @@ public class AsciiCharactersTextAnalyzer : ITextAnalyzer
         if (IsUtf8(encoding))
         {
             if (!encoding.ContainsBom)
-                clarifiedEncoding = encoding with { Name = WellKnownEncodings.ASCII };
+                clarifiedEncoding = encoding with { Name = WellKnownEncodings.Ascii };
             return DetectionProbability.High;
         }
             
         return DetectionProbability.MediumLow;
     }
 
-    private static bool IsUtf8(EncodingInfo encoding) => encoding.Name == WellKnownEncodings.UTF8;
+    private static bool IsUtf8(EncodingInfo encoding) => encoding.Name == WellKnownEncodings.Utf8;
 
-    public string[] SupportedLanguages { get; } = {"ASCII"};
+    public string[] RequiredAnalyzers { get; } = {"ASCII"};
 }

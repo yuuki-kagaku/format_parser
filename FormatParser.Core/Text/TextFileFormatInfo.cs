@@ -20,7 +20,7 @@ public record TextFileFormatInfo(string MimeType, EncodingInfo Encoding) : IFile
         return HashCode.Combine(StringComparer.GetHashCode(MimeType), StringComparer.GetHashCode(Encoding));
     }
 
-    public virtual bool Equals(IFileFormatInfo? other) => other is TextFileFormatInfo textFileFormatInfo && this.Equals(textFileFormatInfo);
+    public virtual bool Equals(IFileFormatInfo? other) => other is TextFileFormatInfo textFileFormatInfo && Equals(textFileFormatInfo);
 
     public string ToPrettyString() => $"{MimeType} ; {Encoding.ToPrettyString()}";
 }

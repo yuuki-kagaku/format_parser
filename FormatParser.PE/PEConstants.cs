@@ -1,5 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace FormatParser.PE;
 
+[SuppressMessage("ReSharper", "IdentifierTypo")]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 internal static class PEConstants
 {
     public static readonly byte[] DosMagicNumbers = {0x4D, 0x5A};

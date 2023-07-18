@@ -1,5 +1,6 @@
 using System.Text;
-using FormatParser.Text.EncodingAnalyzers;
+using FormatParser.Helpers;
+using FormatParser.Text.Helpers;
 using EncodingInfo = FormatParser.Domain.EncodingInfo;
 
 namespace FormatParser.Text.Decoders;
@@ -29,12 +30,12 @@ public abstract class DecoderBase : ITextDecoder
     }
 
     protected abstract Decoder GetDecoder(int inputSize);
-    
-    public abstract int MinimalSizeOfInput { get; }
 
-    public abstract bool SupportBom { get; }
-    
-    public abstract EncodingInfo EncodingWithBom { get; }
+    protected abstract int MinimalSizeOfInput { get; }
+
+    protected abstract bool SupportBom { get; }
+
+    protected abstract EncodingInfo EncodingWithBom { get; }
     
     public abstract EncodingInfo EncodingWithoutBom { get; }
 

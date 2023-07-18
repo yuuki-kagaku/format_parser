@@ -52,6 +52,7 @@ public class FormatDecoder
             }
             catch
             {
+                // ignored
             }
         }
 

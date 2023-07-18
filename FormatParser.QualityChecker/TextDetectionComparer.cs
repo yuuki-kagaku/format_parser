@@ -8,7 +8,7 @@ public class TextDetectionComparer
     private readonly CompositeTextFormatDecoder compositeTextFormatDecoder;
     private readonly QualityCheckerSettings settings;
     private readonly byte[] buffer;
-    private static readonly List<string> textFormats = new List<string>()
+    private static readonly string[] TextFormats =
     {
         "text/",
         "application/json",
@@ -83,7 +83,7 @@ public class TextDetectionComparer
         catch (UnauthorizedAccessException)
         {
         }
-        catch (System.IO.IOException)
+        catch (IOException)
         {
         }
     }
@@ -111,19 +111,12 @@ public class TextDetectionComparer
 
     private static bool IsTextFile(string commandFileOutput, string file)
     {
-        return textFormats.Any(x => commandFileOutput.Contains(x, StringComparison.InvariantCultureIgnoreCase));
+        return TextFormats.Any(x => commandFileOutput.Contains(x, StringComparison.InvariantCultureIgnoreCase));
     }
     
     private static string IsText(bool isText) => isText ? "text" : "binary";
 
-    private static bool ShouldSkip(string commandOutput, int size)
-    {
-        if (size == 0)
-            return true;
-        
-        if (commandOutput.Contains("application/x-archive", StringComparison.InvariantCultureIgnoreCase) && size == "!<arch>\n".Length)
-            return true;
-        
-        return false;
-    }
+    private static bool ShouldSkip(string commandOutput, int size) =>
+        size == 0 ||
+        commandOutput.Contains("application/x-archive", StringComparison.InvariantCultureIgnoreCase) && size == "!<arch>\n".Length;
 }

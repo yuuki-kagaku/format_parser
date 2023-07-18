@@ -1,8 +1,12 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace FormatParser.ELF;
 
+[SuppressMessage("ReSharper", "IdentifierTypo")]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 internal static class ELFConstants
 {
-    public static byte[] ElfMagicBytes = {0x7F, (byte)'E', (byte)'L', (byte)'F'};
+    public static readonly byte[] ElfMagicBytes = {0x7F, (byte)'E', (byte)'L', (byte)'F'};
     
     #region Endianness
     

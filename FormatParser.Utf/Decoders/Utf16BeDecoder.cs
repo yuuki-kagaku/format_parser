@@ -23,13 +23,13 @@ public class Utf16BeDecoder : DecoderBase, ITextDecoder
     public override IEnumerable<char> GetInvalidCharacters => InvalidCharacterHelper
         .GetForbiddenChars(settings);
 
-    public override int MinimalSizeOfInput { get; } = 8;
+    protected override int MinimalSizeOfInput => 8;
 
-    public override bool SupportBom { get; } = true;
-    public override EncodingInfo EncodingWithBom { get; } = EncodingInfo.UTF16BeBom;
-    public override EncodingInfo EncodingWithoutBom { get; } = EncodingInfo.UTF16BeNoBom;
+    protected override bool SupportBom => true;
+    protected override EncodingInfo EncodingWithBom => EncodingInfo.Utf16BeBom;
+    public override EncodingInfo EncodingWithoutBom => EncodingInfo.Utf16BeNoBom;
 
     public override string[]? RequiredEncodingAnalyzers { get; } = { "UTF-16" };
 
-public override DetectionProbability DefaultDetectionProbability { get; } = DetectionProbability.No;
+public override DetectionProbability DefaultDetectionProbability => DetectionProbability.No;
 }
