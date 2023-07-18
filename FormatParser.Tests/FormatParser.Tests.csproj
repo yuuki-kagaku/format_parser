@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
         <OutputType>Library</OutputType>
     </PropertyGroup>
-
+    <Import Project="..\copy-plugins.props" />
 
     <ItemGroup>
       <PackageReference Include="FluentAssertions" Version="6.11.0" />

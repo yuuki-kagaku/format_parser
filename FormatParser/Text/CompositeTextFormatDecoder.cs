@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using FormatParser.Text.Decoders;
 using FormatParser.Text.EncodingAnalyzers;
 using FormatParser.Text.UtfDecoders;
@@ -66,7 +67,7 @@ public class CompositeTextFormatDecoder
                     }
                 }
             }
-            catch
+            catch (DecoderFallbackException)
             {
             }
         }
@@ -75,7 +76,7 @@ public class CompositeTextFormatDecoder
     }
     
     
-    private static IEnumerable<ITextAnalyzer> GetEncodingAnalyzers(ITextDecoder decoder, Dictionary<string, ITextAnalyzer> encodingAnalyzersByLanguage)
+    private IEnumerable<ITextAnalyzer> GetEncodingAnalyzers(ITextDecoder decoder, Dictionary<string, ITextAnalyzer> encodingAnalyzersByLanguage)
     {
         yield return new AsciiCharactersTextAnalyzer();
         yield return new UTF16Heuristics();

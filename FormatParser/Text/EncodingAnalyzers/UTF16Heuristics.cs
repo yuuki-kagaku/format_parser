@@ -2,6 +2,17 @@ namespace FormatParser.Text.EncodingAnalyzers;
 
 public class UTF16Heuristics : IDefaultTextAnalyzer
 {
+    private readonly Lazy<HashSet<char>> commonCjkBmpCharacters;
+
+    public UTF16Heuristics() : this(new CommonCJKCharactersProvider()) {}
+    public UTF16Heuristics(CommonCJKCharactersProvider commonCjkCharactersProvider)
+    {
+        commonCjkBmpCharacters = new Lazy<HashSet<char>>(() => commonCjkCharactersProvider.MostUsedHangul
+            .Concat(commonCjkCharactersProvider.MostUsedChineseCharacters)
+            .Concat(commonCjkCharactersProvider.MostUsedKanji)
+            .ToHashSet(), LazyThreadSafetyMode.PublicationOnly);
+    }
+
     public DetectionProbability AnalyzeProbability(TextSample text, EncodingInfo encoding, out EncodingInfo? clarifiedEncoding)
     {
         clarifiedEncoding = null;
@@ -44,9 +55,9 @@ public class UTF16Heuristics : IDefaultTextAnalyzer
         return DetectionProbability.Low;
     }
 
-    private static bool IsUnusualCJKCharacter(char c)
+    private bool IsUnusualCJKCharacter(char c)
     {
-        if (CommonCjkBmpCharacters.Contains(c))
+        if (commonCjkBmpCharacters.Value.Contains(c))
             return false;
         
         if (UnicodeHelper.IsCJKIdeographOrHangulSyllableFromBmp(c))
@@ -55,19 +66,11 @@ public class UTF16Heuristics : IDefaultTextAnalyzer
         return false;
     }
 
-    public string[] SupportedLanguages { get; } = {"*"};
+    public string[] SupportedLanguages { get; } = {"UTF-16"};
     
     private static readonly HashSet<char> CommonChars = CommonlyUsedCharacters.EnglishChars
         .Concat(CommonlyUsedCharacters.CommonSpecialCharacters)
         .Concat(CommonlyUsedCharacters.CommonPunctuation)            
         .ToHashSet();
 
-    private static readonly HashSet<char> CommonCjkBmpCharacters =
-        CommonCJKChars.MostCommonHangul
-            .Concat(CommonCJKChars.CJKPunctuation)
-            .Concat(CommonCJKChars.MostCommonChineseCharacters)
-            .Concat(CommonCJKChars.Kana)
-            .Concat(CommonCJKChars.MostUsedKanji)
-            .Concat(CommonCJKChars.FullwidthAndHalfwidthForms)
-            .ToHashSet();
 }

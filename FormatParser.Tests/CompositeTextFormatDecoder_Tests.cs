@@ -21,7 +21,11 @@ public class CompositeTextFormatDecoder_Tests : TestBase
         {
             new Windows1251Decoder(textParserSettings)
         };
-        var languageAnalyzers = new ITextAnalyzer[] {new RuFrequencyTextAnalyzer()};
+        var languageAnalyzers = new ITextAnalyzer[]
+        {
+            new UTF16Heuristics(),
+            new RuFrequencyTextAnalyzer()
+        };
 
         var utfDecoders = new IUtfDecoder[]
         {

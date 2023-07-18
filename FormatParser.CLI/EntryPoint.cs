@@ -22,7 +22,11 @@ public class EntryPoint
         var binaryDecoders = GetAllInstancesOf<IBinaryFormatDetector>().ToArray();
         
         var nonUnicodeDecoders = new ITextDecoder[] {new Windows1251Decoder(settings.TextFileParsingSettings)};
-        var languageAnalyzers = new ITextAnalyzer[] {new RuDictionaryTextAnalyzer()};
+        var textAnalyzers = new ITextAnalyzer[]
+        {
+            new UTF16Heuristics(),
+            new RuDictionaryTextAnalyzer()
+        };
         
         var textFileParsingSettings = new TextFileParsingSettings();
         
@@ -43,7 +47,7 @@ public class EntryPoint
         var compositeTextFormatDecoder = new CompositeTextFormatDecoder(
             utfDecoders, 
             nonUnicodeDecoders,
-            languageAnalyzers,
+            textAnalyzers,
             settings.TextFileParsingSettings);
 
         var runner = new CLIRunner(
@@ -79,7 +83,7 @@ public class EntryPoint
 
     private static void LoadPlugins()
     {
-        const string pluginDirectory = "./plugins/";
+        const string pluginDirectory = "plugins";
 
         if (!Directory.Exists(pluginDirectory))
             return;

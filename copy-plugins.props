@@ -1,14 +1,22 @@
 <Project TreatAsLocalProperty="Target">
     <Target Name="CustomAfterBuild" AfterTargets="PostBuildEvent">
+        
         <ItemGroup>
             <PluginElf Include="$(SolutionDir)\FormatParser.ELF\bin\$(Configuration)\$(TargetFramework)\*" />
         </ItemGroup>
+        
         <ItemGroup>
             <PluginMacho Include="$(SolutionDir)\FormatParser.MachO\bin\$(Configuration)\$(TargetFramework)\*" />
         </ItemGroup>
+        
         <ItemGroup>
             <PluginPE Include="$(SolutionDir)\FormatParser.PE\bin\$(Configuration)\$(TargetFramework)\*" />
         </ItemGroup>
+        
+        <ItemGroup>
+            <Dictionaries Include="$(SolutionDir)\resources\most_used_hangul;$(SolutionDir)\resources\most_used_kanji;$(SolutionDir)\resources\most_used_chinese_characters"/>
+        </ItemGroup>
+        
         <Copy SourceFiles="@(PluginElf)" DestinationFiles="@(PluginElf->'$(OutputPath)\plugins\ELF\%(RecursiveDir)%(Filename)%(Extension)')"
               ContinueOnError="false"
               OverwriteReadOnlyFiles="true"/>
@@ -18,5 +26,10 @@
         <Copy SourceFiles="@(PluginPE)" DestinationFiles="@(PluginPE->'$(OutputPath)\plugins\PE\%(RecursiveDir)%(Filename)%(Extension)')"
               ContinueOnError="false"
               OverwriteReadOnlyFiles="true"/>
+
+        <Copy
+                SourceFiles="@(Dictionaries)"
+                DestinationFolder="$(OutputPath)\dictionaries"
+        />
     </Target>
 </Project>

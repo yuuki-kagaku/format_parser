@@ -20,8 +20,7 @@ public class Utf16LeDecoder : DecoderBase, IUtfDecoder
     }
 
     public override IEnumerable<char> GetInvalidCharacters => InvalidCharacterHelper
-        .GetForbiddenChars(settings)
-        .ToHashSet();
+        .GetForbiddenChars(settings);
     
     public override int MinimalSizeOfInput { get; } = 8;
     
@@ -29,7 +28,7 @@ public class Utf16LeDecoder : DecoderBase, IUtfDecoder
     public override EncodingInfo EncodingWithBom { get; } = EncodingInfo.UTF16LeBom;
     public override EncodingInfo EncodingWithoutBom { get; } = EncodingInfo.UTF16LeNoBom;
 
-    public override string? RequiredEncodingAnalyzer { get; } = null;
+    public override string? RequiredEncodingAnalyzer { get; } = "UTF-16";
     
     public override DetectionProbability DefaultDetectionProbability { get; } = DetectionProbability.No;
 }

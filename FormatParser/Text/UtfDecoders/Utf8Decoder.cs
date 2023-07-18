@@ -20,8 +20,7 @@ public class Utf8Decoder : DecoderBase, IUtfDecoder
     }
 
     public override IEnumerable<char> GetInvalidCharacters => InvalidCharacterHelper
-        .GetForbiddenChars(settings)
-        .ToHashSet();
+        .GetForbiddenChars(settings);
 
     public override int MinimalSizeOfInput { get; } = 0;
 

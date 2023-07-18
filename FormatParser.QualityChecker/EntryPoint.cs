@@ -16,7 +16,11 @@ public class EntryPoint
         var directory = args[0];
 
         var nonUnicodeDecoders = new ITextDecoder[] {new Windows1251Decoder(settings.TextFileParsingSettings)};
-        var languageAnalyzers = new ITextAnalyzer[] {new RuDictionaryTextAnalyzer()};
+        var languageAnalyzers = new ITextAnalyzer[]
+        {
+            new UTF16Heuristics(),
+            new RuDictionaryTextAnalyzer()
+        };
 
         var textFileParsingSettings = new TextFileParsingSettings();
         
