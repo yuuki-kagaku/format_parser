@@ -1,4 +1,5 @@
 using FluentAssertions;
+using FormatParser.Domain;
 using FormatParser.Test.Helpers;
 using FormatParser.Text;
 using NUnit.Framework;

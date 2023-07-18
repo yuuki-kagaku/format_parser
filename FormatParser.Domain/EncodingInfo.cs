@@ -1,7 +1,4 @@
-using FormatParser.Domain;
-using FormatParser.Text.Helpers;
-
-namespace FormatParser.Text;
+namespace FormatParser.Domain;
 
 public record EncodingInfo(string Name, Endianness Endianness, bool ContainsBom)
 {

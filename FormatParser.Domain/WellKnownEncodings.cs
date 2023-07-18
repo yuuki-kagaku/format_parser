@@ -1,4 +1,4 @@
-namespace FormatParser.Text.Helpers;
+namespace FormatParser.Domain;
 
 public static class WellKnownEncodings
 {

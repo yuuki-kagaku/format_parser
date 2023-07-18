@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using FormatParser.Text.Decoders;
 using FormatParser.Text.EncodingAnalyzers;
+using EncodingInfo = FormatParser.Domain.EncodingInfo;
 
 namespace FormatParser.Text;
 

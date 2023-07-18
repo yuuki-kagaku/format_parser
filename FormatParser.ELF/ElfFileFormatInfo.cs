@@ -8,6 +8,6 @@ public record ElfFileFormatInfo(Endianness Endianness, Bitness Bitness, Architec
 
     public string ToPrettyString()
     {
-        return $"ELF: {Architecture} {Bitness} {Endianness} Interpreter:{Interpreter}";
+        return $"ELF: {Architecture.ToStringWithoutBitness()}/{Bitness.ToPrettyString()} {Endianness.ToPrettyString()} Interpreter:{Interpreter}";
     }
 }

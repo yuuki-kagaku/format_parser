@@ -8,6 +8,6 @@ public record PeFileFormatInfo(Bitness Bitness, Architecture Architecture, bool 
     
     public string ToPrettyString()
     {
-        return $"PE: {Architecture} {Bitness} managed: {IsManaged}";
+        return $"PE: {Architecture.ToStringWithoutBitness()}/{Bitness.ToPrettyString()} managed: {IsManaged}";
     }
 }

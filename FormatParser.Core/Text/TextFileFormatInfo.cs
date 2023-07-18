@@ -22,5 +22,5 @@ public record TextFileFormatInfo(string MimeType, EncodingInfo Encoding) : IFile
 
     public virtual bool Equals(IFileFormatInfo? other) => other is TextFileFormatInfo textFileFormatInfo && this.Equals(textFileFormatInfo);
 
-    public string ToPrettyString() => $"{MimeType} ; {Encoding}";
+    public string ToPrettyString() => $"{MimeType} ; {Encoding.ToPrettyString()}";
 }

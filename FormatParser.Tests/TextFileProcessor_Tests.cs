@@ -1,4 +1,5 @@
 using FluentAssertions;
+using FormatParser.Domain;
 using FormatParser.Text;
 using FormatParser.Text.Decoders;
 using FormatParser.Text.EncodingAnalyzers;

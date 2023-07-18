@@ -1,5 +1,6 @@
 using System.Text;
 using FormatParser.Text.EncodingAnalyzers;
+using EncodingInfo = FormatParser.Domain.EncodingInfo;
 
 namespace FormatParser.Text.Decoders;
 

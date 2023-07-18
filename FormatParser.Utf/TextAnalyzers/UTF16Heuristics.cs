@@ -1,3 +1,4 @@
+using FormatParser.Domain;
 using FormatParser.Text.EncodingAnalyzers;
 
 namespace FormatParser.Text.TextAnalyzers;

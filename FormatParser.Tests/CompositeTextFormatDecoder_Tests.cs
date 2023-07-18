@@ -5,7 +5,7 @@ using FormatParser.Text.EncodingAnalyzers;
 using FormatParser.Text.TextAnalyzers;
 using FormatParser.Windows1251;
 using NUnit.Framework;
-using EncodingInfo = FormatParser.Text.EncodingInfo;
+using EncodingInfo = FormatParser.Domain.EncodingInfo;
 
 namespace FormatParser.Tests;
 

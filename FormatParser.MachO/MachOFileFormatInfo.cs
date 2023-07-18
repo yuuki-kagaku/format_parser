@@ -8,6 +8,6 @@ public record MachOFileFormatInfo(Endianness Endianness, Bitness Bitness, Archit
 
     public string ToPrettyString()
     {
-        return $"Mach-O: {Architecture} {Bitness} {Endianness} signed:{Signed}";
+        return $"Mach-O: {Architecture.ToStringWithoutBitness()}/{Bitness.ToPrettyString()} {Endianness.ToPrettyString()} signed:{Signed}";
     }
 }

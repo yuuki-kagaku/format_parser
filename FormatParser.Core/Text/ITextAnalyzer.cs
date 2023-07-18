@@ -1,3 +1,5 @@
+using FormatParser.Domain;
+
 namespace FormatParser.Text.EncodingAnalyzers;
 
 public interface ITextAnalyzer

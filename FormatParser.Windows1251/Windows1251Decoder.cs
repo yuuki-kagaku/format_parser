@@ -2,7 +2,7 @@ using System.Text;
 using FormatParser.Domain;
 using FormatParser.Text;
 using FormatParser.Text.Decoders;
-using EncodingInfo = FormatParser.Text.EncodingInfo;
+using EncodingInfo = FormatParser.Domain.EncodingInfo;
 
 namespace FormatParser.Windows1251;
 

@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using FormatParser.Domain;
 using FormatParser.Text;
 using FormatParser.Text.EncodingAnalyzers;
 
