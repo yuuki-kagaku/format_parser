@@ -1,8 +1,12 @@
 <Project TreatAsLocalProperty="Target">
-    <ItemGroup>
-        <None Include="$(SolutionDir)\resources\*">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <Link>dictionaries\%(RecursiveDir)\%(Filename)%(Extension)</Link>
-        </None>
-    </ItemGroup>
+    <Target Name="CustomAfterBuild" AfterTargets="PostBuildEvent">
+        <ItemGroup>
+            <Dictionaries Include="$(SolutionDir)\resources\most_used_hangul;$(SolutionDir)\resources\most_used_kanji;$(SolutionDir)\resources\most_used_chinese_characters"/>
+        </ItemGroup>
+
+        <Copy
+                SourceFiles="@(Dictionaries)"
+                DestinationFolder="$(OutputPath)\dictionaries"
+        />
+    </Target>
 </Project>

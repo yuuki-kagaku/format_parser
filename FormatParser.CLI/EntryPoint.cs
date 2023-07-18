@@ -22,6 +22,9 @@ public static class EntryPoint
         };
 
         var runner = CreateRunner(settings);
+
+        if (!Directory.Exists(settings.Directory))
+            throw new FormatParserException($"Directory {settings.Directory} does not exists.");
         
         runner.Run(settings, state, cts.Token).GetAwaiter().GetResult();
 
