@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\FormatParser.Core\FormatParser.Core.csproj" />
       <ProjectReference Include="..\FormatParser.ELF\FormatParser.ELF.csproj">
           <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       </ProjectReference>
@@ -18,10 +19,15 @@
       <ProjectReference Include="..\FormatParser.PE\FormatParser.PE.csproj">
             <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       </ProjectReference>
-      <ProjectReference Include="..\FormatParser.Utf\FormatParser.Utf.csproj" />
-      <ProjectReference Include="..\FormatParser.Windows1251\FormatParser.Windows1251.csproj" />
-      <ProjectReference Include="..\FormatParser.Core\FormatParser.Core.csproj" />
-      <ProjectReference Include="..\FormatParser.Xml\FormatParser.Xml.csproj" />
+      <ProjectReference Include="..\FormatParser.Utf\FormatParser.Utf.csproj">
+          <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      </ProjectReference>
+      <ProjectReference Include="..\FormatParser.Windows1251\FormatParser.Windows1251.csproj">
+          <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      </ProjectReference>
+      <ProjectReference Include="..\FormatParser.Xml\FormatParser.Xml.csproj">
+          <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      </ProjectReference>
     </ItemGroup>
 
 

@@ -4,8 +4,6 @@ using FormatParser.Text;
 using FormatParser.Text.Decoders;
 using FormatParser.Text.EncodingAnalyzers;
 using FormatParser.TextBasedFormats;
-using FormatParser.Windows1251;
-using FormatParser.Xml;
 
 namespace FormatParser.CLI;
 
@@ -18,22 +16,14 @@ public class EntryPoint
         LoadPlugins();
         
         var binaryDecoders = GetAllInstancesOf<IBinaryFormatDetector>().ToArray();
-        
-        var textAnalyzers = new ITextAnalyzer[]
-        {
-            new AsciiCharactersTextAnalyzer(),
-            new UTF16Heuristics(),
-            new RuDictionaryTextAnalyzer()
-        };
+
+        var textAnalyzers = GetAllInstancesOf<ITextAnalyzer>().ToArray();
         
         var textFileParsingSettings = new TextFileParsingSettings();
         
         var textDecoders = GetAllInstancesOf<ITextDecoder, TextFileParsingSettings>(textFileParsingSettings).ToArray();
 
-        var textBasedFormatDetectors = new ITextBasedFormatDetector[]
-        {
-            new XmlDecoder()
-        };
+        var textBasedFormatDetectors = GetAllInstancesOf<ITextBasedFormatDetector>().ToArray();
 
         var compositeTextFormatDecoder = new CompositeTextFormatDecoder(
             textDecoders, 
@@ -86,8 +76,18 @@ public class EntryPoint
 
             foreach (var dll in plugins)
             {
-                var a = Assembly.LoadFrom(dll);
-                AppDomain.CurrentDomain.Load(a.GetName());
+                try
+                {
+                    var a = Assembly.LoadFrom(dll);
+
+                    if (AppDomain.CurrentDomain.GetAssemblies().Any(x => x.FullName == a.FullName))
+                        continue;
+
+                    AppDomain.CurrentDomain.Load(a.GetName());
+                }
+                catch (FileLoadException)
+                {
+                }
             }
         }
     }
@@ -117,6 +117,5 @@ public class EntryPoint
             .SelectMany(s => s.GetTypes())
             .Where(t => type.IsAssignableFrom(t))
             .Where(t => t is { IsInterface: false, IsAbstract: false });
-
     }
 }
