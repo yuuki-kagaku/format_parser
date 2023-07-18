@@ -1,8 +1,9 @@
 using FluentAssertions;
-using FormatParser.Tests.TestData;
 using FormatParser.Text;
-using FormatParser.Text.Encoding;
+using FormatParser.Text.Decoders;
+using FormatParser.Text.EncodingAnalyzers;
 using FormatParser.Text.UtfDecoders;
+using FormatParser.TextBasedFormats;
 using FormatParser.Windows1251;
 using NUnit.Framework;
 
@@ -55,7 +56,7 @@ public class TextFileProcessor_Tests : TestBase
         var result = textFileProcessor.TryProcess(bytes) as TextFileFormatInfo;
 
         result.Should().NotBeNull();
-        result!.Encoding.Should().Be(EncodingData.Utf8NoBOM);
+        result!.Encoding.Should().Be(EncodingInfo.Utf8NoBOM);
         result.MimeType.Should().Be("text/xml");
     }
 }

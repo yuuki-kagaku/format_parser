@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace FormatParser.Text.Encoding;
+namespace FormatParser.Text.Decoders;
 
 public class FormatParserDecoderFallback : DecoderFallback
 {

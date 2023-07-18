@@ -1,3 +1,5 @@
+using FormatParser.Domain;
+
 namespace FormatParser.PE;
 
 public static class PEArchitectureConverter
@@ -10,9 +12,9 @@ public static class PEArchitectureConverter
         
         Architecture GetArchitecture() => i switch
         {
-            PEConstants.IMAGE_FILE_MACHINE_I386 => Architecture.i386,
+            PEConstants.IMAGE_FILE_MACHINE_I386 => Architecture.I386,
             PEConstants.IMAGE_FILE_MACHINE_AMD64 => Architecture.Amd64,
-            PEConstants.IMAGE_FILE_MACHINE_IA64 => Architecture.ia64,
+            PEConstants.IMAGE_FILE_MACHINE_IA64 => Architecture.Ia64,
             PEConstants.IMAGE_FILE_MACHINE_ARM64 => Architecture.Arm64,
             _ => Architecture.Unknown
         };

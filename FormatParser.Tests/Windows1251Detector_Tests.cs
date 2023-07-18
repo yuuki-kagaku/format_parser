@@ -1,6 +1,4 @@
-using System.Text;
 using FluentAssertions;
-using FormatParser.Tests.TestData;
 using FormatParser.Text;
 using FormatParser.Windows1251;
 using NUnit.Framework;

@@ -1,4 +1,4 @@
-namespace ConsoleApp1;
+namespace FormatParser.QualityChecker;
 
 public class QualityCheckerState
 {

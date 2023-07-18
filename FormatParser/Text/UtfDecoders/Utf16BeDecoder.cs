@@ -1,5 +1,5 @@
 using System.Text;
-using FormatParser.Text.Encoding;
+using FormatParser.Text.Decoders;
 
 namespace FormatParser.Text.UtfDecoders;
 
@@ -14,7 +14,7 @@ public class Utf16BeDecoder : DecoderBase, IUtfDecoder
     
     protected override Decoder GetDecoder(int inputSize)
     {
-        var encoding = (System.Text.Encoding) System.Text.Encoding.BigEndianUnicode.Clone();
+        var encoding = (Encoding) Encoding.BigEndianUnicode.Clone();
         encoding.DecoderFallback = FormatParserDecoderFallback.DoNotFailAtEndOfInput(inputSize, 4);
         return encoding.GetDecoder();
     }
@@ -26,8 +26,8 @@ public class Utf16BeDecoder : DecoderBase, IUtfDecoder
     public override int MinimalSizeOfInput { get; } = 8;
     
     public override bool SupportBom { get; } = true;
-    public override EncodingData EncodingWithBom { get; } = EncodingData.UTF16BeBom;
-    public override EncodingData EncodingWithoutBom { get; } = EncodingData.UTF16BeNoBom;
+    public override EncodingInfo EncodingWithBom { get; } = EncodingInfo.UTF16BeBom;
+    public override EncodingInfo EncodingWithoutBom { get; } = EncodingInfo.UTF16BeNoBom;
 
     public override string? RequiredEncodingAnalyzer { get; } = null;
     

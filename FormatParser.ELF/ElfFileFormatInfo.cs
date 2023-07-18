@@ -1,3 +1,5 @@
+using FormatParser.Domain;
+
 namespace FormatParser.ELF;
 
 public record ElfFileFormatInfo(Endianness Endianness, Bitness Bitness, Architecture Architecture, string? Interpreter) : IFileFormatInfo

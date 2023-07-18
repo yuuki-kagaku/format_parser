@@ -1,8 +1,8 @@
-namespace FormatParser.Text;
+namespace FormatParser.Text.EncodingAnalyzers;
 
 public interface ITextAnalyzer
 {
-    DetectionProbability AnalyzeProbability(TextSample text, EncodingData encoding, out EncodingData? clarifiedEncoding);
+    DetectionProbability AnalyzeProbability(TextSample text, EncodingInfo encoding, out EncodingInfo? clarifiedEncoding);
     
     string[] SupportedLanguages { get; }
 }

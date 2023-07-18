@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using FormatParser.Domain;
 using FormatParser.Helpers;
 
 namespace FormatParser.MachO;

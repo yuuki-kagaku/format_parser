@@ -1,7 +1,7 @@
 using FluentAssertions;
 using FormatParser.BinaryReader;
+using FormatParser.Domain;
 using FormatParser.PE;
-using FormatParser.Tests.TestData;
 using NUnit.Framework;
 
 namespace FormatParser.Tests;
@@ -34,7 +34,7 @@ public class PEDetector_Tests : TestBase
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
-        fileInfo!.Architecture.Should().Be(Architecture.i386);
+        fileInfo!.Architecture.Should().Be(Architecture.I386);
         fileInfo.IsManaged!.Should().Be(false);
     }
     
@@ -56,7 +56,7 @@ public class PEDetector_Tests : TestBase
         
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
-        fileInfo!.Architecture.Should().Be(Architecture.i386);
+        fileInfo!.Architecture.Should().Be(Architecture.I386);
         fileInfo.IsManaged!.Should().Be(true);
     }
     
@@ -89,7 +89,7 @@ public class PEDetector_Tests : TestBase
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
-        fileInfo!.Architecture.Should().Be(Architecture.i386);
+        fileInfo!.Architecture.Should().Be(Architecture.I386);
         fileInfo.IsManaged!.Should().Be(true);
     }
     

@@ -1,7 +1,4 @@
-using System.Text;
 using FluentAssertions;
-using FormatParser.Helpers;
-using FormatParser.Tests.TestData;
 using FormatParser.Text;
 using FormatParser.Text.UtfDecoders;
 using NUnit.Framework;
@@ -31,7 +28,7 @@ public class Utf16LeDecoder_Tests : TestBase
         var textDecodingResult = decoder.TryDecodeText(content, chars);
         textDecodingResult.Should().NotBeNull();
 
-        textDecodingResult!.Encoding.Should().BeEquivalentTo(EncodingData.UTF16LeNoBom);
+        textDecodingResult!.Encoding.Should().BeEquivalentTo(EncodingInfo.UTF16LeNoBom);
         BuildString(textDecodingResult.Chars).Should().BeEquivalentTo(ReadFileAsUtf16Le(filename));
     }
 }

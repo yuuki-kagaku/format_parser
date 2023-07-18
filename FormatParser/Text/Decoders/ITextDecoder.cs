@@ -1,4 +1,4 @@
-namespace FormatParser.Text.Encoding;
+namespace FormatParser.Text.Decoders;
 
 public interface ITextDecoder
 { 
@@ -7,5 +7,5 @@ public interface ITextDecoder
     string? RequiredEncodingAnalyzer { get; }
     DetectionProbability DefaultDetectionProbability { get; }
 
-    HashSet<char>  GetInvalidCharacters { get; }
+    HashSet<char> GetInvalidCharacters { get; }
 }

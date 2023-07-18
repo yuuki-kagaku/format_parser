@@ -1,6 +1,6 @@
 using FormatParser.Text;
 
-namespace ConsoleApp1;
+namespace FormatParser.QualityChecker;
 
 public class QualityCheckerSettings
 {

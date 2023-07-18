@@ -1,8 +1,7 @@
-using System.Text;
 using FluentAssertions;
-using FormatParser.Tests.TestData;
 using FormatParser.Text;
-using FormatParser.Text.Encoding;
+using FormatParser.Text.Decoders;
+using FormatParser.Text.EncodingAnalyzers;
 using FormatParser.Text.UtfDecoders;
 using FormatParser.Windows1251;
 using NUnit.Framework;
@@ -49,7 +48,7 @@ public class CompositeTextFormatDecoder_Tests : TestBase
 
         isSuccessful.Should().BeTrue();
         text.Should().Be(TextSamples.TextWithOnlyAsciiChars);
-        encoding.Should().BeEquivalentTo(EncodingData.ASCII);
+        encoding.Should().BeEquivalentTo(EncodingInfo.ASCII);
     }
     
     [Test]
@@ -62,7 +61,7 @@ public class CompositeTextFormatDecoder_Tests : TestBase
 
         isSuccessful.Should().BeTrue();
         text.Should().Be(ReadFileAsUtf8(file));
-        encoding.Should().BeEquivalentTo(EncodingData.Utf8NoBOM);
+        encoding.Should().BeEquivalentTo(EncodingInfo.Utf8NoBOM);
     }
         
     [Test]
@@ -74,7 +73,7 @@ public class CompositeTextFormatDecoder_Tests : TestBase
 
         isSuccessful.Should().BeTrue();
         text.Should().Be(TextSamples.TextWithOnlyAsciiChars);
-        encoding.Should().BeEquivalentTo(EncodingData.UTF16BeNoBom);
+        encoding.Should().BeEquivalentTo(EncodingInfo.UTF16BeNoBom);
     }
     
     [Test]
@@ -85,7 +84,7 @@ public class CompositeTextFormatDecoder_Tests : TestBase
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
 
         isSuccessful.Should().BeTrue();
-        encoding.Should().BeEquivalentTo(EncodingData.UTF16LeNoBom);
+        encoding.Should().BeEquivalentTo(EncodingInfo.UTF16LeNoBom);
         text.Should().Be(TextSamples.TextWithOnlyAsciiChars);
     }
     
@@ -135,7 +134,7 @@ public class CompositeTextFormatDecoder_Tests : TestBase
 
         isSuccessful.Should().BeTrue();
         text.Should().Be(ReadFileAsUtf16Le(filename));
-        encoding.Should().BeEquivalentTo(EncodingData.UTF16LeNoBom);
+        encoding.Should().BeEquivalentTo(EncodingInfo.UTF16LeNoBom);
     }
 
     [Test]
@@ -147,7 +146,7 @@ public class CompositeTextFormatDecoder_Tests : TestBase
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
 
         isSuccessful.Should().BeTrue();
-        encoding.Should().BeEquivalentTo(EncodingData.UTF16BeNoBom);
+        encoding.Should().BeEquivalentTo(EncodingInfo.UTF16BeNoBom);
         text.Should().Be(ReadFileAsUtf16Be(filename));
     }
 
@@ -160,7 +159,7 @@ public class CompositeTextFormatDecoder_Tests : TestBase
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
 
         isSuccessful.Should().BeTrue();
-        encoding.Should().BeEquivalentTo(EncodingData.UTF16BeNoBom);
+        encoding.Should().BeEquivalentTo(EncodingInfo.UTF16BeNoBom);
         text.Should().Be(ReadFileAsUtf16Be(filename));
     }
     
@@ -173,7 +172,7 @@ public class CompositeTextFormatDecoder_Tests : TestBase
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
 
         isSuccessful.Should().BeTrue();
-        encoding.Should().BeEquivalentTo(EncodingData.UTF16LeNoBom);
+        encoding.Should().BeEquivalentTo(EncodingInfo.UTF16LeNoBom);
         text.Should().Be(ReadFileAsUtf16Le(filename));
     }
     
@@ -186,7 +185,7 @@ public class CompositeTextFormatDecoder_Tests : TestBase
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
 
         isSuccessful.Should().BeTrue();
-        encoding.Should().BeEquivalentTo(EncodingData.UTF16LeNoBom);
+        encoding.Should().BeEquivalentTo(EncodingInfo.UTF16LeNoBom);
         text.Should().Be(ReadFileAsUtf16Le(filename));
     }
     
@@ -199,7 +198,7 @@ public class CompositeTextFormatDecoder_Tests : TestBase
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
 
         isSuccessful.Should().BeTrue();
-        encoding.Should().BeEquivalentTo(EncodingData.UTF16BeNoBom);
+        encoding.Should().BeEquivalentTo(EncodingInfo.UTF16BeNoBom);
         text.Should().Be(ReadFileAsUtf16Be(filename));
     }
     
@@ -212,7 +211,7 @@ public class CompositeTextFormatDecoder_Tests : TestBase
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
 
         isSuccessful.Should().BeTrue();
-        encoding.Should().BeEquivalentTo(EncodingData.UTF16LeNoBom);
+        encoding.Should().BeEquivalentTo(EncodingInfo.UTF16LeNoBom);
         text.Should().Be(ReadFileAsUtf16Le(filename));
     }
     
@@ -225,7 +224,7 @@ public class CompositeTextFormatDecoder_Tests : TestBase
         var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
 
         isSuccessful.Should().BeTrue();
-        encoding.Should().BeEquivalentTo(EncodingData.UTF16BeNoBom);
+        encoding.Should().BeEquivalentTo(EncodingInfo.UTF16BeNoBom);
         text.Should().Be(ReadFileAsUtf16Be(filename));
     }
 

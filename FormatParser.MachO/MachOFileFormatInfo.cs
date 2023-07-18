@@ -1,3 +1,5 @@
+using FormatParser.Domain;
+
 namespace FormatParser.MachO;
 
 public record MachOFileFormatInfo(Endianness Endianness, Bitness Bitness, Architecture Architecture, bool Signed) : IFileFormatInfo

@@ -1,7 +1,7 @@
-using FormatParser.Text.Encoding;
+using FormatParser.Text.Decoders;
 
-namespace FormatParser.Text;
+namespace FormatParser.Text.UtfDecoders;
 
-public interface IUtfDecoder : Encoding.ITextDecoder
+public interface IUtfDecoder : ITextDecoder
 {
 }

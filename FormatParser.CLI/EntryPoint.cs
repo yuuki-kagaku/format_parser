@@ -1,8 +1,11 @@
 ﻿using System.Reflection;
 using System.Text.Json;
+using FormatParser.CLI.ArgumentParser;
 using FormatParser.Text;
-using FormatParser.Text.Encoding;
+using FormatParser.Text.Decoders;
+using FormatParser.Text.EncodingAnalyzers;
 using FormatParser.Text.UtfDecoders;
+using FormatParser.TextBasedFormats;
 using FormatParser.Windows1251;
 
 namespace FormatParser.CLI;

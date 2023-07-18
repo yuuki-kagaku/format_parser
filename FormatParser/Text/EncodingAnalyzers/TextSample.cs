@@ -1,7 +1,7 @@
 using System.Text;
 using FormatParser.Helpers;
 
-namespace FormatParser.Text;
+namespace FormatParser.Text.EncodingAnalyzers;
 
 public class TextSample
 {

@@ -1,10 +1,11 @@
-﻿using ConsoleApp1;
-using FormatParser;
-using FormatParser.Helpers;
+﻿using FormatParser.Helpers;
 using FormatParser.Text;
-using FormatParser.Text.Encoding;
+using FormatParser.Text.Decoders;
+using FormatParser.Text.EncodingAnalyzers;
 using FormatParser.Text.UtfDecoders;
 using FormatParser.Windows1251;
+
+namespace FormatParser.QualityChecker;
 
 public class EntryPoint
 {

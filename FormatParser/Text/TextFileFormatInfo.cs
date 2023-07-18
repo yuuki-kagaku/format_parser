@@ -1,6 +1,6 @@
 namespace FormatParser.Text;
 
-public record TextFileFormatInfo(string MimeType, EncodingData Encoding) : IFileFormatInfo
+public record TextFileFormatInfo(string MimeType, EncodingInfo Encoding) : IFileFormatInfo
 {
     private static readonly StringComparer stringComparer = StringComparer.InvariantCultureIgnoreCase;
     public virtual bool Equals(TextFileFormatInfo? other)

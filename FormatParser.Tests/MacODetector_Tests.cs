@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using FormatParser.BinaryReader;
+using FormatParser.Domain;
 using FormatParser.MachO;
-using FormatParser.Tests.TestData;
 using NUnit.Framework;
 
 namespace FormatParser.Tests;
@@ -44,7 +44,7 @@ public class MacODetector_Tests : TestBase
         fileInfo.Datas[0].Signed!.Should().Be(true);
 
         fileInfo.Datas[1].Bitness.Should().Be(Bitness.Bitness32);
-        fileInfo.Datas[1].Architecture.Should().Be(Architecture.i386);
+        fileInfo.Datas[1].Architecture.Should().Be(Architecture.I386);
         fileInfo.Datas[1].Endianness.Should().Be(Endianness.LittleEndian);
         fileInfo.Datas[1].Signed!.Should().Be(true);
         
@@ -85,7 +85,7 @@ public class MacODetector_Tests : TestBase
     
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
-        fileInfo!.Architecture.Should().Be(Architecture.i386);
+        fileInfo!.Architecture.Should().Be(Architecture.I386);
         fileInfo!.Endianness.Should().Be(Endianness.LittleEndian);
         fileInfo.Signed!.Should().Be(false);
     }

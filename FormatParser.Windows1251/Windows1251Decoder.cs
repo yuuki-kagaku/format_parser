@@ -1,6 +1,8 @@
 using System.Text;
+using FormatParser.Domain;
 using FormatParser.Text;
-using FormatParser.Text.Encoding;
+using FormatParser.Text.Decoders;
+using EncodingInfo = FormatParser.Text.EncodingInfo;
 
 namespace FormatParser.Windows1251;
 
@@ -34,8 +36,8 @@ public class Windows1251Decoder : DecoderBase
     public override int MinimalSizeOfInput { get; } = 0;
     
     public override bool SupportBom { get; } = false;
-    public override EncodingData EncodingWithBom => throw new NotSupportedException();
-    public override EncodingData EncodingWithoutBom { get; } = new ("Windows-1251", Endianness.NotAllowed, false);
+    public override EncodingInfo EncodingWithBom => throw new NotSupportedException();
+    public override EncodingInfo EncodingWithoutBom { get; } = new ("Windows-1251", Endianness.NotAllowed, false);
 
     public override DetectionProbability DefaultDetectionProbability { get; } = DetectionProbability.Lowest;
     public override string? RequiredEncodingAnalyzer { get; } = "ru";

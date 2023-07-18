@@ -1,6 +1,3 @@
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 
 namespace FormatParser.PerformanceTest;

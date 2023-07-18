@@ -35,7 +35,7 @@ public class FileDiscoverer
             if (settings.FallOnUnauthorizedException)
                 throw;
         }
-        catch (System.IO.IOException)
+        catch (IOException)
         {
             if (settings.FallOnIOException)
                 throw;
@@ -56,7 +56,7 @@ public class FileDiscoverer
             if (settings.FallOnUnauthorizedException)
                 throw;
         }
-        catch (System.IO.IOException)
+        catch (IOException)
         {
             if (settings.FallOnIOException)
                 throw;

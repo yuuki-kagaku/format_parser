@@ -1,6 +1,7 @@
 using System.Text;
+using FormatParser.Text.EncodingAnalyzers;
 
-namespace FormatParser.Text.Encoding;
+namespace FormatParser.Text.Decoders;
 
 public abstract class DecoderBase : ITextDecoder
 {
@@ -31,9 +32,9 @@ public abstract class DecoderBase : ITextDecoder
 
     public abstract bool SupportBom { get; }
     
-    public abstract EncodingData EncodingWithBom { get; }
+    public abstract EncodingInfo EncodingWithBom { get; }
     
-    public abstract EncodingData EncodingWithoutBom { get; }
+    public abstract EncodingInfo EncodingWithoutBom { get; }
 
     public abstract HashSet<char> GetInvalidCharacters { get; }
 

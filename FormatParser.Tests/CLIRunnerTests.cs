@@ -12,7 +12,7 @@ public class CLIRunnerTests : TestBase
     {
         var output = ShellRunner.RunCommand("dotnet", $"FormatParser.CLI.dll {TestDir}{Path.DirectorySeparatorChar}for_cli");
 
-        var expected = @$"[     3] : Unknown{Environment.NewLine}[     2] : text/plain ; {EncodingData.UTF16LeNoBom}{Environment.NewLine}[     1] : text/plain ; {EncodingData.UTF16BeNoBom}";
+        var expected = @$"[     3] : Unknown{Environment.NewLine}[     2] : text/plain ; {EncodingInfo.UTF16LeNoBom}{Environment.NewLine}[     1] : text/plain ; {EncodingInfo.UTF16BeNoBom}";
         output.Should().Contain(expected);
     }
 }

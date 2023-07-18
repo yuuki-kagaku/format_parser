@@ -1,4 +1,4 @@
-namespace FormatParser.CLI;
+namespace FormatParser.CLI.ArgumentParser;
 
 public class ArgumentParserException : Exception
 {

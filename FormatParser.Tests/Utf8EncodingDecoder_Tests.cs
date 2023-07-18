@@ -1,9 +1,5 @@
-using System.Text;
-using System.Threading.Channels;
 using FluentAssertions;
-using FormatParser.Tests.TestData;
 using FormatParser.Text;
-using FormatParser.Text.Encoding;
 using FormatParser.Text.UtfDecoders;
 using NUnit.Framework;
 

@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using FormatParser.Domain;
 using FormatParser.Helpers;
 
 namespace FormatParser.MachO;
@@ -24,6 +25,6 @@ public record FatMachOFileFormatInfo(Endianness Endianness, Bitness Bitness, Imm
 
     public string ToPrettyString()
     {
-        return $"Fat Mach-O {Endianness} {Bitness}: {string.Join(',', Datas.Select(x => x))}";
+        return $"Fat Mach-O {Endianness} {Bitness}: {string.Join(',', Datas.Select(x => x.ToPrettyString()))}";
     }
 }

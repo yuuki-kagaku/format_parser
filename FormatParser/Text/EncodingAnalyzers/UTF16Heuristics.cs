@@ -2,7 +2,7 @@ namespace FormatParser.Text.EncodingAnalyzers;
 
 public class UTF16Heuristics : IDefaultTextAnalyzer
 {
-    public DetectionProbability AnalyzeProbability(TextSample text, EncodingData encoding, out EncodingData? clarifiedEncoding)
+    public DetectionProbability AnalyzeProbability(TextSample text, EncodingInfo encoding, out EncodingInfo? clarifiedEncoding)
     {
         clarifiedEncoding = null;
 

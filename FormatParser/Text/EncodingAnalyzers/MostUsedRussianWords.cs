@@ -1,4 +1,4 @@
-namespace FormatParser.Text;
+namespace FormatParser.Text.EncodingAnalyzers;
 
 public static class MostUsedRussianWords
 {

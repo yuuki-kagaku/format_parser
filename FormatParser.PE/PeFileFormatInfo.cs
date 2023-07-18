@@ -1,3 +1,5 @@
+using FormatParser.Domain;
+
 namespace FormatParser.PE;
 
 public record PeFileFormatInfo(Bitness Bitness, Architecture Architecture, bool IsManaged) : IFileFormatInfo

@@ -1,19 +1,20 @@
 using System.Diagnostics.CodeAnalysis;
-using FormatParser.Text.Encoding;
+using FormatParser.Text.Decoders;
 using FormatParser.Text.EncodingAnalyzers;
+using FormatParser.Text.UtfDecoders;
 
 namespace FormatParser.Text;
 
 public class CompositeTextFormatDecoder
 {
     private readonly TextFileParsingSettings settings;
-    private readonly Encoding.ITextDecoder[] decoders;
-    private readonly Dictionary<Encoding.ITextDecoder, IEnumerable<ITextAnalyzer>> encodingAnalyzersDictionary;
-    private readonly Dictionary<Encoding.ITextDecoder, CodepointValidator> invalidCharactersCheckers;
+    private readonly ITextDecoder[] decoders;
+    private readonly Dictionary<ITextDecoder, IEnumerable<ITextAnalyzer>> encodingAnalyzersDictionary;
+    private readonly Dictionary<ITextDecoder, CodepointValidator> invalidCharactersCheckers;
 
     public CompositeTextFormatDecoder(
         IUtfDecoder[] utfDecoders,
-        Encoding.ITextDecoder[] nonUtfDecoders, 
+        ITextDecoder[] nonUtfDecoders, 
         ITextAnalyzer[] encodingAnalyzers,
         TextFileParsingSettings settings)
     {
@@ -28,7 +29,7 @@ public class CompositeTextFormatDecoder
         this.settings = settings;
     }
 
-    public bool TryDecode(ArraySegment<byte> bytes, [NotNullWhen(true)] out EncodingData? resultEncoding, [NotNullWhen(true)] out string? resultTextSample)
+    public bool TryDecode(ArraySegment<byte> bytes, [NotNullWhen(true)] out EncodingInfo? resultEncoding, [NotNullWhen(true)] out string? resultTextSample)
     {
         var bestMatchProbability = DetectionProbability.No;
         resultEncoding = null;
@@ -66,7 +67,7 @@ public class CompositeTextFormatDecoder
                     }
                 }
             }
-            catch (Exception e)
+            catch
             {
             }
         }
@@ -75,7 +76,7 @@ public class CompositeTextFormatDecoder
     }
     
     
-    private static IEnumerable<ITextAnalyzer> GetEncodingAnalyzers(Encoding.ITextDecoder decoder, Dictionary<string, ITextAnalyzer> encodingAnalyzersByLanguage)
+    private static IEnumerable<ITextAnalyzer> GetEncodingAnalyzers(ITextDecoder decoder, Dictionary<string, ITextAnalyzer> encodingAnalyzersByLanguage)
     {
         yield return new AsciiCharactersTextAnalyzer();
         yield return new UTF16Heuristics();

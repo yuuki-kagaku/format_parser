@@ -1,4 +1,5 @@
 using FormatParser.BinaryReader;
+using FormatParser.Domain;
 using FormatParser.Helpers;
 
 namespace FormatParser.ELF;

@@ -1,8 +1,7 @@
-using FormatParser;
 using FormatParser.Test.Helpers;
 using FormatParser.Text;
 
-namespace ConsoleApp1;
+namespace FormatParser.QualityChecker;
 
 public class TextDetectionComparer
 {

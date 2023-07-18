@@ -7,6 +7,4 @@ public class FormatParserCliState
 {
     public Stopwatch? Stopwatch { get; set; }
     public ConcurrentDictionary<IFileFormatInfo, AtomicInt> Occurence { get; } = new();
-    
-    public bool FileDiscoveryFinished = false;
 }

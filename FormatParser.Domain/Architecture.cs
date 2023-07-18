@@ -1,25 +1,25 @@
-namespace FormatParser;
+namespace FormatParser.Domain;
 
 public enum Architecture
 {
     Unknown,
     
-    i386,
+    I386,
     Amd64,
     
     Arm, // AARCH32
     Arm64,
     
-    ia64,
-    m68k,
+    Ia64,
+    M68K,
 
     PowerPC,
-    ppc64,
+    Ppc64,
     
     Sparc,
         
-    mips,
-    s390, // IBM System Z
+    Mips,
+    S390, // IBM System Z
     
     RiscV,
 }

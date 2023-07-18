@@ -1,4 +1,4 @@
-namespace FormatParser;
+namespace FormatParser.Domain;
 
 public enum Bitness
 {

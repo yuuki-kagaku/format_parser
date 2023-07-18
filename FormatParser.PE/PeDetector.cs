@@ -1,4 +1,5 @@
 ﻿using FormatParser.BinaryReader;
+using FormatParser.Domain;
 
 namespace FormatParser.PE;
 
@@ -86,7 +87,7 @@ public class PeDetector : IBinaryFormatDetector
     private static void EnsureCorrectImageHeaderMagicNumber(uint magic)
     {
         if (magic != PEConstants.ImageHeaderMagicNumber)
-            throw new ParsingException("Wrong NT Header magic number");
+            throw new FormatParserException("Wrong NT Header magic number");
     }
     
     private static void EnsureCorrectOptionalHeaderMagicNumber(ushort magic, Bitness bitness)
@@ -95,11 +96,11 @@ public class PeDetector : IBinaryFormatDetector
         {
             case PEConstants.IMAGE_NT_OPTIONAL_HDR32_MAGIC:
                 if (bitness != Bitness.Bitness32)
-                    throw new ParsingException($"Found 32 bit header in {bitness} binary.");
+                    throw new FormatParserException($"Found 32 bit header in {bitness} binary.");
                 break;
             case PEConstants.IMAGE_NT_OPTIONAL_HDR64_MAGIC:
                 if (bitness != Bitness.Bitness64)
-                    throw new ParsingException($"Found 64 bit header in {bitness} binary.");
+                    throw new FormatParserException($"Found 64 bit header in {bitness} binary.");
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(magic), "Unknown optional PE Header magic number.");

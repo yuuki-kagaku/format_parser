@@ -39,7 +39,6 @@ public class CLIRunner
     {
         await Task.Yield();
         await fileDiscoverer.DiscoverFilesAsync(settings.Directory, channel);
-        state.FileDiscoveryFinished = true;
         await RunParsingProcessor(channel.Reader, state, settings, cancellationToken);
     }
 

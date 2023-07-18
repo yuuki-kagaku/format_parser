@@ -1,6 +1,5 @@
 using System.Text;
 using FormatParser.Helpers;
-using FormatParser.Tests.TestData;
 
 namespace FormatParser.Tests;
 

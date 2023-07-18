@@ -1,4 +1,4 @@
-namespace FormatParser.Tests.TestData;
+namespace FormatParser.Tests;
 
 public enum TestFileCategory
 {
