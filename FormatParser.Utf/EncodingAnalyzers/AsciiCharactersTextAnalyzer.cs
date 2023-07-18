@@ -14,7 +14,8 @@ public class AsciiCharactersTextAnalyzer : ITextAnalyzer
         
         if (IsUtf8(encoding))
         {
-            clarifiedEncoding = encoding with { Name = WellKnownEncodings.ASCII };
+            if (!encoding.ContainsBom)
+                clarifiedEncoding = encoding with { Name = WellKnownEncodings.ASCII };
             return DetectionProbability.High;
         }
             
@@ -23,5 +24,5 @@ public class AsciiCharactersTextAnalyzer : ITextAnalyzer
 
     private static bool IsUtf8(EncodingInfo encoding) => encoding.Name == WellKnownEncodings.UTF8;
 
-    public string[] SupportedLanguages { get; } = {"UTF-8"};
+    public string[] SupportedLanguages { get; } = {"ASCII"};
 }

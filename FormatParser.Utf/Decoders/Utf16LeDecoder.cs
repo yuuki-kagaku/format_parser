@@ -1,9 +1,8 @@
 using System.Text;
-using FormatParser.Text.Decoders;
 
-namespace FormatParser.Text.UtfDecoders;
+namespace FormatParser.Text.Decoders;
 
-public class Utf16LeDecoder : DecoderBase, IUtfDecoder
+public class Utf16LeDecoder : DecoderBase, ITextDecoder
 {
     private readonly CodepointValidatorSettings settings;
 
@@ -28,7 +27,7 @@ public class Utf16LeDecoder : DecoderBase, IUtfDecoder
     public override EncodingInfo EncodingWithBom { get; } = EncodingInfo.UTF16LeBom;
     public override EncodingInfo EncodingWithoutBom { get; } = EncodingInfo.UTF16LeNoBom;
 
-    public override string? RequiredEncodingAnalyzer { get; } = "UTF-16";
+    public override string[]? RequiredEncodingAnalyzers { get; } = {"UTF-16"};
     
     public override DetectionProbability DefaultDetectionProbability { get; } = DetectionProbability.No;
 }

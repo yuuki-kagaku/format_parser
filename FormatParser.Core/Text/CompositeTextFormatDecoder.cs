@@ -75,15 +75,15 @@ public class CompositeTextFormatDecoder
     
     private IEnumerable<ITextAnalyzer> GetEncodingAnalyzers(ITextDecoder decoder, Dictionary<string, ITextAnalyzer> encodingAnalyzersByLanguage)
     {
-        yield return new AsciiCharactersTextAnalyzer();
-        yield return new UTF16Heuristics();
-        
-        if (decoder.RequiredEncodingAnalyzer == null)
+        if (decoder.RequiredEncodingAnalyzers == null)
             yield break;
-        
-        if (!encodingAnalyzersByLanguage.TryGetValue(decoder.RequiredEncodingAnalyzer, out var analyzer))
-            throw new Exception($"Could not find analyzer for {decoder.RequiredEncodingAnalyzer}");
 
-        yield return analyzer;
+        foreach (var encodingAnalyzerId in decoder.RequiredEncodingAnalyzers)
+        {
+            if (!encodingAnalyzersByLanguage.TryGetValue(encodingAnalyzerId, out var analyzer))
+                throw new Exception($"Could not find analyzer for {decoder.RequiredEncodingAnalyzers}");
+
+            yield return analyzer;
+        }
     }
 }

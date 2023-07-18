@@ -14,4 +14,8 @@
       <ProjectReference Include="..\FormatParser.Core\FormatParser.Core.csproj" />
     </ItemGroup>
 
+
+
+
+
 </Project>

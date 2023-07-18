@@ -1,20 +1,19 @@
 using System.Text;
-using FormatParser.Text.Decoders;
 
-namespace FormatParser.Text.UtfDecoders;
+namespace FormatParser.Text.Decoders;
 
-public class Utf32LeDecoder : DecoderBase, IUtfDecoder
+public class Utf32BeDecoder : DecoderBase, ITextDecoder
 {
     private readonly CodepointValidatorSettings settings;
 
-    public Utf32LeDecoder(TextFileParsingSettings settings)
+    public Utf32BeDecoder(TextFileParsingSettings settings)
     {
         this.settings = new CodepointValidatorSettings(settings.AllowEscapeChar, settings.AllowFormFeed, settings.AllowC1ControlsForUtf, false);
     }
     
     protected override Decoder GetDecoder(int inputSize)
     {
-        var encoding = (Encoding) new UTF32Encoding(false, true, true).Clone();
+        var encoding = (Encoding) new UTF32Encoding(true, true, true).Clone();
         encoding.DecoderFallback = FormatParserDecoderFallback.DoNotFailAtEndOfInput(inputSize, 4);
         return encoding.GetDecoder();
     }
@@ -22,13 +21,13 @@ public class Utf32LeDecoder : DecoderBase, IUtfDecoder
     public override IEnumerable<char> GetInvalidCharacters => InvalidCharacterHelper
         .GetForbiddenChars(settings);
     
-    public override bool SupportBom { get; } = true;
-    public override EncodingInfo EncodingWithBom { get; } = EncodingInfo.UTF32LeBom;
-    public override EncodingInfo EncodingWithoutBom { get; } = EncodingInfo.UTF32LeNoBom;
-
-    public override string? RequiredEncodingAnalyzer { get; } = null;
-    
     public override int MinimalSizeOfInput { get; } = 8;
+
+    public override bool SupportBom { get; } = true;
+    public override EncodingInfo EncodingWithBom { get; } = EncodingInfo.UTF32BeBom;
+    public override EncodingInfo EncodingWithoutBom { get; } = EncodingInfo.UTF32BeNoBom;
+
+    public override string[]? RequiredEncodingAnalyzers { get; } = null;
     
     public override DetectionProbability DefaultDetectionProbability { get; } = DetectionProbability.Lowest;
 }

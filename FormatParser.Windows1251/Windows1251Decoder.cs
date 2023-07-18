@@ -14,7 +14,7 @@ public class Windows1251Decoder : DecoderBase
     {
         this.settings = new CodepointValidatorSettings(settings.AllowEscapeChar, settings.AllowFormFeed, true, false);
     }
-    
+
     protected override Decoder GetDecoder(int inputSize) => Decoder;
 
     private static readonly Decoder Decoder = GetDecoder();
@@ -27,18 +27,19 @@ public class Windows1251Decoder : DecoderBase
     private static Decoder GetDecoder()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-        var encoding = (Encoding) Encoding.GetEncoding("windows-1251").Clone();
+        var encoding = (Encoding)Encoding.GetEncoding("windows-1251").Clone();
         var decoder = encoding.GetDecoder();
         decoder.Fallback = DecoderFallback.ExceptionFallback;
         return encoding.GetDecoder();
     }
-    
+
     public override int MinimalSizeOfInput { get; } = 0;
-    
+
     public override bool SupportBom { get; } = false;
     public override EncodingInfo EncodingWithBom => throw new NotSupportedException();
-    public override EncodingInfo EncodingWithoutBom { get; } = new ("Windows-1251", Endianness.NotAllowed, false);
+    public override EncodingInfo EncodingWithoutBom { get; } = new("Windows-1251", Endianness.NotAllowed, false);
 
     public override DetectionProbability DefaultDetectionProbability { get; } = DetectionProbability.No;
-    public override string? RequiredEncodingAnalyzer { get; } = "ru";
+    public override string[]? RequiredEncodingAnalyzers { get; } = { "ru" } ;
+
 }

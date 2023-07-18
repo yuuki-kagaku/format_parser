@@ -1,6 +1,6 @@
 using FluentAssertions;
 using FormatParser.Text;
-using FormatParser.Text.UtfDecoders;
+using FormatParser.Text.Decoders;
 using NUnit.Framework;
 
 namespace FormatParser.Tests;

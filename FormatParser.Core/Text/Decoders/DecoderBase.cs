@@ -39,7 +39,7 @@ public abstract class DecoderBase : ITextDecoder
 
     public abstract IEnumerable<char> GetInvalidCharacters { get; }
 
-    public abstract string? RequiredEncodingAnalyzer { get; }
+    public abstract string[]? RequiredEncodingAnalyzers { get; }
     
     public abstract DetectionProbability DefaultDetectionProbability { get; }
 }

@@ -2,7 +2,6 @@ using FluentAssertions;
 using FormatParser.Text;
 using FormatParser.Text.Decoders;
 using FormatParser.Text.EncodingAnalyzers;
-using FormatParser.Text.UtfDecoders;
 using FormatParser.TextBasedFormats;
 using FormatParser.Windows1251;
 using NUnit.Framework;
