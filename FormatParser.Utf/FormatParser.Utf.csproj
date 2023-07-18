@@ -9,8 +9,9 @@
 
 
 
+
     <ItemGroup>
-      <Folder Include="Text\" />
+      <ProjectReference Include="..\FormatParser.Core\FormatParser.Core.csproj" />
     </ItemGroup>
 
 </Project>

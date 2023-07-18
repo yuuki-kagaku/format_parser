@@ -1,6 +1,6 @@
 namespace FormatParser.Text.EncodingAnalyzers;
 
-public class UTF16Heuristics : IDefaultTextAnalyzer
+public class UTF16Heuristics : ITextAnalyzer
 {
     private readonly HashSet<char> commonCjkBmpCharacters;
 

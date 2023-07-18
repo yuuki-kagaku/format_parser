@@ -1,4 +1,4 @@
-﻿using FormatParser.BinaryReader;
+﻿using FormatParser.Helpers.BinaryReader;
 
 namespace FormatParser;
 

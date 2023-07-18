@@ -1,6 +1,6 @@
 using FluentAssertions;
-using FormatParser.BinaryReader;
 using FormatParser.Domain;
+using FormatParser.Helpers.BinaryReader;
 using FormatParser.PE;
 using NUnit.Framework;
 

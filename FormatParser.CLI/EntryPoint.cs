@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Reflection;
-using System.Text.Json;
+﻿using System.Reflection;
 using FormatParser.CLI.ArgumentParser;
 using FormatParser.Text;
 using FormatParser.Text.Decoders;
@@ -21,32 +19,24 @@ public class EntryPoint
         
         var binaryDecoders = GetAllInstancesOf<IBinaryFormatDetector>().ToArray();
         
-        var nonUnicodeDecoders = new ITextDecoder[] {new Windows1251Decoder(settings.TextFileParsingSettings)};
         var textAnalyzers = new ITextAnalyzer[]
         {
+            new AsciiCharactersTextAnalyzer(),
             new UTF16Heuristics(),
             new RuDictionaryTextAnalyzer()
         };
         
         var textFileParsingSettings = new TextFileParsingSettings();
         
-        var utfDecoders = new IUtfDecoder[]
-        {
-            new Utf8Decoder(textFileParsingSettings),
-            new Utf16LeDecoder(textFileParsingSettings),
-            new Utf16BeDecoder(textFileParsingSettings),
-            new Utf32LeDecoder(textFileParsingSettings),
-            new Utf32BeDecoder(textFileParsingSettings),
-        };
-        
+        var textDecoders = GetAllInstancesOf<ITextDecoder, TextFileParsingSettings>(textFileParsingSettings).ToArray();
+
         var textBasedFormatDetectors = new ITextBasedFormatDetector[]
         {
             new XmlDecoder()
         };
 
         var compositeTextFormatDecoder = new CompositeTextFormatDecoder(
-            utfDecoders, 
-            nonUnicodeDecoders,
+            textDecoders, 
             textAnalyzers,
             settings.TextFileParsingSettings);
 
@@ -83,7 +73,7 @@ public class EntryPoint
 
     private static void LoadPlugins()
     {
-        const string pluginDirectory = "plugins";
+        var pluginDirectory = $"{Environment.CurrentDirectory}{Path.DirectorySeparatorChar}plugins{Path.DirectorySeparatorChar}";
 
         if (!Directory.Exists(pluginDirectory))
             return;
@@ -110,9 +100,23 @@ public class EntryPoint
             .GetAssemblies()
             .SelectMany(s => s.GetTypes())
             .Where(t => type.IsAssignableFrom(t))
-            .Where(t => !t.IsInterface || !t.IsAbstract);
+            .Where(t => t is { IsInterface: false, IsAbstract: false });
 
         foreach (var t in types.OrderBy(t => t.Name))
             yield return (T)Activator.CreateInstance(t)!;
+    }
+    
+    private static IEnumerable<T> GetAllInstancesOf<T, TParam>(TParam param)
+    {
+        var type = typeof(T);
+        var types = AppDomain
+            .CurrentDomain
+            .GetAssemblies()
+            .SelectMany(s => s.GetTypes())
+            .Where(t => type.IsAssignableFrom(t))
+            .Where(t => t is { IsInterface: false, IsAbstract: false });
+
+        foreach (var t in types.OrderBy(t => t.Name))
+            yield return (T)Activator.CreateInstance(t, param)!;
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Immutable;
-using FormatParser.BinaryReader;
 using FormatParser.Domain;
-using FormatParser.Helpers;
+using FormatParser.Helpers.BinaryReader;
 
 namespace FormatParser.MachO;
 

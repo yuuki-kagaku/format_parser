@@ -18,8 +18,9 @@
       <ProjectReference Include="..\FormatParser.PE\FormatParser.PE.csproj">
             <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       </ProjectReference>
+      <ProjectReference Include="..\FormatParser.Utf\FormatParser.Utf.csproj" />
       <ProjectReference Include="..\FormatParser.Windows1251\FormatParser.Windows1251.csproj" />
-      <ProjectReference Include="..\FormatParser\FormatParser.csproj" />
+      <ProjectReference Include="..\FormatParser.Core\FormatParser.Core.csproj" />
     </ItemGroup>
 
 

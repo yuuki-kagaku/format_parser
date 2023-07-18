@@ -1,4 +1,4 @@
-namespace FormatParser.BinaryReader;
+namespace FormatParser.Helpers.BinaryReader;
 
 public class BinaryReaderException : Exception
 {

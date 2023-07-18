@@ -1,5 +1,5 @@
-﻿using FormatParser.BinaryReader;
-using FormatParser.Domain;
+﻿using FormatParser.Domain;
+using FormatParser.Helpers.BinaryReader;
 
 namespace FormatParser.PE;
 

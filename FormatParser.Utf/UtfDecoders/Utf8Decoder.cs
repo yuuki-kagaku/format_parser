@@ -28,7 +28,7 @@ public class Utf8Decoder : DecoderBase, IUtfDecoder
     public override EncodingInfo EncodingWithBom { get; } = EncodingInfo.Utf8BOM;
     public override EncodingInfo EncodingWithoutBom { get; } = EncodingInfo.Utf8NoBOM;
 
-    public override string? RequiredEncodingAnalyzer { get; } = null;
+    public override string? RequiredEncodingAnalyzer { get; } = "UTF-8";
     
     public override DetectionProbability DefaultDetectionProbability { get; } = DetectionProbability.Lowest;
 }

@@ -1,5 +1,5 @@
-using FormatParser.BinaryReader;
 using FormatParser.Helpers;
+using FormatParser.Helpers.BinaryReader;
 
 namespace FormatParser.DefaultFormatDetectors;
 

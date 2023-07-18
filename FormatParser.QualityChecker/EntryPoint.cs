@@ -15,27 +15,27 @@ public class EntryPoint
         
         var directory = args[0];
 
-        var nonUnicodeDecoders = new ITextDecoder[] {new Windows1251Decoder(settings.TextFileParsingSettings)};
         var languageAnalyzers = new ITextAnalyzer[]
         {
+            new AsciiCharactersTextAnalyzer(),
             new UTF16Heuristics(),
             new RuDictionaryTextAnalyzer()
         };
 
         var textFileParsingSettings = new TextFileParsingSettings();
         
-        var utfDecoders = new IUtfDecoder[]
+        var decoders = new ITextDecoder[]
         {
             new Utf8Decoder(textFileParsingSettings),
             new Utf16LeDecoder(textFileParsingSettings),
             new Utf16BeDecoder(textFileParsingSettings),
             new Utf32LeDecoder(textFileParsingSettings),
             new Utf32BeDecoder(textFileParsingSettings),
+            new Windows1251Decoder(settings.TextFileParsingSettings)
         };
         
         var compositeTextFormatDecoder = new CompositeTextFormatDecoder(
-            utfDecoders, 
-            nonUnicodeDecoders,
+            decoders, 
             languageAnalyzers,
             settings.TextFileParsingSettings);
         
@@ -88,7 +88,7 @@ public class EntryPoint
         Console.WriteLine("");
         Console.WriteLine($"Total amount of mismatches (excluding false detections of '{settings.Utility}') : {state.MatchMismatches}");
         Console.WriteLine($"Text files according '{settings.Utility}' : {state.TextFilesAccordingToFileCommand}");
-        Console.WriteLine($"Text files according to FormatParser : {state.TextFilesAccordingToFormatParser}");
+        Console.WriteLine($"Text files according to FormatParser.Core : {state.TextFilesAccordingToFormatParser}");
         Console.WriteLine();
         Console.WriteLine($"False negative text file detections of '{settings.Utility}' (this files excluded from every statistics above) : {state.FalseNegativesOfFileCommand}");
 

@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.CLI", "FormatParser.CLI\FormatParser.CLI.csproj", "{EE517A12-3E4D-49E6-A7CE-BBD7E635D78F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser", "FormatParser\FormatParser.csproj", "{9C3CC462-15A7-487F-9131-16998E793D36}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.Core", "FormatParser.Core\FormatParser.Core.csproj", "{9C3CC462-15A7-487F-9131-16998E793D36}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.ELF", "FormatParser.ELF\FormatParser.ELF.csproj", "{4B286C93-6D18-4A91-B23A-E6230F642DC6}"
 EndProject
@@ -23,6 +23,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.PerformanceTest", "FormatParser.PerformanceTest\FormatParser.PerformanceTest.csproj", "{83CA3EBF-704D-4058-BA78-D161F1565637}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.Windows1251", "FormatParser.Windows1251\FormatParser.Windows1251.csproj", "{5286ABE9-3CCE-4ED1-A9D3-EC130FF08CC2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.Helpers", "FormatParser.Helpers\FormatParser.Helpers.csproj", "{394CE69C-D026-4E72-A51C-0075ACE0F450}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -78,5 +80,9 @@ Global
 		{5286ABE9-3CCE-4ED1-A9D3-EC130FF08CC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5286ABE9-3CCE-4ED1-A9D3-EC130FF08CC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5286ABE9-3CCE-4ED1-A9D3-EC130FF08CC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{394CE69C-D026-4E72-A51C-0075ACE0F450}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{394CE69C-D026-4E72-A51C-0075ACE0F450}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{394CE69C-D026-4E72-A51C-0075ACE0F450}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{394CE69C-D026-4E72-A51C-0075ACE0F450}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

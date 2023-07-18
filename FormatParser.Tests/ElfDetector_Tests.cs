@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
-using FormatParser.BinaryReader;
 using FormatParser.Domain;
 using FormatParser.ELF;
+using FormatParser.Helpers.BinaryReader;
 using NUnit.Framework;
 
 namespace FormatParser.Tests;

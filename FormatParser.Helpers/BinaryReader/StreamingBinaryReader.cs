@@ -2,7 +2,7 @@ using System.Buffers.Binary;
 using System.Text;
 using FormatParser.Domain;
 
-namespace FormatParser.BinaryReader;
+namespace FormatParser.Helpers.BinaryReader;
 
 public class StreamingBinaryReader
 {

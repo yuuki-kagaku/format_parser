@@ -2,7 +2,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using FormatParser.Text.Decoders;
 using FormatParser.Text.EncodingAnalyzers;
-using FormatParser.Text.UtfDecoders;
 
 namespace FormatParser.Text;
 
@@ -14,13 +13,11 @@ public class CompositeTextFormatDecoder
     private readonly Dictionary<ITextDecoder, CodepointValidator> invalidCharactersCheckers;
 
     public CompositeTextFormatDecoder(
-        IUtfDecoder[] utfDecoders,
-        ITextDecoder[] nonUtfDecoders, 
+        ITextDecoder[] decoders, 
         ITextAnalyzer[] encodingAnalyzers,
         TextFileParsingSettings settings)
     {
-        decoders = utfDecoders.Concat(nonUtfDecoders).ToArray();
-        
+        this.decoders = decoders;
         var encodingAnalyzersByLanguage = encodingAnalyzers
             .SelectMany(analyzer => analyzer.SupportedLanguages.Select(lang => (Language: lang, Analyzer: analyzer)))
             .ToDictionary(x => x.Language, x => x.Analyzer);
@@ -80,7 +77,7 @@ public class CompositeTextFormatDecoder
     {
         yield return new AsciiCharactersTextAnalyzer();
         yield return new UTF16Heuristics();
-
+        
         if (decoder.RequiredEncodingAnalyzer == null)
             yield break;
         

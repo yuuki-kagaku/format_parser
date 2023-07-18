@@ -17,28 +17,25 @@ public class CompositeTextFormatDecoder_Tests : TestBase
     {
         var textParserSettings = new TextFileParsingSettings();
         
-        var nonUnicodeDecoders = new ITextDecoder[]
-        {
-            new Windows1251Decoder(textParserSettings)
-        };
         var languageAnalyzers = new ITextAnalyzer[]
         {
+            new AsciiCharactersTextAnalyzer(),
             new UTF16Heuristics(),
             new RuFrequencyTextAnalyzer()
         };
 
-        var utfDecoders = new IUtfDecoder[]
+        var textDecoders = new ITextDecoder[]
         {
             new Utf8Decoder(textParserSettings),
             new Utf16LeDecoder(textParserSettings),
             new Utf16BeDecoder(textParserSettings),
             new Utf32LeDecoder(textParserSettings),
             new Utf32BeDecoder(textParserSettings),
+            new Windows1251Decoder(textParserSettings),
         };
 
         decoder = new CompositeTextFormatDecoder(
-            utfDecoders, 
-            nonUnicodeDecoders,
+            textDecoders, 
             languageAnalyzers,
             textParserSettings);
     }
