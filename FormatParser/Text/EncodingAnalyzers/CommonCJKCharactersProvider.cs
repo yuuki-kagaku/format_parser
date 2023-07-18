@@ -4,21 +4,17 @@ namespace FormatParser.Text.EncodingAnalyzers;
 
 public class CommonCJKCharactersProvider
 {
-    private readonly Lazy<IEnumerable<char>> mostUsedHangul;
-    private readonly Lazy<IEnumerable<char>> mostUsedKanji;
-    private readonly Lazy<IEnumerable<char>> mostUsedChineseCharacters;
-
     public CommonCJKCharactersProvider()
     {
-        var settings = new Lazy<CommomCJKCharatersSettings>(() => ReadSettings(), LazyThreadSafetyMode.PublicationOnly);
-        mostUsedHangul = new Lazy<IEnumerable<char>>(() => File.ReadAllText(settings.Value.MostUsedHangul));
-        mostUsedKanji = new Lazy<IEnumerable<char>>(() => File.ReadAllText(settings.Value.MostUsedKanji));
-        mostUsedChineseCharacters = new Lazy<IEnumerable<char>>(() => File.ReadAllText(settings.Value.MostUsedChineseCharacters));
+        var settings = ReadSettings();
+        MostUsedHangul = File.ReadAllText(settings.MostUsedHangul);
+        MostUsedKanji = File.ReadAllText(settings.MostUsedKanji);
+        MostUsedChineseCharacters = File.ReadAllText(settings.MostUsedChineseCharacters);
     }
 
-    public IEnumerable<char> MostUsedHangul => mostUsedHangul.Value;
-    public IEnumerable<char> MostUsedKanji => mostUsedKanji.Value;
-    public IEnumerable<char> MostUsedChineseCharacters => mostUsedChineseCharacters.Value;
+    public IEnumerable<char> MostUsedHangul { get; }
+    public IEnumerable<char> MostUsedKanji { get; }
+    public IEnumerable<char> MostUsedChineseCharacters { get; }
 
     private CommomCJKCharatersSettings ReadSettings()
     {

@@ -2,15 +2,15 @@ namespace FormatParser.Text.EncodingAnalyzers;
 
 public class UTF16Heuristics : IDefaultTextAnalyzer
 {
-    private readonly Lazy<HashSet<char>> commonCjkBmpCharacters;
+    private readonly HashSet<char> commonCjkBmpCharacters;
 
     public UTF16Heuristics() : this(new CommonCJKCharactersProvider()) {}
     public UTF16Heuristics(CommonCJKCharactersProvider commonCjkCharactersProvider)
     {
-        commonCjkBmpCharacters = new Lazy<HashSet<char>>(() => commonCjkCharactersProvider.MostUsedHangul
+        commonCjkBmpCharacters = commonCjkCharactersProvider.MostUsedHangul
             .Concat(commonCjkCharactersProvider.MostUsedChineseCharacters)
             .Concat(commonCjkCharactersProvider.MostUsedKanji)
-            .ToHashSet(), LazyThreadSafetyMode.PublicationOnly);
+            .ToHashSet();
     }
 
     public DetectionProbability AnalyzeProbability(TextSample text, EncodingInfo encoding, out EncodingInfo? clarifiedEncoding)
@@ -57,7 +57,7 @@ public class UTF16Heuristics : IDefaultTextAnalyzer
 
     private bool IsUnusualCJKCharacter(char c)
     {
-        if (commonCjkBmpCharacters.Value.Contains(c))
+        if (commonCjkBmpCharacters.Contains(c))
             return false;
         
         if (UnicodeHelper.IsCJKIdeographOrHangulSyllableFromBmp(c))
@@ -72,5 +72,4 @@ public class UTF16Heuristics : IDefaultTextAnalyzer
         .Concat(CommonlyUsedCharacters.CommonSpecialCharacters)
         .Concat(CommonlyUsedCharacters.CommonPunctuation)            
         .ToHashSet();
-
 }
