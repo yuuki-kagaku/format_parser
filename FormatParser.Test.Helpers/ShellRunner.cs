@@ -2,6 +2,7 @@ namespace FormatParser.Test.Helpers;
 
 public static class ShellRunner
 {
+    public static string RunCommand(string command) => RunCommand(command, "");
     public static string RunCommand(string command, string args)
     {
         var process = new System.Diagnostics.Process();
