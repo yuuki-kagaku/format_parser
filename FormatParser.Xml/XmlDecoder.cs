@@ -1,5 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
+using FormatParser.Domain;
 using FormatParser.Text;
 
 namespace FormatParser.Xml;
@@ -9,19 +9,17 @@ public class XmlDecoder : ITextBasedFormatDetector
     private static readonly Regex Pattern = new (@$"^<\?xml([^>]+)encoding=""(?<encoding>[^""]+)""",
         RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
     
-    public bool TryMatchFormat(string header, [NotNullWhen(true)] out string? clarifiedEncoding)
+    public IFileFormatInfo? TryMatchFormat(string header, EncodingInfo encodingInfo)
     {
         var match = Pattern.Match(header);
 
         if (match.Success)
         {
-            clarifiedEncoding = match.Groups["encoding"].Value;
-            return true;
+            return new TextFileFormatInfo(MimeType, encodingInfo with {Name = match.Groups["encoding"].Value});
         }
         
-        clarifiedEncoding = null;
-        return false;
+        return null;
     }
 
-    public string MimeType => "text/xml";
+    public static string MimeType => "text/xml";
 }

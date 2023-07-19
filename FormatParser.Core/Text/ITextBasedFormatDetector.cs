@@ -1,10 +1,8 @@
-using System.Diagnostics.CodeAnalysis;
+using FormatParser.Domain;
 
 namespace FormatParser.Text;
 
 public interface ITextBasedFormatDetector
 {
-    public bool TryMatchFormat(string text, [NotNullWhen(true)] out string? clarifiedEncoding);
-    
-    public string MimeType { get; }
+    IFileFormatInfo? TryMatchFormat(string text, EncodingInfo encodingInfo);
 }

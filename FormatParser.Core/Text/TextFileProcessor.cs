@@ -16,41 +16,35 @@ public class TextFileProcessor
 
     public IFileFormatInfo? TryProcess(ArraySegment<byte> buffer)
     {
-        try
-        {
-            if (!compositeTextFormatDecoder.TryDecode(buffer, out var encoding, out var textSample))
-                return null;
-            
-            if (TryMatchTextBasedFormat(textSample, out var type, out var formatEncoding))
-                return new TextFileFormatInfo(type, encoding with {Name = formatEncoding ?? encoding.Name});
+     
+        if (!compositeTextFormatDecoder.TryDecode(buffer, out var encoding, out var textSample))
+            return null;
 
-            return new TextFileFormatInfo(DefaultTextType, encoding);
-        }
-        catch
-        {
-            return null; 
-        }
+        var detectionResult = TryMatchTextBasedFormat(textSample, encoding);
+        if (detectionResult != null)
+            return detectionResult;
+            
+        return new TextFileFormatInfo(DefaultTextType, encoding);
+       
+        return null;
     }
     
-    private bool TryMatchTextBasedFormat(string header, [NotNullWhen(true)] out string? type, out string? encoding)
+    private IFileFormatInfo? TryMatchTextBasedFormat(string header, EncodingInfo encoding)
     {
         foreach (var detector in textBasedFormatDetectors)
         {
             try
             {
-                if (detector.TryMatchFormat(header, out encoding))
-                {
-                    type = detector.MimeType;
-                    return true;
-                }
+                var detectionResult = detector.TryMatchFormat(header, encoding);
+                if (detectionResult != null)
+                    return detectionResult;
             }
             catch
             {
             }
         }
 
-        (type, encoding) = (null, null);
-        return false;
+        return null;
     }
     
     public static string DefaultTextType => "text/plain";
