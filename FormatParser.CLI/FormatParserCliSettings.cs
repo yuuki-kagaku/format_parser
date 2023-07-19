@@ -9,6 +9,7 @@ public class FormatParserCliSettings
     public int BufferSize { get; set; } = 16384;
     
     public bool FailOnUnauthorizedAccessException { get; set; } = false;
+    public bool ShowElapsedTime { get; set; } = false;
     public bool FailOnIOException { get; set; } = true;
 
     public TextFileParsingSettings TextFileParsingSettings { get; set; } = new();

@@ -16,8 +16,10 @@ internal static class PEConstants
 
     #endregion
 
-    #region OptionalHeaderMagicNumbers
+    #region OptionalHeader
 
+    public const int OptionalHeaderMinSuze = 224;
+    
     public const ushort IMAGE_NT_OPTIONAL_HDR32_MAGIC = 0x10b;
     public const ushort IMAGE_NT_OPTIONAL_HDR64_MAGIC = 0x20b;
     public const ushort IMAGE_ROM_OPTIONAL_HDR_MAGIC = 0x107;

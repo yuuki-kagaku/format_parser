@@ -10,9 +10,6 @@ public abstract class DecoderBase : ITextDecoder
 {
     public TextDecodingResult? TryDecodeText(ArraySegment<byte> bytes)
     {
-        if (bytes.Count < MinimalSizeOfInput)
-            return null;
-        
         var decoder = GetDecoder(bytes.Count);
         try
         {
@@ -22,6 +19,9 @@ public abstract class DecoderBase : ITextDecoder
             if (SupportBom && chars[0] == UnicodeHelper.Bom)
                 return new TextDecodingResult(new ArraySegment<char>(chars, 1, numberOfChars - 1), EncodingWithBom);
            
+            if (bytes.Count < MinimalSizeOfInput)
+                return null;
+            
             return new TextDecodingResult(new ArraySegment<char>(chars, 0, numberOfChars), EncodingWithoutBom);
         }
         catch (DecoderFallbackException)

@@ -6,6 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <OutputType>Exe</OutputType>
+        <RootNamespace>FormatParser.PerformanceTest</RootNamespace>
     </PropertyGroup>
     <Import Project="..\copy-dictionaries.props" />
 

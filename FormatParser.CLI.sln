@@ -20,7 +20,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.Test.Helpers",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.Domain", "FormatParser.Domain\FormatParser.Domain.csproj", "{DD259180-CAF1-4209-BA56-E2A9761CAD24}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.PerformanceTest", "FormatParser.PerformanceTest\FormatParser.PerformanceTest.csproj", "{83CA3EBF-704D-4058-BA78-D161F1565637}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.PerformanceTest.InMemory", "FormatParser.PerformanceTest.InMemory\FormatParser.PerformanceTest.InMemory.csproj", "{83CA3EBF-704D-4058-BA78-D161F1565637}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.Windows1251", "FormatParser.Windows1251\FormatParser.Windows1251.csproj", "{5286ABE9-3CCE-4ED1-A9D3-EC130FF08CC2}"
 EndProject

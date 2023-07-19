@@ -25,6 +25,6 @@ public record FatMachOFileFormatInfo(Endianness Endianness, Bitness Bitness, Imm
 
     public string ToPrettyString()
     {
-        return $"Fat Mach-O {Bitness.ToPrettyString()} {Endianness.ToPrettyString()}: {string.Join(',', Datas.Select(x => x.ToPrettyString()))}";
+        return $"Fat Mach-O {Bitness.ToPrettyString()} {Endianness.ToPrettyString()}: {{ {string.Join(", ", Datas.Select(x => x.ToPrettyStringWithoutPrefix()))} }}";
     }
 }

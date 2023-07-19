@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Text.Json;
 using FormatParser.ArgumentParser;
 using FormatParser.Text;
 using FormatParser.Text.Decoders;
@@ -21,20 +22,21 @@ public static class EntryPoint
             PrintState(state);
         };
 
-        var runner = CreateRunner(settings);
+        var runner = CreateRunner(settings, GetOverrideSettings());
 
         if (!Directory.Exists(settings.Directory))
             throw new FormatParserException($"Directory {settings.Directory} does not exists.");
         
         runner.Run(settings, state, cts.Token).GetAwaiter().GetResult();
 
-        Console.WriteLine($"Run complete. Elapsed: {state.Stopwatch!.Elapsed.TotalMilliseconds}");
-        Console.WriteLine();
+        if (settings.ShowElapsedTime)
+        {
+            Console.WriteLine($"Run complete. Elapsed: {state.Stopwatch!.Elapsed.TotalMilliseconds}");
+            Console.WriteLine();
+        }
 
         PrintState(state);
     }
-
- 
 
     private static void PrintState(FormatParserCliState state)
     {
@@ -49,18 +51,30 @@ public static class EntryPoint
         var argsParser = new ArgumentParser<FormatParserCliSettings>()
             .WithPositionalArgument((settings, arg) => settings.Directory = arg)
             .OnNamedParameter("parallel", (settings, arg) => settings.DegreeOfParallelism = arg, false)
+            .OnNamedParameter("show-elapsed", settings => settings.ShowElapsedTime = true, false)
             .OnNamedParameter("buffer-size", (settings, arg) => settings.BufferSize = arg, false);
 
         return argsParser.Parse(args);
     }
+
+    private static OverrideSettings GetOverrideSettings()
+    {
+        const string filename = "override.settings.json";
+        if (!File.Exists(filename))
+            return new();
+
+        return JsonSerializer.Deserialize<OverrideSettings>(File.ReadAllText(filename)) ?? new ();
+    }
     
-    private static CLIRunner CreateRunner(FormatParserCliSettings settings)
+    private static CLIRunner CreateRunner(FormatParserCliSettings settings, OverrideSettings overrideSettings)
     {
         var binaryFormatDetectors = GetAllInstancesOf<IBinaryFormatDetector>().ToArray();
 
-        var textAnalyzers = GetAllInstancesOf<ITextAnalyzer>().ToArray();
+        var textAnalyzers = GetAllInstancesOf<ITextAnalyzer>()
+            .Where(x => !overrideSettings.DisabledAnalyzers.Any(a => string.Equals(a, x.GetType().FullName, StringComparison.InvariantCultureIgnoreCase)))
+            .ToArray();
         
-        var textFileParsingSettings = new TextFileParsingSettings()
+        var textFileParsingSettings = new TextFileParsingSettings
         {
             SampleSize = settings.BufferSize,
         };

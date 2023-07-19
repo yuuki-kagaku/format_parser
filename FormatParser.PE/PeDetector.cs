@@ -40,7 +40,7 @@ public class PeDetector : IBinaryFormatDetector
 
     private async Task<bool> ReadOptionalHeader(StreamingBinaryReader streamingBinaryReader, ushort size, Bitness bitness)
     {
-        if (size < 224)
+        if (size < PEConstants.OptionalHeaderMinSuze)
             return false;
         
         var magicNumber = await streamingBinaryReader.ReadUShort(); // Magic

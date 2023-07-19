@@ -7,5 +7,10 @@ public record MachOFileFormatInfo(Endianness Endianness, Bitness Bitness, Archit
     public virtual bool Equals(IFileFormatInfo? other) => other is MachOFileFormatInfo machOFileFormatInfo && Equals(machOFileFormatInfo);
 
     public string ToPrettyString() => 
-        $"Mach-O: {Architecture.ToStringWithoutBitness()}/{Bitness.ToPrettyString()} {Endianness.ToPrettyString()} signed:{Signed}";
+        $"Mach-O: {ToPrettyStringWithoutPrefix()}";
+    
+    public string ToPrettyStringWithoutPrefix() => 
+        $"{Architecture.ToStringWithoutBitness()}/{Bitness.ToPrettyString()} {Endianness.ToPrettyString()} signed: {FormatSigned()}";
+
+    private string FormatSigned() => Signed ? "yes" : "no"; 
 }
