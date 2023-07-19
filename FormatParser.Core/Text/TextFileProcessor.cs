@@ -25,8 +25,6 @@ public class TextFileProcessor
             return detectionResult;
             
         return new TextFileFormatInfo(DefaultTextType, encoding);
-       
-        return null;
     }
     
     private IFileFormatInfo? TryMatchTextBasedFormat(string header, EncodingInfo encoding)
