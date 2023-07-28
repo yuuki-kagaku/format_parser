@@ -9,13 +9,13 @@ public class FileDiscoverer
 
     public FileDiscoverer(FileDiscovererSettings settings) => this.settings = settings;
 
-    public async Task DiscoverFilesAsync(string directory, Channel<string> channel)
+    public async Task DiscoverFilesAsync(string directory, ChannelWriter<string> channelWriter)
     {
-        await DiscoverFilesInternalAsync(directory, channel);
-        channel.Writer.Complete();
+        await DiscoverFilesInternalAsync(directory, channelWriter);
+        channelWriter.Complete();
     }
     
-    private async Task DiscoverFilesInternalAsync(string directory, Channel<string> channel)
+    private async Task DiscoverFilesInternalAsync(string directory, ChannelWriter<string> channelWriter)
     {
         try
         {
@@ -24,7 +24,7 @@ public class FileDiscoverer
                 if (ShouldSkip(file))
                     continue;
 
-                await channel.Writer.WriteAsync(file);
+                await channelWriter.WriteAsync(file);
             }
         }
         catch (UnauthorizedAccessException)
@@ -45,7 +45,7 @@ public class FileDiscoverer
                 if (new FileInfo(subDirectory).IsSymlink())
                     continue;
 
-                await DiscoverFilesInternalAsync(subDirectory, channel);
+                await DiscoverFilesInternalAsync(subDirectory, channelWriter);
             }
         }
         catch (UnauthorizedAccessException)

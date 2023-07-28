@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using FormatParser.Domain;
 
 namespace FormatParser.Text;
@@ -16,7 +15,6 @@ public class TextFileProcessor
 
     public IFileFormatInfo? TryProcess(ArraySegment<byte> buffer)
     {
-     
         if (!compositeTextFormatDecoder.TryDecode(buffer, out var encoding, out var textSample))
             return null;
 

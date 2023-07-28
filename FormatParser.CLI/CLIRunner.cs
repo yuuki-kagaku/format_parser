@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Threading.Channels;
+using FormatParser.Helpers;
 
 namespace FormatParser.CLI;
 
@@ -16,35 +17,31 @@ public class CLIRunner
         this.streamFactory = streamFactory;
     }
 
-    public async Task Run(FormatParserCliSettings settings, FormatParserCliState state, CancellationToken cancellationToken)
+    public async Task Run(FormatParserCliSettings settings, FormatParserCliState state)
     {
         var channel = Channel.CreateUnbounded<string>();
 
         state.Stopwatch = Stopwatch.StartNew();
-        var discovererTask = RunFileDiscovererWithProcessorContinuation(settings, state, channel, cancellationToken);
-        var processorTasks = RunProcessors(settings, state, channel, cancellationToken);
+        var fileDiscovererTask = RunFileDiscovererWithProcessorContinuation(settings, state, channel);
+        var processorTasks = RunProcessors(settings, state, channel);
 
-        await Task.WhenAll(processorTasks.Concat(new[] { discovererTask }));
+        await Task.WhenAll(processorTasks.Concat(fileDiscovererTask));
     }
 
-    private List<Task> RunProcessors(FormatParserCliSettings settings, FormatParserCliState state, Channel<string> channel, CancellationToken cancellationToken)
+    private IEnumerable<Task> RunProcessors(FormatParserCliSettings settings, FormatParserCliState state, Channel<string> channel)
     {
-        var list = new List<Task>();
-        
         for (var i = 0; i < settings.DegreeOfParallelism - 1; i++)
-            list.Add(RunParsingProcessor(channel.Reader, state, settings, cancellationToken));
-        
-        return list;
+            yield return RunParsingProcessor(channel.Reader, state);
     }
     
-    private async Task RunFileDiscovererWithProcessorContinuation(FormatParserCliSettings settings, FormatParserCliState state, Channel<string> channel, CancellationToken cancellationToken)
+    private async Task RunFileDiscovererWithProcessorContinuation(FormatParserCliSettings settings, FormatParserCliState state, Channel<string> channel)
     {
         await Task.Yield();
         await fileDiscoverer.DiscoverFilesAsync(settings.Directory ?? throw new ArgumentNullException(nameof(settings.Directory)), channel);
-        await RunParsingProcessor(channel.Reader, state, settings, cancellationToken);
+        await RunParsingProcessor(channel.Reader, state);
     }
 
-    private async Task RunParsingProcessor(ChannelReader<string> channelReader, FormatParserCliState state, FormatParserCliSettings settings, CancellationToken cancellationToken)
+    private async Task RunParsingProcessor(ChannelReader<string> channelReader, FormatParserCliState state)
     {
         var processor = new ParsingProcessor(formatDecoder, streamFactory, channelReader, state);
         await Task.Yield();

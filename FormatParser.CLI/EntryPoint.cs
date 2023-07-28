@@ -14,7 +14,6 @@ public static class EntryPoint
 
         LoadPlugins();
         
-        var cts = new CancellationTokenSource();
         var state = new FormatParserCliState();
         
         Console.CancelKeyPress += (sender, eventArgs) =>
@@ -27,7 +26,7 @@ public static class EntryPoint
         if (!Directory.Exists(settings.Directory))
             throw new FormatParserException($"Directory {settings.Directory} does not exists.");
         
-        runner.Run(settings, state, cts.Token).GetAwaiter().GetResult();
+        runner.Run(settings, state).GetAwaiter().GetResult();
 
         if (settings.ShowElapsedTime)
         {
