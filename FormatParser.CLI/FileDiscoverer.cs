@@ -17,36 +17,45 @@ public class FileDiscoverer
     
     private async Task DiscoverFilesInternalAsync(string directory, ChannelWriter<string> channelWriter)
     {
-        try
+        await RunWithExceptionHandling(async () =>
         {
             foreach (var file in Directory.GetFiles(directory))
             {
-                if (ShouldSkip(file))
+                if (ShouldSkipFile(file))
                     continue;
 
                 await channelWriter.WriteAsync(file);
             }
-        }
-        catch (UnauthorizedAccessException)
-        {
-            if (settings.FallOnUnauthorizedException)
-                throw;
-        }
-        catch (IOException)
-        {
-            if (settings.FailOnIOException)
-                throw;
-        }
-
-        try
+        });
+        
+        await RunWithExceptionHandling(async () =>
         {
             foreach (var subDirectory in Directory.GetDirectories(directory))
             {
-                if (new FileInfo(subDirectory).IsSymlink())
+                if (ShouldSkipDirectory(subDirectory))
                     continue;
 
                 await DiscoverFilesInternalAsync(subDirectory, channelWriter);
             }
+        });
+    }
+    
+    private bool ShouldSkipFile(string file)
+    {
+        return RunWithExceptionHandling(() =>
+        {
+            var fileInfo = new FileInfo(file);
+            return fileInfo.IsSymlink() || fileInfo.IsEmpty();
+        }, true);
+    }
+    
+    private bool ShouldSkipDirectory(string directory) => RunWithExceptionHandling(() => new DirectoryInfo(directory).IsSymlink(), true);
+
+    private async Task RunWithExceptionHandling(Func<Task> action)
+    {
+        try
+        {
+            await action();
         }
         catch (UnauthorizedAccessException)
         {
@@ -59,10 +68,26 @@ public class FileDiscoverer
                 throw;
         }
     }
-
-    private static bool ShouldSkip(string file)
+    
+    private bool RunWithExceptionHandling(Func<bool> action, bool valueOnException)
     {
-        var fileInfo = new FileInfo(file);
-        return fileInfo.IsSymlink() || fileInfo.IsEmpty();
+        try
+        {
+            return action();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            if (settings.FallOnUnauthorizedException)
+                throw;
+            
+            return valueOnException;
+        }
+        catch (IOException)
+        {
+            if (settings.FailOnIOException)
+                throw;
+            
+            return valueOnException;
+        }
     }
 }
