@@ -40,77 +40,46 @@ public class CompositeTextFormatDecoder_Tests : TestBase
   
     private static IEnumerable<TestCaseData> TestData()
     {
-        yield return new TestCaseData(
-                TestFileCategory.TextUtf8, "loren_utf8_no_bom", new Func<string, string>(ReadFileAsUtf8), WellKnownEncodingInfos.Ascii)
-            .SetName("Should_read_ascii");
+        yield return CreateTestCase(TestFileCategory.TextUtf8, "loren_utf8_no_bom", ReadFileAsUtf8, WellKnownEncodingInfos.Ascii, "Should_read_ascii");
         
-        yield return new TestCaseData(
-                TestFileCategory.TextUtf8, "utf8_bmp", new Func<string, string>(ReadFileAsUtf8), WellKnownEncodingInfos.Utf8NoBom)
-            .SetName("Should_read_utf8_without_bom_with_japanese_characters_inside_bmp");
+        yield return CreateTestCase(TestFileCategory.TextUtf8, "utf8_bmp", ReadFileAsUtf8, WellKnownEncodingInfos.Utf8NoBom, "Should_read_utf8_without_bom_with_japanese_characters_inside_bmp");
         
-        yield return new TestCaseData(
-                TestFileCategory.TextUtf8, "utf8_bom", new Func<string, string>(ReadFileAsUtf8), WellKnownEncodingInfos.Utf8Bom)
-            .SetName("Should_read_utf8_with_bom");
+        yield return CreateTestCase(TestFileCategory.TextUtf8, "utf8_bom", ReadFileAsUtf8, WellKnownEncodingInfos.Utf8Bom, "Should_read_utf8_with_bom");
    
-        yield return new TestCaseData(
-                TestFileCategory.TextUtf16, "loren_utf16_be_nobom", new Func<string, string>(ReadFileAsUtf16Be), WellKnownEncodingInfos.Utf16BeNoBom)
-            .SetName("Should_read_utf16_be_no_bom");
+        yield return CreateTestCase(TestFileCategory.TextUtf16, "loren_utf16_be_nobom", ReadFileAsUtf16Be, WellKnownEncodingInfos.Utf16BeNoBom, "Should_read_utf16_be_no_bom");
 
-        yield return new TestCaseData(
-                TestFileCategory.TextUtf16, "loren_utf16_le_nobom", new Func<string, string>(ReadFileAsUtf16Le), WellKnownEncodingInfos.Utf16LeNoBom)
-            .SetName("Should_read_utf16_le_no_bom");
+        yield return CreateTestCase(TestFileCategory.TextUtf16, "loren_utf16_le_nobom", ReadFileAsUtf16Le, WellKnownEncodingInfos.Utf16LeNoBom, "Should_read_utf16_le_no_bom");
 
-        yield return new TestCaseData(
-                TestFileCategory.Text, "bsd_windows1251", new Func<string, string>(ReadFileAsWindows1251), new Windows1251Decoder(new TextFileParsingSettings()).EncodingWithoutBom)
-            .SetName("Should_read_windows1251");
+        yield return CreateTestCase(TestFileCategory.Text, "bsd_windows1251", ReadFileAsWindows1251, new ("Windows-1251", Endianness.NotAllowed, false), "Should_read_windows1251");
         
-        yield return new TestCaseData(
-                TestFileCategory.TextUtf16, "Japanese_language_sample_le", new Func<string, string>(ReadFileAsUtf16Le), WellKnownEncodingInfos.Utf16LeNoBom)
-            .SetName("Should_read_utf16le_with_regular_japanese_text");
+        yield return CreateTestCase(TestFileCategory.TextUtf16, "Japanese_language_sample_le", ReadFileAsUtf16Le, WellKnownEncodingInfos.Utf16LeNoBom, "Should_read_utf16le_with_regular_japanese_text");
         
-        yield return new TestCaseData(
-                TestFileCategory.TextUtf16, "Japanese_language_sample_be", new Func<string, string>(ReadFileAsUtf16Be), WellKnownEncodingInfos.Utf16BeNoBom)
-            .SetName("Should_read_utf16be_with_regular_japanese_text");
+        yield return CreateTestCase(TestFileCategory.TextUtf16, "Japanese_language_sample_be", ReadFileAsUtf16Be, WellKnownEncodingInfos.Utf16BeNoBom, "Should_read_utf16be_with_regular_japanese_text");
         
-        yield return new TestCaseData(
-                TestFileCategory.TextUtf32, "loren_utf32_le_no_bom", new Func<string, string>(ReadFileAsUtf32Le), WellKnownEncodingInfos.Utf32LeNoBom)
-            .SetName("Should_read_utf32_le_no_bom");
+        yield return CreateTestCase(TestFileCategory.TextUtf32, "loren_utf32_le_no_bom", ReadFileAsUtf32Le, WellKnownEncodingInfos.Utf32LeNoBom, "Should_read_utf32_le_no_bom");
 
-        yield return new TestCaseData(
-                TestFileCategory.TextUtf32, "loren_utf32_le_bom", new Func<string, string>(ReadFileAsUtf32Le), WellKnownEncodingInfos.Utf32LeBom)
-            .SetName("Should_read_utf32_le_bom");
+        yield return CreateTestCase(TestFileCategory.TextUtf32, "loren_utf32_le_bom", ReadFileAsUtf32Le, WellKnownEncodingInfos.Utf32LeBom, "Should_read_utf32_le_bom");
         
-        yield return new TestCaseData(
-                TestFileCategory.TextUtf32, "loren_utf32_be_bom", new Func<string, string>(ReadFileAsUtf32Be), WellKnownEncodingInfos.Utf32BeBom)
-            .SetName("Should_read_utf32_be_bom");
+        yield return CreateTestCase(TestFileCategory.TextUtf32, "loren_utf32_be_bom", ReadFileAsUtf32Be, WellKnownEncodingInfos.Utf32BeBom, "Should_read_utf32_be_bom");
 
-        yield return new TestCaseData(
-                TestFileCategory.TextUtf32, "loren_utf32_be_nobom", new Func<string, string>(ReadFileAsUtf32Be), WellKnownEncodingInfos.Utf32BeNoBom)
-            .SetName("Should_read_utf32_be_no_bom");
+        yield return CreateTestCase(TestFileCategory.TextUtf32, "loren_utf32_be_nobom", ReadFileAsUtf32Be, WellKnownEncodingInfos.Utf32BeNoBom, "Should_read_utf32_be_no_bom");
         
-        yield return new TestCaseData(
-                TestFileCategory.TextUtf16, "literary_chinese_utf16be", new Func<string, string>(ReadFileAsUtf16Be), WellKnownEncodingInfos.Utf16BeNoBom)
-            .SetName("Should_read_utf16be_with_classical_chinese_text");
+        yield return CreateTestCase(TestFileCategory.TextUtf16, "literary_chinese_utf16be", ReadFileAsUtf16Be, WellKnownEncodingInfos.Utf16BeNoBom, "Should_read_utf16be_with_classical_chinese_text");
 
-        yield return new TestCaseData(
-                TestFileCategory.TextUtf16, "literary_chinese_utf16le", new Func<string, string>(ReadFileAsUtf16Le), WellKnownEncodingInfos.Utf16LeNoBom)
-            .SetName("Should_read_utf16le_with_classical_chinese_text");
+        yield return CreateTestCase(TestFileCategory.TextUtf16, "literary_chinese_utf16le", ReadFileAsUtf16Le, WellKnownEncodingInfos.Utf16LeNoBom, "Should_read_utf16le_with_classical_chinese_text");
         
-        yield return new TestCaseData(
-                TestFileCategory.TextUtf16, "cuneiform_le", new Func<string, string>(ReadFileAsUtf16Le), WellKnownEncodingInfos.Utf16LeNoBom)
-            .SetName("Should_read_utf16le_with_cuneiform_text_with_characters_outside_bmp");
+        yield return CreateTestCase(TestFileCategory.TextUtf16, "cuneiform_le", ReadFileAsUtf16Le, WellKnownEncodingInfos.Utf16LeNoBom, "Should_read_utf16le_with_cuneiform_text_with_characters_outside_bmp");
 
-        yield return new TestCaseData(
-                TestFileCategory.TextUtf16, "cuneiform_be", new Func<string, string>(ReadFileAsUtf16Be), WellKnownEncodingInfos.Utf16BeNoBom)
-            .SetName("Should_read_utf16be_with_cuneiform_text_with_characters_outside_bmp");
+        yield return CreateTestCase(TestFileCategory.TextUtf16, "cuneiform_be", ReadFileAsUtf16Be, WellKnownEncodingInfos.Utf16BeNoBom, "Should_read_utf16be_with_cuneiform_text_with_characters_outside_bmp");
 
-        yield return new TestCaseData(
-                TestFileCategory.TextUtf16, "thai_mixed_with_chinese_le", new Func<string, string>(ReadFileAsUtf16Le), WellKnownEncodingInfos.Utf16LeNoBom)
-            .SetName("Should_read_utf16le_with_mixed_thai_and_chinese_characters");
+        yield return CreateTestCase(TestFileCategory.TextUtf16, "thai_mixed_with_chinese_le", ReadFileAsUtf16Le, WellKnownEncodingInfos.Utf16LeNoBom, "Should_read_utf16le_with_mixed_thai_and_chinese_characters");
 
-        yield return new TestCaseData(
-                TestFileCategory.TextUtf16, "thai_mixed_with_chinese_be", new Func<string, string>(ReadFileAsUtf16Be), WellKnownEncodingInfos.Utf16BeNoBom)
-            .SetName("Should_read_utf16be_with_mixed_thai_and_chinese_characters");
+        yield return CreateTestCase(TestFileCategory.TextUtf16, "thai_mixed_with_chinese_be", ReadFileAsUtf16Be, WellKnownEncodingInfos.Utf16BeNoBom,"Should_read_utf16be_with_mixed_thai_and_chinese_characters");
+        
+        yield break;
+
+        static TestCaseData CreateTestCase(TestFileCategory testFileCategory, string file, Func<string, string> getContent, EncodingInfo expectedEncoding, string name) => 
+            new TestCaseData(testFileCategory, file, new Func<string, string>(getContent), expectedEncoding).SetName(name);
     }
 
     [TestCaseSource(nameof(TestData))]

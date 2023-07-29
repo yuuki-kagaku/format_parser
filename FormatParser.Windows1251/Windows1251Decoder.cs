@@ -35,7 +35,7 @@ public class Windows1251Decoder : DecoderBase
 
     protected override bool SupportBom => false;
     protected override EncodingInfo EncodingWithBom => throw new NotSupportedException();
-    public override EncodingInfo EncodingWithoutBom { get; } = new("Windows-1251", Endianness.NotAllowed, false);
+    public override EncodingInfo EncodingWithoutBom { get; } = new ("Windows-1251", Endianness.NotAllowed, false);
 
     public override DetectionProbability DefaultDetectionProbability => DetectionProbability.No;
     public override string[]? RequiredEncodingAnalyzers { get; } = { "ru" } ;
