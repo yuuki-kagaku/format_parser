@@ -37,7 +37,7 @@ public class TestBase
 
     protected string TestDir = "TestData";
 
-    protected string BuildString(ArraySegment<char> chars) => new StringBuilder().Append(chars.ToMemory()).ToString();
+    protected static string BuildString(ArraySegment<char> chars) => new StringBuilder().Append(chars.ToMemory()).ToString();
     
     protected static string ReadFileAsUtf8(string file) => File.ReadAllText(file);
 

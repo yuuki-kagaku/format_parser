@@ -21,8 +21,7 @@ public class Utf16BeDecoder : DecoderBase, ITextDecoder
         return encoding.GetDecoder();
     }
 
-    public override IEnumerable<char> GetInvalidCharacters => InvalidCharactersHelper
-        .GetForbiddenChars(settings);
+    public override IEnumerable<char> GetInvalidCharacters => InvalidCharactersHelper.GetForbiddenChars(settings);
 
     protected override int MinimalSizeOfInput => 8;
 

@@ -17,7 +17,7 @@ public class PEDetector_Tests : TestBase
     }
     
     [Test]
-    public async Task PeDetector_ShouldParse_Amd64Exe()
+    public async Task PeDetector_ShouldDetect_Amd64_Exe()
     {
         var fileInfo = await DetectAsync(GetFile(TestFileCategory.PeWindows, "procdump64.exe"));
 
@@ -28,7 +28,7 @@ public class PEDetector_Tests : TestBase
     }
     
     [Test]
-    public async Task PeDetector_ShouldParse_i386Exe()
+    public async Task PeDetector_ShouldDetect_i386_Exe()
     {
         var fileInfo = await DetectAsync(GetFile(TestFileCategory.PeWindows, "procdump.exe"));
 
@@ -39,7 +39,7 @@ public class PEDetector_Tests : TestBase
     }
     
     [Test]
-    public async Task PeDetector_ShouldParse_ArmExe()
+    public async Task PeDetector_ShouldDetect_Arm_Exe()
     {
         var fileInfo = await DetectAsync(GetFile(TestFileCategory.PeWindows, "procexp64a.exe"));
 
@@ -50,7 +50,7 @@ public class PEDetector_Tests : TestBase
     }
     
     [Test]
-    public async Task PeDetector_ShouldParse_Managed_AnyCPUDll()
+    public async Task PeDetector_ShouldDetect_Managed_AnyCPU_Dll()
     {
         var fileInfo = await DetectAsync(GetFile(TestFileCategory.PeManaged, "HelloWorld.Core.AnyCpu.dll"));
         
@@ -61,7 +61,7 @@ public class PEDetector_Tests : TestBase
     }
     
     [Test]
-    public async Task PeDetector_ShouldParse_Managed_amd64_Dll()
+    public async Task PeDetector_ShouldDetect_Managed_amd64_Dll()
     {
         var fileInfo = await DetectAsync(GetFile(TestFileCategory.PeManaged, "HelloWorld.Core.amd64.dll"));
 
@@ -72,7 +72,7 @@ public class PEDetector_Tests : TestBase
     }
     
     [Test]
-    public async Task PeDetector_ShouldParse_Managed_arm64_Dll()
+    public async Task PeDetector_ShouldDetect_Managed_arm64_Dll()
     {
         var fileInfo = await DetectAsync(GetFile(TestFileCategory.PeManaged, "HelloWorldCore.arm64.dll"));
 
@@ -83,7 +83,7 @@ public class PEDetector_Tests : TestBase
     }
     
     [Test]
-    public async Task PeDetector_ShouldParse_Managed_x86_Dll()
+    public async Task PeDetector_ShouldDetect_Managed_x86_Dll()
     {
         var fileInfo = await DetectAsync(GetFile(TestFileCategory.PeManaged, "HelloWorld.Core.86.dll"));
 

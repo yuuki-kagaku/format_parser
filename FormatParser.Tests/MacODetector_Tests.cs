@@ -17,19 +17,7 @@ public class MacODetector_Tests : TestBase
     }
     
     [Test]
-    public async Task MachDetector_ShouldParseMacExecutable()
-    {
-        var fileInfo = await DetectAsync(GetFile(TestFileCategory.Mac, "VLC")) as MachOFileFormatInfo;
-
-        fileInfo.Should().NotBeNull();
-        fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
-        fileInfo.Architecture.Should().Be(Architecture.Amd64);
-        fileInfo.Endianness.Should().Be(Endianness.LittleEndian);
-        fileInfo.Signed.Should().Be(true);
-    }
-    
-    [Test]
-    public async Task MachDetector_ShouldParse_fat_file()
+    public async Task MachDetector_ShouldDetect_fat_file()
     {
         var fileInfo = await DetectAsync(GetFile(TestFileCategory.MacFat, "DOSBox")) as FatMachOFileFormatInfo;;
 
@@ -55,7 +43,19 @@ public class MacODetector_Tests : TestBase
     }
     
     [Test]
-    public async Task MachDetector_ShouldParse_signed_amd64_file()
+    public async Task MachDetector_ShouldDetect_signed_amd64_file()
+    {
+        var fileInfo = await DetectAsync(GetFile(TestFileCategory.Mac, "VLC")) as MachOFileFormatInfo;
+
+        fileInfo.Should().NotBeNull();
+        fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
+        fileInfo.Architecture.Should().Be(Architecture.Amd64);
+        fileInfo.Endianness.Should().Be(Endianness.LittleEndian);
+        fileInfo.Signed.Should().Be(true);
+    }
+    
+    [Test]
+    public async Task MachDetector_ShouldDetect_signed_official_apple_amd64_file()
     {
         var fileInfo = await DetectAsync(GetFile(TestFileCategory.Mac, "Read_Before_You_Install_iTunes")) as MachOFileFormatInfo;
     
@@ -67,7 +67,7 @@ public class MacODetector_Tests : TestBase
     }
     
     [Test]
-    public async Task MachDetector_ShouldParse_signed_arm_file()
+    public async Task MachDetector_ShouldDetect_signed_arm_file()
     {
         var fileInfo = await DetectAsync(GetFile(TestFileCategory.Mac, "MachO-iOS-armv7s-Helloworld")) as MachOFileFormatInfo;
     
@@ -79,7 +79,7 @@ public class MacODetector_Tests : TestBase
     }
     
     [Test]
-    public async Task MachDetector_ShouldParse_unsigned_file()
+    public async Task MachDetector_ShouldDetect_unsigned_file()
     {
         var fileInfo = await DetectAsync(GetFile(TestFileCategory.Mac, "hello_world")) as MachOFileFormatInfo;
     
