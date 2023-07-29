@@ -9,10 +9,14 @@ public class StreamingBinaryReader
     private readonly Stream stream;
     private readonly byte[] defaultBuffer = GC.AllocateArray<byte>(16, true);
     private Endianness endianness;
+    
     private static readonly Endianness RunningCpuEndianness = BitConverter.IsLittleEndian ? Endianness.LittleEndian : Endianness.BigEndian;
 
     public StreamingBinaryReader(Stream stream, Endianness endianness)
     {
+        if (endianness is not (Endianness.BigEndian or Endianness.LittleEndian))
+            throw new ArgumentOutOfRangeException(nameof(endianness));
+        
         this.stream = stream;
         this.endianness = endianness;
     }
@@ -40,27 +44,23 @@ public class StreamingBinaryReader
         return array;
     }
     
-    public async Task<ArraySegment<byte>> TryReadArraySegment(int count)
+    public async Task<ArraySegment<byte>> TryReadArraySegmentAsync(int count)
     {
         var array = new byte[count];
         var readBytes = await ReadInternalAsync(count, array, false);
         
         return new ArraySegment<byte>(array, 0, readBytes);
     }
-
-    public void SkipUlong() => SkipLong();
-
+   
     public void SkipLong() => Skip<long>();
-
-    public void SkipUInt() => SkipInt();
     public void SkipInt() => Skip<int>();
-
-    public void SkipUShort() => SkipShort();
     public void SkipShort() => Skip<short>();
     public void SkipByte() => Skip<byte>();
+    public void SkipUlong() => SkipLong();
+    public void SkipUInt() => SkipInt();
+    public void SkipUShort() => SkipShort();
     public void SkipBytes(int count) => Offset += count;
     public void SkipBytes(uint count) => Offset += count;
-    private unsafe void Skip<T>() where T : unmanaged => Offset += sizeof(T);
 
     public async Task<string> ReadNulTerminatingStringAsync(int size)
     {
@@ -73,49 +73,49 @@ public class StreamingBinaryReader
         return Encoding.ASCII.GetString(new ArraySegment<byte>(array, 0, array.Length - 1));
     }
     
-    public async Task<short> ReadShort()
+    public async Task<short> ReadShortAsync()
     {
         await ReadInternalAsync(sizeof(short));
         return ConvertShort();
     }
     
-    public async Task<ushort> ReadUShort()
+    public async Task<ushort> ReadUShortAsync()
     {
         await ReadInternalAsync(sizeof(ushort));
         return ConvertUShort();
     }
     
-    public async Task<int> ReadInt()
+    public async Task<int> ReadIntAsync()
     {
         await ReadInternalAsync(sizeof(int));
         return ConvertInt();
     }
     
-    public async Task<uint> ReadUInt()
+    public async Task<uint> ReadUIntAsync()
     {
         await ReadInternalAsync(sizeof(uint));
         return ConvertUInt();
     }
     
-    public async Task<long> ReadLong()
+    public async Task<long> ReadLongAsync()
     {
         await ReadInternalAsync(sizeof(long));
         return ConvertLong();
     }
     
-    public async Task<ulong> ReadULong()
+    public async Task<ulong> ReadULongAsync()
     {
         await ReadInternalAsync(sizeof(ulong));
         return ConvertULong();
     }
     
-    public async Task<ulong> ReadPointer(Bitness bitness)
+    public async Task<ulong> ReadPointerAsync(Bitness bitness)
     {
         return bitness switch
         {
-            Bitness.Bitness16 => await ReadUShort(),
-            Bitness.Bitness32 => await ReadUInt(),
-            Bitness.Bitness64 => await ReadULong(),
+            Bitness.Bitness16 => await ReadUShortAsync(),
+            Bitness.Bitness32 => await ReadUIntAsync(),
+            Bitness.Bitness64 => await ReadULongAsync(),
             _ => throw new ArgumentOutOfRangeException(nameof(bitness))
         };
     }
@@ -192,8 +192,10 @@ public class StreamingBinaryReader
     private long ReverseEndiannessIfNeeded(long val) => 
         endianness == RunningCpuEndianness ? val : BinaryPrimitives.ReverseEndianness(val);
 
+    private unsafe void Skip<T>() where T : unmanaged => Offset += sizeof(T);
+    
     private Task ReadInternalAsync(int count) => ReadInternalAsync(count, defaultBuffer, true);
-
+    
     private async Task<int> ReadInternalAsync(int count, byte[] buffer, bool ensureAllBytesRead)
     {
         var totalBytesRead = 0;
@@ -208,6 +210,6 @@ public class StreamingBinaryReader
             totalBytesRead += bytesRead;
         }
 
-        return count;
+        return totalBytesRead;
     }
 }

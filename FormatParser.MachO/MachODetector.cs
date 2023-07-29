@@ -18,16 +18,15 @@ public class MachODetector : IBinaryFormatDetector
 
         var (bitness, endianness, isFat) = tuple;
 
-        if (isFat)
-            return await ReadFatFormatInfo(binaryReader, endianness, bitness);
-
-        return await ReadNonFatFormatInfo(binaryReader, bitness, endianness);
+        return isFat
+            ? await ReadFatFormatInfoAsync(binaryReader, endianness, bitness)
+            : await ReadNonFatFormatInfoAsync(binaryReader, bitness, endianness);
     }
 
-    private static async Task<FatMachOFileFormatInfo> ReadFatFormatInfo(StreamingBinaryReader binaryReader, Endianness endianness, Bitness bitness)
+    private static async Task<FatMachOFileFormatInfo> ReadFatFormatInfoAsync(StreamingBinaryReader binaryReader, Endianness endianness, Bitness bitness)
     {
         binaryReader.SetEndianness(endianness);
-        var numberOfArchitectures = (int)await binaryReader.ReadUInt();
+        var numberOfArchitectures = (int)await binaryReader.ReadUIntAsync();
 
         var headers = new List<(Architecture, ulong Offset)>(numberOfArchitectures);
         
@@ -44,21 +43,21 @@ public class MachODetector : IBinaryFormatDetector
             
             binaryReader.SetEndianness(endianness);
             
-            result.Add(await ReadNonFatFormatInfo(binaryReader, bitness, endianness));
+            result.Add(await ReadNonFatFormatInfoAsync(binaryReader, bitness, endianness));
         }
 
         return new FatMachOFileFormatInfo(endianness, bitness, result.ToImmutableArray());
     }
 
-    private static async Task<MachOFileFormatInfo> ReadNonFatFormatInfo(StreamingBinaryReader binaryReader, Bitness bitness, Endianness endianness)
+    private static async Task<MachOFileFormatInfo> ReadNonFatFormatInfoAsync(StreamingBinaryReader binaryReader, Bitness bitness, Endianness endianness)
     {
         binaryReader.SetEndianness(endianness);
         var (numberOfCommands, architecture) = await ReadNonFatHeaderAsync(binaryReader, bitness);
 
         for (var i = 0; i < numberOfCommands; i++)
         {
-            var commandType = await binaryReader.ReadUInt();
-            var commandSize = await binaryReader.ReadUInt();
+            var commandType = await binaryReader.ReadUIntAsync();
+            var commandSize = await binaryReader.ReadUIntAsync();
 
             if (commandType != MachOConstants.LC_CODE_SIGNATURE)
                 binaryReader.SkipBytes(commandSize - 2 * sizeof(uint));
@@ -71,12 +70,12 @@ public class MachODetector : IBinaryFormatDetector
 
     private static async Task<(Architecture, ulong Offset)> ReadArchitecturesOfFatFileAsync(StreamingBinaryReader streamingBinaryReader, Bitness bitness)
     {
-        var architecture = MachOArchitectureConverter.Convert(await streamingBinaryReader.ReadInt()); // cputype
-        
+        var architecture = MachOArchitectureConverter.Convert(await streamingBinaryReader.ReadIntAsync()); // cputype
         streamingBinaryReader.SkipInt(); // cpusubtype
-        var offset = await streamingBinaryReader.ReadPointer(bitness); // offset
+        var offset = await streamingBinaryReader.ReadPointerAsync(bitness); // offset
         streamingBinaryReader.SkipPointer(bitness); // size
         streamingBinaryReader.SkipPointer(bitness); // align
+        
         if (bitness == Bitness.Bitness64)
             streamingBinaryReader.SkipUInt(); // reserved
         
@@ -85,13 +84,11 @@ public class MachODetector : IBinaryFormatDetector
     
     private static async Task<NonFatHeader> ReadNonFatHeaderAsync(StreamingBinaryReader streamingBinaryReader, Bitness bitness)
     {
-        var architecture = MachOArchitectureConverter.Convert(await streamingBinaryReader.ReadInt()); // cputype
+        var architecture = MachOArchitectureConverter.Convert(await streamingBinaryReader.ReadIntAsync()); // cputype
         streamingBinaryReader.SkipInt(); // cpusubtype
         streamingBinaryReader.SkipUInt(); // filetype
-        var numberOfCommands = await streamingBinaryReader.ReadUInt(); // ncmds
-        
+        var numberOfCommands = await streamingBinaryReader.ReadUIntAsync(); // ncmds
         streamingBinaryReader.SkipUInt(); // sizeofcmds
-        
         streamingBinaryReader.SkipUInt(); // flags
         
         if (bitness == Bitness.Bitness64)

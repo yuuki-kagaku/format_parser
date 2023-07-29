@@ -20,14 +20,14 @@ public class Utf8Decoder : DecoderBase, ITextDecoder
         return encoding.GetDecoder();
     }
 
-    public override IEnumerable<char> GetInvalidCharacters => InvalidCharacterHelper
+    public override IEnumerable<char> GetInvalidCharacters => InvalidCharactersHelper
         .GetForbiddenChars(settings);
 
     protected override int MinimalSizeOfInput => 0;
 
     protected override bool SupportBom => true;
-    protected override EncodingInfo EncodingWithBom => EncodingInfo.Utf8Bom;
-    public override EncodingInfo EncodingWithoutBom => EncodingInfo.Utf8NoBom;
+    protected override EncodingInfo EncodingWithBom => WellKnownEncodingInfos.Utf8Bom;
+    public override EncodingInfo EncodingWithoutBom => WellKnownEncodingInfos.Utf8NoBom;
 
     public override string[]? RequiredEncodingAnalyzers { get; } = {"ASCII"};
     

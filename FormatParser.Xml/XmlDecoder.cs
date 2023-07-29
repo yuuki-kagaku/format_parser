@@ -6,7 +6,7 @@ namespace FormatParser.Xml;
 
 public class XmlDecoder : ITextBasedFormatDetector
 {
-    private static readonly Regex Pattern = new (@$"^<\?xml([^>]+)encoding=""(?<encoding>[^""]+)""",
+    private static readonly Regex Pattern = new (@"^<\?xml([^>]+)encoding=""(?<encoding>[^""]+)""",
         RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
     
     public IFileFormatInfo? TryMatchFormat(string header, EncodingInfo encodingInfo)
@@ -14,9 +14,7 @@ public class XmlDecoder : ITextBasedFormatDetector
         var match = Pattern.Match(header);
 
         if (match.Success)
-        {
             return new TextFileFormatInfo(MimeType, encodingInfo with {Name = match.Groups["encoding"].Value});
-        }
         
         return null;
     }

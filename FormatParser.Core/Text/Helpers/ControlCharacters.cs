@@ -1,3 +1,5 @@
+using FormatParser.Helpers;
+
 namespace FormatParser.Text.Helpers;
 
 public static class ControlCharacters
@@ -18,8 +20,9 @@ public static class ControlCharacters
                 LF,
                 Tab,
             })
-            .Concat(new []{Delete}) // delete character, technically positions outside C0 controls
+            .Concat(Delete) // delete character, technically positions outside C0 controls
             .ToHashSet();
+    
     public static readonly IReadOnlySet<char> C1Controls =
         Enumerable.Range(128, 32)
             .Select(x => (char)x)

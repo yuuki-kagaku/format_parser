@@ -1,7 +1,6 @@
-using System.Text;
 using System.Threading.Channels;
 using FormatParser.Domain;
-using FormatParser.Text;
+using FormatParser.Helpers;
 
 namespace FormatParser.CLI;
 
@@ -9,43 +8,42 @@ public class ParsingProcessor
 {
     private readonly FormatDecoder formatDecoder;
     private readonly IStreamFactory streamFactory;
-    private readonly ChannelReader<string> channel;
+    private readonly ChannelReader<string> channelReader;
     private readonly FormatParserCliState state;
+    private readonly FileDiscovererSettings settings;
 
-    public ParsingProcessor(FormatDecoder formatDecoder, IStreamFactory streamFactory, ChannelReader<string> channel, FormatParserCliState state)
+    public ParsingProcessor(FormatDecoder formatDecoder, IStreamFactory streamFactory, ChannelReader<string> channelReader, FormatParserCliState state, FileDiscovererSettings settings)
     {
         this.formatDecoder = formatDecoder;
         this.streamFactory = streamFactory;
-        this.channel = channel;
+        this.channelReader = channelReader;
         this.state = state;
+        this.settings = settings;
     }
 
     public async Task ProcessFiles()
     {
         while (true)
         {
-            while (channel.TryRead(out var file))
+            while (channelReader.TryRead(out var file))
             {
-                try
+                await FileDiscoveryHelper.RunWithExceptionHandling(async () =>
                 {
                     await using var stream = streamFactory.GetStream(file);
-                    var fileInfo = await formatDecoder.Decode(stream);
-                    AddInfoToState(fileInfo);
-                }
-                catch (UnauthorizedAccessException)
-                {
-                }
+                    var fileFormatInfo = await formatDecoder.Decode(stream);
+                    AddInfoToState(fileFormatInfo);
+                }, settings);
             }
             
-            var hasMoreDate = await channel.WaitToReadAsync();
+            var hasMoreData = await channelReader.WaitToReadAsync();
             
-            if (!hasMoreDate)
+            if (!hasMoreData)
                 return;
         }
     }
 
     private void AddInfoToState(IFileFormatInfo info)
     {
-        state.Occurence.GetOrAdd(info, _ => new()).Increment();
+        state.Occurence.GetOrNew(info).Increment();
     }
 }

@@ -15,6 +15,6 @@ public class ArchDetector : IBinaryFormatDetector
 
         var header = await binaryReader.ReadBytesAsync(MagicNumbers.Length);
         
-        return ArrayComparer<byte>.Instance.Equals(header, MagicNumbers) ? new ArchFileFormat() : null;
+        return SequentialCollectionComparer<byte>.Instance.Equals(header, MagicNumbers) ? new ArchFileFormat() : null;
     }
 }

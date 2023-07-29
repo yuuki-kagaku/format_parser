@@ -20,14 +20,13 @@ public class Utf32BeDecoder : DecoderBase, ITextDecoder
         return encoding.GetDecoder();
     }
 
-    public override IEnumerable<char> GetInvalidCharacters => InvalidCharacterHelper
-        .GetForbiddenChars(settings);
+    public override IEnumerable<char> GetInvalidCharacters => InvalidCharactersHelper.GetForbiddenChars(settings);
 
     protected override int MinimalSizeOfInput => 8;
 
     protected override bool SupportBom => true;
-    protected override EncodingInfo EncodingWithBom => EncodingInfo.Utf32BeBom;
-    public override EncodingInfo EncodingWithoutBom => EncodingInfo.Utf32BeNoBom;
+    protected override EncodingInfo EncodingWithBom => WellKnownEncodingInfos.Utf32BeBom;
+    public override EncodingInfo EncodingWithoutBom => WellKnownEncodingInfos.Utf32BeNoBom;
 
     public override string[]? RequiredEncodingAnalyzers => null;
 

@@ -19,7 +19,7 @@ public class FormatDecoder
 
     public async Task<IFileFormatInfo> Decode(Stream stream)
     {
-        var binaryReader = new StreamingBinaryReader(stream, Endianness.NotAllowed);
+        var binaryReader = new StreamingBinaryReader(stream, Endianness.BigEndian);
 
         var result = await TryDecodeAsBinaryAsync(binaryReader);
 
@@ -27,15 +27,11 @@ public class FormatDecoder
             return result;
 
         binaryReader.Offset = 0;
-        
-        var buffer = await binaryReader.TryReadArraySegment(settings.SampleSize);
+        var buffer = await binaryReader.TryReadArraySegmentAsync(settings.SampleSize);
 
         result = textFileProcessor.TryProcess(buffer);
   
-        if (result != null)
-            return result;
-
-        return new UnknownFileFormatInfo();
+        return result ?? new UnknownFileFormatInfo();
     }
 
     private async Task<IFileFormatInfo?> TryDecodeAsBinaryAsync(StreamingBinaryReader binaryReader)

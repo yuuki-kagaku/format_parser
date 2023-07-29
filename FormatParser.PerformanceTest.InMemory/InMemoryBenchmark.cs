@@ -16,8 +16,8 @@ namespace FormatParser.PerformanceTest;
 [SimpleJob(RuntimeMoniker.Net70)]
 public class InMemoryBenchmark
 {
-    private List<Stream> streams;
-    private FormatDecoder decoder;
+    private List<Stream> streams = null!;
+    private FormatDecoder decoder = null!;
 
     [GlobalSetup]
     public void Setup()

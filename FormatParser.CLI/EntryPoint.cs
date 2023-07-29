@@ -14,7 +14,6 @@ public static class EntryPoint
 
         LoadPlugins();
         
-        var cts = new CancellationTokenSource();
         var state = new FormatParserCliState();
         
         Console.CancelKeyPress += (sender, eventArgs) =>
@@ -27,7 +26,7 @@ public static class EntryPoint
         if (!Directory.Exists(settings.Directory))
             throw new FormatParserException($"Directory {settings.Directory} does not exists.");
         
-        runner.Run(settings, state, cts.Token).GetAwaiter().GetResult();
+        runner.Run(settings, state).GetAwaiter().GetResult();
 
         if (settings.ShowElapsedTime)
         {
@@ -78,6 +77,12 @@ public static class EntryPoint
         {
             SampleSize = settings.BufferSize,
         };
+
+        var fileDiscovererSettings = new FileDiscovererSettings
+        {
+            FallOnUnauthorizedException = settings.FailOnUnauthorizedAccessException,
+            FailOnIOException = settings.FailOnIOException
+        };
         
         var textDecoders = GetAllInstancesOf<ITextDecoder, TextFileParsingSettings>(textFileParsingSettings).ToArray();
 
@@ -88,18 +93,16 @@ public static class EntryPoint
             textAnalyzers);
 
         var streamFactory = new StreamFactory(settings.BufferSize);
+        var formatDecoder = new FormatDecoder(binaryFormatDetectors,
+            new TextFileProcessor(textBasedFormatDetectors, compositeTextFormatDecoder),
+            settings.TextFileParsingSettings
+        );
         
         return new CLIRunner(
-            new FileDiscoverer(new FileDiscovererSettings
-            {
-                FallOnUnauthorizedException = settings.FailOnUnauthorizedAccessException,
-                FailOnIOException = settings.FailOnIOException
-            }), 
-            new FormatDecoder(binaryFormatDetectors, 
-                new TextFileProcessor(textBasedFormatDetectors, compositeTextFormatDecoder), 
-                settings.TextFileParsingSettings
-            ),
-            streamFactory
+            new FileDiscoverer(fileDiscovererSettings), 
+            formatDecoder,
+            streamFactory,
+            fileDiscovererSettings
         );
     }
 

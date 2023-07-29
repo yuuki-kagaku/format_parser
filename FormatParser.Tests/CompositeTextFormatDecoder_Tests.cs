@@ -1,4 +1,5 @@
 using FluentAssertions;
+using FormatParser.Domain;
 using FormatParser.Text;
 using FormatParser.Text.Decoders;
 using FormatParser.Text.TextAnalyzers;
@@ -36,269 +37,75 @@ public class CompositeTextFormatDecoder_Tests : TestBase
 
         decoder = new CompositeTextFormatDecoder(textDecoders, textAnalyzers);
     }
-    
-    [Test]
-    public async Task Should_read_ascii()
+  
+    private static IEnumerable<TestCaseData> TestData()
     {
-        var filename = GetFile(TestFileCategory.TextUtf8, "loren_utf8_no_bom");
-        var buffer = await GetBufferAsync(filename);
-
-        var isSuccessful = decoder.TryDecode(buffer, out var encoding, out var text);
-
-        isSuccessful.Should().BeTrue();
-        text.Should().Be(ReadFileAsUtf8(filename));
-        encoding.Should().BeEquivalentTo(EncodingInfo.Ascii);
-    }
-    
-    [Test]
-    public async Task Should_read_utf8_without_bom_with_japanese_characters_inside_bmp()
-    {
-        var file = GetFile(TestFileCategory.TextUtf8, "utf8_bmp");
-        var buffer = await GetBufferAsync(file);
-
-        var isSuccessful = decoder.TryDecode(buffer, out var encoding, out var text);
-
-        isSuccessful.Should().BeTrue();
-        text.Should().Be(ReadFileAsUtf8(file));
-        encoding.Should().BeEquivalentTo(EncodingInfo.Utf8NoBom);
-    }
-    
-    [Test]
-    public async Task Should_read_utf8_with_bom()
-    {
-        var file = GetFile(TestFileCategory.TextUtf8, "utf8_bom");
-        var buffer = await GetBufferAsync(file);
-
-        var isSuccessful = decoder.TryDecode(buffer, out var encoding, out var text);
-
-        isSuccessful.Should().BeTrue();
-        text.Should().Be(ReadFileAsUtf8(file));
-        encoding.Should().BeEquivalentTo(EncodingInfo.Utf8Bom);
-    }
-
+        yield return CreateTestCase(TestFileCategory.TextUtf8, "loren_utf8_no_bom", ReadFileAsUtf8, WellKnownEncodingInfos.Ascii, "Should_read_ascii");
         
-    [Test]
-    public async Task Should_read_utf16_be_no_bom()
+        yield return CreateTestCase(TestFileCategory.TextUtf8, "utf8_bmp", ReadFileAsUtf8, WellKnownEncodingInfos.Utf8NoBom, "Should_read_utf8_without_bom_with_japanese_characters_inside_bmp");
+        
+        yield return CreateTestCase(TestFileCategory.TextUtf8, "utf8_bom", ReadFileAsUtf8, WellKnownEncodingInfos.Utf8Bom, "Should_read_utf8_with_bom");
+   
+        yield return CreateTestCase(TestFileCategory.TextUtf16, "loren_utf16_be_nobom", ReadFileAsUtf16Be, WellKnownEncodingInfos.Utf16BeNoBom, "Should_read_utf16_be_no_bom");
+
+        yield return CreateTestCase(TestFileCategory.TextUtf16, "loren_utf16_le_nobom", ReadFileAsUtf16Le, WellKnownEncodingInfos.Utf16LeNoBom, "Should_read_utf16_le_no_bom");
+
+        yield return CreateTestCase(TestFileCategory.Text, "bsd_windows1251", ReadFileAsWindows1251, new ("Windows-1251", Endianness.NotAllowed, false), "Should_read_windows1251");
+        
+        yield return CreateTestCase(TestFileCategory.TextUtf16, "Japanese_language_sample_le", ReadFileAsUtf16Le, WellKnownEncodingInfos.Utf16LeNoBom, "Should_read_utf16le_with_regular_japanese_text");
+        
+        yield return CreateTestCase(TestFileCategory.TextUtf16, "Japanese_language_sample_be", ReadFileAsUtf16Be, WellKnownEncodingInfos.Utf16BeNoBom, "Should_read_utf16be_with_regular_japanese_text");
+        
+        yield return CreateTestCase(TestFileCategory.TextUtf32, "loren_utf32_le_no_bom", ReadFileAsUtf32Le, WellKnownEncodingInfos.Utf32LeNoBom, "Should_read_utf32_le_no_bom");
+
+        yield return CreateTestCase(TestFileCategory.TextUtf32, "loren_utf32_le_bom", ReadFileAsUtf32Le, WellKnownEncodingInfos.Utf32LeBom, "Should_read_utf32_le_bom");
+        
+        yield return CreateTestCase(TestFileCategory.TextUtf32, "loren_utf32_be_bom", ReadFileAsUtf32Be, WellKnownEncodingInfos.Utf32BeBom, "Should_read_utf32_be_bom");
+
+        yield return CreateTestCase(TestFileCategory.TextUtf32, "loren_utf32_be_nobom", ReadFileAsUtf32Be, WellKnownEncodingInfos.Utf32BeNoBom, "Should_read_utf32_be_no_bom");
+        
+        yield return CreateTestCase(TestFileCategory.TextUtf16, "literary_chinese_utf16be", ReadFileAsUtf16Be, WellKnownEncodingInfos.Utf16BeNoBom, "Should_read_utf16be_with_classical_chinese_text");
+
+        yield return CreateTestCase(TestFileCategory.TextUtf16, "literary_chinese_utf16le", ReadFileAsUtf16Le, WellKnownEncodingInfos.Utf16LeNoBom, "Should_read_utf16le_with_classical_chinese_text");
+        
+        yield return CreateTestCase(TestFileCategory.TextUtf16, "cuneiform_le", ReadFileAsUtf16Le, WellKnownEncodingInfos.Utf16LeNoBom, "Should_read_utf16le_with_cuneiform_text_with_characters_outside_bmp");
+
+        yield return CreateTestCase(TestFileCategory.TextUtf16, "cuneiform_be", ReadFileAsUtf16Be, WellKnownEncodingInfos.Utf16BeNoBom, "Should_read_utf16be_with_cuneiform_text_with_characters_outside_bmp");
+
+        yield return CreateTestCase(TestFileCategory.TextUtf16, "thai_mixed_with_chinese_le", ReadFileAsUtf16Le, WellKnownEncodingInfos.Utf16LeNoBom, "Should_read_utf16le_with_mixed_thai_and_chinese_characters");
+
+        yield return CreateTestCase(TestFileCategory.TextUtf16, "thai_mixed_with_chinese_be", ReadFileAsUtf16Be, WellKnownEncodingInfos.Utf16BeNoBom,"Should_read_utf16be_with_mixed_thai_and_chinese_characters");
+        
+        yield break;
+
+        static TestCaseData CreateTestCase(TestFileCategory testFileCategory, string file, Func<string, string> getContent, EncodingInfo expectedEncoding, string name) => 
+            new TestCaseData(testFileCategory, file, new Func<string, string>(getContent), expectedEncoding).SetName(name);
+    }
+
+    [TestCaseSource(nameof(TestData))]
+    public async Task Should_correctly_read_text_and_identify_encoding(TestFileCategory testFileCategory, string file, Func<string, string> getContent, EncodingInfo expectedEncoding)
     {
-        var filename = GetFile(TestFileCategory.TextUtf16, "loren_utf16_be_nobom");
+        var filename = GetFile(testFileCategory, file);
         var buffer = await GetBufferAsync(filename);
 
         var isSuccessful = decoder.TryDecode(buffer, out var encoding, out var text);
 
         isSuccessful.Should().BeTrue();
-        text.Should().Be(ReadFileAsUtf16Be(filename));
-        encoding.Should().BeEquivalentTo(EncodingInfo.Utf16BeNoBom);
+        text.Should().Be(getContent(filename));
+        encoding.Should().BeEquivalentTo(expectedEncoding);
     }
-    
-    [Test]
-    public async Task Should_read_utf16_le_no_bom()
-    {
-        var filename = GetFile(TestFileCategory.TextUtf16, "loren_utf16_le_nobom");
-        var buffer = await GetBufferAsync(filename);
 
-        var isSuccessful = decoder.TryDecode(buffer, out var encoding, out var text);
-
-        isSuccessful.Should().BeTrue();
-        encoding.Should().BeEquivalentTo(EncodingInfo.Utf16LeNoBom);
-        text.Should().Be(ReadFileAsUtf16Le(filename));
-    }
-    
-    [Test]
-    public async Task Should_read_windows1251()
+    [TestCase(TestFileCategory.PseudoText, "be_tasks.svgz", TestName = "Should_not_read_pseudo_utf16be_file_when_there_is_a_lot_of_uncommon_cjk_chars_and_no_chars_outside_bmp")]
+    [TestCase(TestFileCategory.PseudoText, "le_apport.svgz", TestName = "Should_not_read_pseudo_utf16le_file_when_there_is_a_lot_of_uncommon_cjk_chars_and_no_chars_outside_bmp")]
+    public async Task Should_not_read_binary_file_that_can_be_interpreted_as_text(TestFileCategory testFileCategory, string filename)
     {
-        var filename = GetFile(TestFileCategory.Text, "bsd_windows1251");
-        var buffer = await GetBufferAsync(filename);
-    
-        var isSuccessful = decoder.TryDecode(buffer, out var encoding, out var text);
-
-        isSuccessful.Should().BeTrue();
-        encoding.Should().BeEquivalentTo(new Windows1251Decoder(new TextFileParsingSettings()).EncodingWithoutBom);
-        text.Should().Be(ReadFileAsWindows1251(filename));
-    }
-    
-    [Test]
-    public async Task Should_not_read_pseudo_utf16be_file_when_there_is_a_lot_of_uncommon_cjk_chars_and_no_chars_outside_bmp()
-    {
-        var buffer = await GetBufferAsync(GetFile(TestFileCategory.PseudoText, "be_tasks.svgz"));
+        var buffer = await GetBufferAsync(GetFile(testFileCategory, filename));
     
         var isSuccessful = decoder.TryDecode(buffer, out var encoding, out var text);
 
         isSuccessful.Should().BeFalse();
         encoding.Should().Be(null);
         text.Should().Be(null);
-    }
-    
-    [Test]
-    public async Task Should_not_read_pseudo_utf16le_file_when_there_is_a_lot_of_uncommon_cjk_chars_and_no_chars_outside_bmp()
-    {
-        var buffer = await GetBufferAsync(GetFile(TestFileCategory.PseudoText, "le_apport.svgz"));
-    
-        var isSuccessful = decoder.TryDecode(buffer, out var encoding, out var text);
-
-        isSuccessful.Should().BeFalse();
-        encoding.Should().Be(null);
-        text.Should().Be(null);
-    }
-
-    [Test]
-    public async Task Should_read_utf16le_with_regular_japanese_text()
-    {
-        var filename = GetFile(TestFileCategory.TextUtf16, "Japanese_language_sample_le");
-        var buffer = await GetBufferAsync(filename);
-
-        var isSuccessful = decoder.TryDecode(buffer, out var encoding, out var text);
-
-        isSuccessful.Should().BeTrue();
-        text.Should().Be(ReadFileAsUtf16Le(filename));
-        encoding.Should().BeEquivalentTo(EncodingInfo.Utf16LeNoBom);
-    }
-
-    [Test]
-    public async Task Should_read_utf16be_with_regular_japanese_text()
-    {
-        var filename = GetFile(TestFileCategory.TextUtf16, "Japanese_language_sample_be");
-        var buffer = await GetBufferAsync(filename);
-
-        var isSuccessful = decoder.TryDecode(buffer, out var encoding, out var text);
-
-        isSuccessful.Should().BeTrue();
-        encoding.Should().BeEquivalentTo(EncodingInfo.Utf16BeNoBom);
-        text.Should().Be(ReadFileAsUtf16Be(filename));
-    }
-    
-    [Test]
-    public async Task Should_read_utf32_le_no_bom()
-    {
-        var filename = GetFile(TestFileCategory.TextUtf32, "loren_utf32_le_no_bom");
-
-        var binaryReader = await GetBufferAsync(filename);
-        
-        var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
-        
-        isSuccessful.Should().BeTrue();
-        encoding.Should().BeEquivalentTo(EncodingInfo.Utf32LeNoBom);
-        text.Should().Be(ReadFileAsUtf32Le(filename));
-    }
-    
-    [Test]
-    public async Task Should_read_utf32_le_bom()
-    {
-        var filename = GetFile(TestFileCategory.TextUtf32, "loren_utf32_le_bom");
-
-        var binaryReader = await GetBufferAsync(filename);
-        
-        var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
-        
-        isSuccessful.Should().BeTrue();
-        encoding.Should().BeEquivalentTo(EncodingInfo.Utf32LeBom);
-        text.Should().Be(ReadFileAsUtf32Le(filename));
-    }
-    
-        
-    [Test]
-    public async Task Should_read_utf32_be_bom()
-    {
-        var filename = GetFile(TestFileCategory.TextUtf32, "loren_utf32_be_bom");
-
-        var binaryReader = await GetBufferAsync(filename);
-        
-        var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
-        
-        isSuccessful.Should().BeTrue();
-        encoding.Should().BeEquivalentTo(EncodingInfo.Utf32BeBom);
-        text.Should().Be(ReadFileAsUtf32Be(filename));
-    }
-    
-    [Test]
-    public async Task Should_read_utf32_be_no_bom()
-    {
-        var filename = GetFile(TestFileCategory.TextUtf32, "loren_utf32_be_nobom");
-
-        var binaryReader = await GetBufferAsync(filename);
-        
-        var isSuccessful = decoder.TryDecode(binaryReader, out var encoding, out var text);
-        
-        isSuccessful.Should().BeTrue();
-        encoding.Should().BeEquivalentTo(EncodingInfo.Utf32BeNoBom);
-        text.Should().Be(ReadFileAsUtf32Be(filename));
-    }
-
-    [Test]
-    public async Task Should_read_utf16be_with_classical_chinese_text()
-    {
-        var filename = GetFile(TestFileCategory.TextUtf16, "literary_chinese_utf16be");
-        var buffer = await GetBufferAsync(filename);
-
-        var isSuccessful = decoder.TryDecode(buffer, out var encoding, out var text);
-
-        isSuccessful.Should().BeTrue();
-        encoding.Should().BeEquivalentTo(EncodingInfo.Utf16BeNoBom);
-        text.Should().Be(ReadFileAsUtf16Be(filename));
-    }
-    
-    [Test]
-    public async Task Should_read_utf16le_with_classical_chinese_text()
-    {
-        var filename = GetFile(TestFileCategory.TextUtf16, "literary_chinese_utf16le");
-        var buffer = await GetBufferAsync(filename);
-
-        var isSuccessful = decoder.TryDecode(buffer, out var encoding, out var text);
-
-        isSuccessful.Should().BeTrue();
-        encoding.Should().BeEquivalentTo(EncodingInfo.Utf16LeNoBom);
-        text.Should().Be(ReadFileAsUtf16Le(filename));
-    }
-    
-    [Test]
-    public async Task Should_read_utf16le_with_cuneiform_text_with_characters_outside_bmp()
-    {
-        var filename = GetFile(TestFileCategory.TextUtf16, "cuneiform_le");
-        var buffer = await GetBufferAsync(filename);
-
-        var isSuccessful = decoder.TryDecode(buffer, out var encoding, out var text);
-
-        isSuccessful.Should().BeTrue();
-        encoding.Should().BeEquivalentTo(EncodingInfo.Utf16LeNoBom);
-        text.Should().Be(ReadFileAsUtf16Le(filename));
-    }
-    
-    [Test]
-    public async Task Should_read_utf16be_with_cuneiform_text_with_characters_outside_bmp()
-    {
-        var filename = GetFile(TestFileCategory.TextUtf16, "cuneiform_be");
-        var buffer = await GetBufferAsync(filename);
-
-        var isSuccessful = decoder.TryDecode(buffer, out var encoding, out var text);
-
-        isSuccessful.Should().BeTrue();
-        encoding.Should().BeEquivalentTo(EncodingInfo.Utf16BeNoBom);
-        text.Should().Be(ReadFileAsUtf16Be(filename));
-    }
-    
-    [Test]
-    public async Task Should_read_utf16le_with_mixed_thai_and_chinese_characters()
-    {
-        var filename = GetFile(TestFileCategory.TextUtf16, "thai_mixed_with_chinese_le");
-        var buffer = await GetBufferAsync(filename);
-
-        var isSuccessful = decoder.TryDecode(buffer, out var encoding, out var text);
-
-        isSuccessful.Should().BeTrue();
-        encoding.Should().BeEquivalentTo(EncodingInfo.Utf16LeNoBom);
-        text.Should().Be(ReadFileAsUtf16Le(filename));
-    }
-    
-    [Test]
-    public async Task Should_read_utf16be_with_mixed_thai_and_chinese_characters()
-    {
-        var filename = GetFile(TestFileCategory.TextUtf16, "thai_mixed_with_chinese_be");
-        var buffer = await GetBufferAsync(filename);
-
-        var isSuccessful = decoder.TryDecode(buffer, out var encoding, out var text);
-
-        isSuccessful.Should().BeTrue();
-        encoding.Should().BeEquivalentTo(EncodingInfo.Utf16BeNoBom);
-        text.Should().Be(ReadFileAsUtf16Be(filename));
     }
 
     private static async Task<ArraySegment<byte>> GetBufferAsync(string filename)
