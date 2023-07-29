@@ -4,24 +4,24 @@ using FormatParser.Text;
 
 namespace FormatParser;
 
-public class FormatDecoder
+public class FormatDetector
 {
-    private readonly IBinaryFormatDetector[] binaryDecoders;
+    private readonly IBinaryFormatDetector[] binaryDetectors;
     private readonly TextFileProcessor textFileProcessor;
     private readonly TextFileParsingSettings settings;
 
-    public FormatDecoder(IBinaryFormatDetector[] binaryDecoders, TextFileProcessor textFileProcessor, TextFileParsingSettings settings)
+    public FormatDetector(IBinaryFormatDetector[] binaryDetectors, TextFileProcessor textFileProcessor, TextFileParsingSettings settings)
     {
-        this.binaryDecoders = binaryDecoders;
+        this.binaryDetectors = binaryDetectors;
         this.textFileProcessor = textFileProcessor;
         this.settings = settings;
     }
 
-    public async Task<IFileFormatInfo> Decode(Stream stream)
+    public async Task<IFileFormatInfo> Detect(Stream stream)
     {
         var binaryReader = new StreamingBinaryReader(stream, Endianness.BigEndian);
 
-        var result = await TryDecodeAsBinaryAsync(binaryReader);
+        var result = await TryDetectBinaryFormatAsync(binaryReader);
 
         if (result != null)
             return result;
@@ -34,9 +34,9 @@ public class FormatDecoder
         return result ?? new UnknownFileFormatInfo();
     }
 
-    private async Task<IFileFormatInfo?> TryDecodeAsBinaryAsync(StreamingBinaryReader binaryReader)
+    private async Task<IFileFormatInfo?> TryDetectBinaryFormatAsync(StreamingBinaryReader binaryReader)
     {
-        foreach (var binaryFormatDecoder in binaryDecoders)
+        foreach (var binaryFormatDecoder in binaryDetectors)
         {
             try
             {

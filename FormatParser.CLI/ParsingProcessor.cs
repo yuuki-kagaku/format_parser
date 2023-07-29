@@ -6,15 +6,15 @@ namespace FormatParser.CLI;
 
 public class ParsingProcessor
 {
-    private readonly FormatDecoder formatDecoder;
+    private readonly FormatDetector formatDetector;
     private readonly IStreamFactory streamFactory;
     private readonly ChannelReader<string> channelReader;
     private readonly FormatParserCliState state;
     private readonly FileDiscovererSettings settings;
 
-    public ParsingProcessor(FormatDecoder formatDecoder, IStreamFactory streamFactory, ChannelReader<string> channelReader, FormatParserCliState state, FileDiscovererSettings settings)
+    public ParsingProcessor(FormatDetector formatDetector, IStreamFactory streamFactory, ChannelReader<string> channelReader, FormatParserCliState state, FileDiscovererSettings settings)
     {
-        this.formatDecoder = formatDecoder;
+        this.formatDetector = formatDetector;
         this.streamFactory = streamFactory;
         this.channelReader = channelReader;
         this.state = state;
@@ -30,7 +30,7 @@ public class ParsingProcessor
                 await FileDiscoveryHelper.RunWithExceptionHandling(async () =>
                 {
                     await using var stream = streamFactory.GetStream(file);
-                    var fileFormatInfo = await formatDecoder.Decode(stream);
+                    var fileFormatInfo = await formatDetector.Detect(stream);
                     AddInfoToState(fileFormatInfo);
                 }, settings);
             }

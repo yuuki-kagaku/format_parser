@@ -59,7 +59,6 @@ public class ElfDetector : IBinaryFormatDetector
         return new ElfHeaderInfo {ProgramHeadersNumber = programHeadersNumber, Bitness = bitness, Architecture = architecture, Endianness = endianness};
     }
 
-
     private static async Task<ProgramHeaderInfo> ReadProgramHeaderAsync(StreamingBinaryReader streamingBinaryReader, Bitness bitness)
     {
         switch (bitness)

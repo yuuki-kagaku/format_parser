@@ -93,7 +93,7 @@ public static class EntryPoint
             textAnalyzers);
 
         var streamFactory = new StreamFactory(settings.BufferSize);
-        var formatDecoder = new FormatDecoder(binaryFormatDetectors,
+        var formatDecoder = new FormatDetector(binaryFormatDetectors,
             new TextFileProcessor(textBasedFormatDetectors, compositeTextFormatDecoder),
             settings.TextFileParsingSettings
         );

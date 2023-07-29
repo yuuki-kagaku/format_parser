@@ -17,83 +17,83 @@ public class PEDetector_Tests : TestBase
     }
     
     [Test]
-    public async Task PEParser_ShouldParse_Amd64Exe()
+    public async Task PeDetector_ShouldParse_Amd64Exe()
     {
-        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.PeWindows, "procdump64.exe"));
+        var fileInfo = await DetectAsync(GetFile(TestFileCategory.PeWindows, "procdump64.exe"));
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
-        fileInfo!.Architecture.Should().Be(Architecture.Amd64);
-        fileInfo.IsManaged!.Should().Be(false);
+        fileInfo.Architecture.Should().Be(Architecture.Amd64);
+        fileInfo.IsManaged.Should().Be(false);
     }
     
     [Test]
-    public async Task PEParser_ShouldParse_i386Exe()
+    public async Task PeDetector_ShouldParse_i386Exe()
     {
-        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.PeWindows, "procdump.exe"));
+        var fileInfo = await DetectAsync(GetFile(TestFileCategory.PeWindows, "procdump.exe"));
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
-        fileInfo!.Architecture.Should().Be(Architecture.I386);
-        fileInfo.IsManaged!.Should().Be(false);
+        fileInfo.Architecture.Should().Be(Architecture.I386);
+        fileInfo.IsManaged.Should().Be(false);
     }
     
     [Test]
-    public async Task PEParser_ShouldParse_ArmExe()
+    public async Task PeDetector_ShouldParse_ArmExe()
     {
-        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.PeWindows, "procexp64a.exe"));
+        var fileInfo = await DetectAsync(GetFile(TestFileCategory.PeWindows, "procexp64a.exe"));
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
-        fileInfo!.Architecture.Should().Be(Architecture.Arm64);
-        fileInfo.IsManaged!.Should().Be(false);
+        fileInfo.Architecture.Should().Be(Architecture.Arm64);
+        fileInfo.IsManaged.Should().Be(false);
     }
     
     [Test]
-    public async Task PEParser_ShouldParse_Managed_AnyCPUDll()
+    public async Task PeDetector_ShouldParse_Managed_AnyCPUDll()
     {
-        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.PeManaged, "HelloWorld.Core.AnyCpu.dll"));
+        var fileInfo = await DetectAsync(GetFile(TestFileCategory.PeManaged, "HelloWorld.Core.AnyCpu.dll"));
         
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
-        fileInfo!.Architecture.Should().Be(Architecture.I386);
-        fileInfo.IsManaged!.Should().Be(true);
+        fileInfo.Architecture.Should().Be(Architecture.I386);
+        fileInfo.IsManaged.Should().Be(true);
     }
     
     [Test]
-    public async Task PEParser_ShouldParse_Managed_amd64_Dll()
+    public async Task PeDetector_ShouldParse_Managed_amd64_Dll()
     {
-        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.PeManaged, "HelloWorld.Core.amd64.dll"));
+        var fileInfo = await DetectAsync(GetFile(TestFileCategory.PeManaged, "HelloWorld.Core.amd64.dll"));
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
-        fileInfo!.Architecture.Should().Be(Architecture.Amd64);
-        fileInfo.IsManaged!.Should().Be(true);
+        fileInfo.Architecture.Should().Be(Architecture.Amd64);
+        fileInfo.IsManaged.Should().Be(true);
     }
     
     [Test]
-    public async Task PEParser_ShouldParse_Managed_arm64_Dll()
+    public async Task PeDetector_ShouldParse_Managed_arm64_Dll()
     {
-        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.PeManaged, "HelloWorldCore.arm64.dll"));
+        var fileInfo = await DetectAsync(GetFile(TestFileCategory.PeManaged, "HelloWorldCore.arm64.dll"));
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
-        fileInfo!.Architecture.Should().Be(Architecture.Arm64);
-        fileInfo.IsManaged!.Should().Be(true);
+        fileInfo.Architecture.Should().Be(Architecture.Arm64);
+        fileInfo.IsManaged.Should().Be(true);
     }
     
     [Test]
-    public async Task PEParser_ShouldParse_Managed_x86_Dll()
+    public async Task PeDetector_ShouldParse_Managed_x86_Dll()
     {
-        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.PeManaged, "HelloWorld.Core.86.dll"));
+        var fileInfo = await DetectAsync(GetFile(TestFileCategory.PeManaged, "HelloWorld.Core.86.dll"));
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
-        fileInfo!.Architecture.Should().Be(Architecture.I386);
-        fileInfo.IsManaged!.Should().Be(true);
+        fileInfo.Architecture.Should().Be(Architecture.I386);
+        fileInfo.IsManaged.Should().Be(true);
     }
     
-    private async Task<PeFileFormatInfo?> DecodeAsync(string filename)
+    private async Task<PeFileFormatInfo?> DetectAsync(string filename)
     {
         await using var stream = new FileStream(filename, FileMode.Open, FileAccess.Read);
         var binaryReader = new StreamingBinaryReader(stream, Endianness.BigEndian);
