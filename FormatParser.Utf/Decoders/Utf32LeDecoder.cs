@@ -20,7 +20,7 @@ public class Utf32LeDecoder : DecoderBase, ITextDecoder
         return encoding.GetDecoder();
     }
 
-    public override IEnumerable<char> GetInvalidCharacters => InvalidCharacterHelper
+    public override IEnumerable<char> GetInvalidCharacters => InvalidCharactersHelper
         .GetForbiddenChars(settings);
 
     protected override bool SupportBom => true;
@@ -28,7 +28,6 @@ public class Utf32LeDecoder : DecoderBase, ITextDecoder
     public override EncodingInfo EncodingWithoutBom => WellKnownEncodingInfos.Utf32LeNoBom;
 
     public override string[]? RequiredEncodingAnalyzers => null;
-
     protected override int MinimalSizeOfInput => 8;
 
     public override DetectionProbability DefaultDetectionProbability => DetectionProbability.Lowest;

@@ -2,21 +2,13 @@ using FormatParser.Text.Helpers;
 
 namespace FormatParser.Text;
 
-public static class InvalidCharacterHelper
+public static class InvalidCharactersHelper
 {
     public static IEnumerable<char> GetForbiddenChars(CharacterValidatorSettings settings) =>
         ControlCharacters.NonTextC0Controls.Except(GetC0CharactersToAllow(settings))
             .Concat(GetForbiddenNoncharacters(settings))
             .Concat(GetForbiddenC1Controls(settings));
 
-    private static IEnumerable<char> GetForbiddenC1Controls(CharacterValidatorSettings settings)
-    {
-        if (settings.AllowC1Controls)
-            return Array.Empty<char>();
-
-        return ControlCharacters.C1Controls;
-    }
-    
     private static IEnumerable<char> GetC0CharactersToAllow(CharacterValidatorSettings settings)
     {
         if (settings.AllowEscapeChar)
@@ -33,5 +25,13 @@ public static class InvalidCharacterHelper
 
         yield return (char) 0xFFFE;
         yield return (char) 0xFFFF;
+    }
+    
+    private static IEnumerable<char> GetForbiddenC1Controls(CharacterValidatorSettings settings)
+    {
+        if (settings.AllowC1Controls)
+            return Array.Empty<char>();
+
+        return ControlCharacters.C1Controls;
     }
 }
