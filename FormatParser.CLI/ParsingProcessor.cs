@@ -30,7 +30,7 @@ public class ParsingProcessor
                 await FileDiscoveryHelper.RunWithExceptionHandling(async () =>
                 {
                     await using var stream = streamFactory.GetStream(file);
-                    var fileFormatInfo = await formatDetector.Detect(stream);
+                    var fileFormatInfo = await formatDetector.DetectAsync(stream);
                     AddInfoToState(fileFormatInfo);
                 }, settings);
             }

@@ -7,44 +7,76 @@ namespace FormatParser;
 public class FormatDetector
 {
     private readonly IBinaryFormatDetector[] binaryDetectors;
-    private readonly TextFileProcessor textFileProcessor;
+    private readonly ITextBasedFormatDetector[] textBasedFormatDetectors;
+    private readonly CompositeTextFormatDecoder compositeTextFormatDecoder;
     private readonly TextFileParsingSettings settings;
 
-    public FormatDetector(IBinaryFormatDetector[] binaryDetectors, TextFileProcessor textFileProcessor, TextFileParsingSettings settings)
+    public FormatDetector(IBinaryFormatDetector[] binaryDetectors, ITextBasedFormatDetector[] textBasedFormatDetectors, CompositeTextFormatDecoder compositeTextFormatDecoder, TextFileParsingSettings settings)
     {
         this.binaryDetectors = binaryDetectors;
-        this.textFileProcessor = textFileProcessor;
+        this.textBasedFormatDetectors = textBasedFormatDetectors;
+        this.compositeTextFormatDecoder = compositeTextFormatDecoder;
         this.settings = settings;
     }
 
-    public async Task<IFileFormatInfo> Detect(Stream stream)
+    public async Task<IFileFormatInfo> DetectAsync(Stream stream)
     {
-        var binaryReader = new StreamingBinaryReader(stream, Endianness.BigEndian);
+        var streamingBinaryReader = new StreamingBinaryReader(stream, Endianness.BigEndian);
 
-        var result = await TryDetectBinaryFormatAsync(binaryReader);
+        var result = await TryDetectBinaryFormatAsync(streamingBinaryReader);
 
         if (result != null)
             return result;
 
-        binaryReader.Offset = 0;
-        var buffer = await binaryReader.TryReadArraySegmentAsync(settings.SampleSize);
+        streamingBinaryReader.Offset = 0;
+        var buffer = await streamingBinaryReader.TryReadArraySegmentAsync(settings.SampleSize);
 
-        result = textFileProcessor.TryProcess(buffer);
+        result = TryDetectTextBasedFormat(buffer);
   
         return result ?? new UnknownFileFormatInfo();
     }
-
-    private async Task<IFileFormatInfo?> TryDetectBinaryFormatAsync(StreamingBinaryReader binaryReader)
+    
+    private async Task<IFileFormatInfo?> TryDetectBinaryFormatAsync(StreamingBinaryReader streamingBinaryReader)
     {
-        foreach (var binaryFormatDecoder in binaryDetectors)
+        foreach (var binaryFormatDetector in binaryDetectors)
         {
             try
             {
-                binaryReader.Offset = 0;
-                var result = await binaryFormatDecoder.TryDetectAsync(binaryReader);
+                streamingBinaryReader.Offset = 0;
+                var result = await binaryFormatDetector.TryDetectAsync(streamingBinaryReader);
                 
                 if (result != null)
                     return result;
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        return null;
+    }
+    
+    private IFileFormatInfo? TryDetectTextBasedFormat(ArraySegment<byte> buffer)
+    {
+        if (!compositeTextFormatDecoder.TryDecode(buffer, out var encoding, out var textSample))
+            return null;
+
+        var detectionResult = TryMatchTextBasedFormat(textSample, encoding);
+        
+        return detectionResult ?? new TextFileFormatInfo(TextFileFormatInfo.DefaultTextType, encoding);
+    }
+    
+    private IFileFormatInfo? TryMatchTextBasedFormat(string header, EncodingInfo encoding)
+    {
+        foreach (var detector in textBasedFormatDetectors)
+        {
+            try
+            {
+                var detectionResult = detector.TryMatchFormat(header, encoding);
+                
+                if (detectionResult != null)
+                    return detectionResult;
             }
             catch
             {

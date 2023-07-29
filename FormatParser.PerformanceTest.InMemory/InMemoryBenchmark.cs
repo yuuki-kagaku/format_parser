@@ -68,7 +68,8 @@ public class InMemoryBenchmark
         };
 
          detector = new FormatDetector(binaryFormatDetectors,
-             new TextFileProcessor(textBasedFormatDetectors, compositeTextFormatDecoder),
+             textBasedFormatDetectors, 
+             compositeTextFormatDecoder,
              new TextFileParsingSettings()
          );
     }
@@ -85,7 +86,7 @@ public class InMemoryBenchmark
         {
             foreach (var stream in streams)
             {
-                await detector.Detect(stream);
+                await detector.DetectAsync(stream);
             }
         }
     }

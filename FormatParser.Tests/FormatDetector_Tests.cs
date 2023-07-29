@@ -9,9 +9,9 @@ using NUnit.Framework;
 
 namespace FormatParser.Tests;
 
-public class TextFileProcessor_Tests : TestBase
+public class FormatDetector_Tests : TestBase
 {
-    private TextFileProcessor textFileProcessor = null!;
+    private FormatDetector formatDetector = null!;
 
     [SetUp]
     public void SetUp()
@@ -42,16 +42,16 @@ public class TextFileProcessor_Tests : TestBase
             new XmlDecoder()
         };
         
-        textFileProcessor = new TextFileProcessor(textBasedFormatDetectors, decoder);
+        formatDetector = new FormatDetector(Array.Empty<IBinaryFormatDetector>(), textBasedFormatDetectors, decoder, textParserSettings);
     }
     
     [Test]
-    public void Should_read_xml()
+    public async Task Should_read_xml()
     {
         var file = GetFile(TestFileCategory.Xml, "file.xml");
 
-        var bytes = File.ReadAllBytes(file);
-        var result = textFileProcessor.TryProcess(bytes) as TextFileFormatInfo;
+        await using var stream =  new FileStream(file, FileMode.Open, FileAccess.ReadWrite);
+        var result = (await formatDetector.DetectAsync(stream)) as TextFileFormatInfo;
 
         result.Should().NotBeNull();
         result!.Encoding.Should().Be(WellKnownEncodingInfos.Utf8NoBom);
