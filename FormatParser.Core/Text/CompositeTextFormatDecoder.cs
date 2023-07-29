@@ -69,7 +69,7 @@ public class CompositeTextFormatDecoder
     }
     
     
-    private IEnumerable<ITextAnalyzer> GetEncodingAnalyzers(ITextDecoder decoder, Dictionary<string, ITextAnalyzer> encodingAnalyzersByLanguage)
+    private static IEnumerable<ITextAnalyzer> GetEncodingAnalyzers(ITextDecoder decoder, Dictionary<string, ITextAnalyzer> encodingAnalyzersByLanguage)
     {
         if (decoder.RequiredEncodingAnalyzers == null)
             yield break;

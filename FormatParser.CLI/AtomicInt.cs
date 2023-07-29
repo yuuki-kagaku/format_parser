@@ -4,7 +4,7 @@ public class AtomicInt
 {
     private volatile int value;
 
-    public int Add(int value) => Interlocked.Add(ref this.value, value);
+    public int Add(int val) => Interlocked.Add(ref this.value, val);
     public int Increment() => Interlocked.Increment(ref value);
 
     public int Read() => Volatile.Read(ref value);

@@ -9,10 +9,14 @@ public class StreamingBinaryReader
     private readonly Stream stream;
     private readonly byte[] defaultBuffer = GC.AllocateArray<byte>(16, true);
     private Endianness endianness;
+    
     private static readonly Endianness RunningCpuEndianness = BitConverter.IsLittleEndian ? Endianness.LittleEndian : Endianness.BigEndian;
 
     public StreamingBinaryReader(Stream stream, Endianness endianness)
     {
+        if (endianness is not (Endianness.BigEndian or Endianness.LittleEndian))
+            throw new ArgumentOutOfRangeException(nameof(endianness));
+        
         this.stream = stream;
         this.endianness = endianness;
     }
@@ -47,20 +51,16 @@ public class StreamingBinaryReader
         
         return new ArraySegment<byte>(array, 0, readBytes);
     }
-
-    public void SkipUlong() => SkipLong();
-
+   
     public void SkipLong() => Skip<long>();
-
-    public void SkipUInt() => SkipInt();
     public void SkipInt() => Skip<int>();
-
-    public void SkipUShort() => SkipShort();
     public void SkipShort() => Skip<short>();
     public void SkipByte() => Skip<byte>();
+    public void SkipUlong() => SkipLong();
+    public void SkipUInt() => SkipInt();
+    public void SkipUShort() => SkipShort();
     public void SkipBytes(int count) => Offset += count;
     public void SkipBytes(uint count) => Offset += count;
-    private unsafe void Skip<T>() where T : unmanaged => Offset += sizeof(T);
 
     public async Task<string> ReadNulTerminatingStringAsync(int size)
     {
@@ -192,8 +192,10 @@ public class StreamingBinaryReader
     private long ReverseEndiannessIfNeeded(long val) => 
         endianness == RunningCpuEndianness ? val : BinaryPrimitives.ReverseEndianness(val);
 
+    private unsafe void Skip<T>() where T : unmanaged => Offset += sizeof(T);
+    
     private Task ReadInternalAsync(int count) => ReadInternalAsync(count, defaultBuffer, true);
-
+    
     private async Task<int> ReadInternalAsync(int count, byte[] buffer, bool ensureAllBytesRead)
     {
         var totalBytesRead = 0;
@@ -208,6 +210,6 @@ public class StreamingBinaryReader
             totalBytesRead += bytesRead;
         }
 
-        return count;
+        return totalBytesRead;
     }
 }

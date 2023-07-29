@@ -24,8 +24,8 @@ public class Utf32LeDecoder : DecoderBase, ITextDecoder
         .GetForbiddenChars(settings);
 
     protected override bool SupportBom => true;
-    protected override EncodingInfo EncodingWithBom => EncodingInfo.Utf32LeBom;
-    public override EncodingInfo EncodingWithoutBom => EncodingInfo.Utf32LeNoBom;
+    protected override EncodingInfo EncodingWithBom => WellKnownEncodingInfos.Utf32LeBom;
+    public override EncodingInfo EncodingWithoutBom => WellKnownEncodingInfos.Utf32LeNoBom;
 
     public override string[]? RequiredEncodingAnalyzers => null;
 

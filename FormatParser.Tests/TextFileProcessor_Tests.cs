@@ -54,7 +54,7 @@ public class TextFileProcessor_Tests : TestBase
         var result = textFileProcessor.TryProcess(bytes) as TextFileFormatInfo;
 
         result.Should().NotBeNull();
-        result!.Encoding.Should().Be(EncodingInfo.Utf8NoBom);
+        result!.Encoding.Should().Be(WellKnownEncodingInfos.Utf8NoBom);
         result.MimeType.Should().Be("text/xml");
     }
 }

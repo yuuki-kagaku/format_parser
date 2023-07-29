@@ -17,7 +17,7 @@ public class FileDiscoverer
     
     private async Task DiscoverFilesInternalAsync(string directory, ChannelWriter<string> channelWriter)
     {
-        await RunWithExceptionHandling(async () =>
+        await FileDiscoveryHelper.RunWithExceptionHandling(async () =>
         {
             foreach (var file in Directory.GetFiles(directory))
             {
@@ -26,9 +26,9 @@ public class FileDiscoverer
 
                 await channelWriter.WriteAsync(file);
             }
-        });
+        }, settings);
         
-        await RunWithExceptionHandling(async () =>
+        await FileDiscoveryHelper.RunWithExceptionHandling(async () =>
         {
             foreach (var subDirectory in Directory.GetDirectories(directory))
             {
@@ -37,57 +37,18 @@ public class FileDiscoverer
 
                 await DiscoverFilesInternalAsync(subDirectory, channelWriter);
             }
-        });
+        }, settings);
     }
     
     private bool ShouldSkipFile(string file)
     {
-        return RunWithExceptionHandling(() =>
+        return FileDiscoveryHelper.RunWithExceptionHandling(() =>
         {
             var fileInfo = new FileInfo(file);
             return fileInfo.IsSymlink() || fileInfo.IsEmpty();
-        }, true);
+        }, true, settings);
     }
     
-    private bool ShouldSkipDirectory(string directory) => RunWithExceptionHandling(() => new DirectoryInfo(directory).IsSymlink(), true);
-
-    private async Task RunWithExceptionHandling(Func<Task> action)
-    {
-        try
-        {
-            await action();
-        }
-        catch (UnauthorizedAccessException)
-        {
-            if (settings.FallOnUnauthorizedException)
-                throw;
-        }
-        catch (IOException)
-        {
-            if (settings.FailOnIOException)
-                throw;
-        }
-    }
-    
-    private bool RunWithExceptionHandling(Func<bool> action, bool valueOnException)
-    {
-        try
-        {
-            return action();
-        }
-        catch (UnauthorizedAccessException)
-        {
-            if (settings.FallOnUnauthorizedException)
-                throw;
-            
-            return valueOnException;
-        }
-        catch (IOException)
-        {
-            if (settings.FailOnIOException)
-                throw;
-            
-            return valueOnException;
-        }
-    }
+    private bool ShouldSkipDirectory(string directory) => FileDiscoveryHelper.RunWithExceptionHandling(() =>
+        new DirectoryInfo(directory).IsSymlink(), true, settings);
 }

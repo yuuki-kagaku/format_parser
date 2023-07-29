@@ -9,12 +9,14 @@ public class CLIRunner
     private readonly FileDiscoverer fileDiscoverer;
     private readonly FormatDecoder formatDecoder;
     private readonly IStreamFactory streamFactory;
+    private readonly FileDiscovererSettings fileDiscovererSettings;
 
-    public CLIRunner(FileDiscoverer fileDiscoverer, FormatDecoder formatDecoder, IStreamFactory streamFactory)
+    public CLIRunner(FileDiscoverer fileDiscoverer, FormatDecoder formatDecoder, IStreamFactory streamFactory, FileDiscovererSettings fileDiscovererSettings)
     {
         this.fileDiscoverer = fileDiscoverer;
         this.formatDecoder = formatDecoder;
         this.streamFactory = streamFactory;
+        this.fileDiscovererSettings = fileDiscovererSettings;
     }
 
     public async Task Run(FormatParserCliSettings settings, FormatParserCliState state)
@@ -43,7 +45,7 @@ public class CLIRunner
 
     private async Task RunParsingProcessor(ChannelReader<string> channelReader, FormatParserCliState state)
     {
-        var processor = new ParsingProcessor(formatDecoder, streamFactory, channelReader, state);
+        var processor = new ParsingProcessor(formatDecoder, streamFactory, channelReader, state, fileDiscovererSettings);
         await Task.Yield();
         await processor.ProcessFiles();
     }

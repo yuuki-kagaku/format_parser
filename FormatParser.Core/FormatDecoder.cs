@@ -19,7 +19,7 @@ public class FormatDecoder
 
     public async Task<IFileFormatInfo> Decode(Stream stream)
     {
-        var binaryReader = new StreamingBinaryReader(stream, Endianness.NotAllowed);
+        var binaryReader = new StreamingBinaryReader(stream, Endianness.BigEndian);
 
         var result = await TryDecodeAsBinaryAsync(binaryReader);
 

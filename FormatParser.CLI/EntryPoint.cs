@@ -77,6 +77,12 @@ public static class EntryPoint
         {
             SampleSize = settings.BufferSize,
         };
+
+        var fileDiscovererSettings = new FileDiscovererSettings
+        {
+            FallOnUnauthorizedException = settings.FailOnUnauthorizedAccessException,
+            FailOnIOException = settings.FailOnIOException
+        };
         
         var textDecoders = GetAllInstancesOf<ITextDecoder, TextFileParsingSettings>(textFileParsingSettings).ToArray();
 
@@ -87,18 +93,16 @@ public static class EntryPoint
             textAnalyzers);
 
         var streamFactory = new StreamFactory(settings.BufferSize);
+        var formatDecoder = new FormatDecoder(binaryFormatDetectors,
+            new TextFileProcessor(textBasedFormatDetectors, compositeTextFormatDecoder),
+            settings.TextFileParsingSettings
+        );
         
         return new CLIRunner(
-            new FileDiscoverer(new FileDiscovererSettings
-            {
-                FallOnUnauthorizedException = settings.FailOnUnauthorizedAccessException,
-                FailOnIOException = settings.FailOnIOException
-            }), 
-            new FormatDecoder(binaryFormatDetectors, 
-                new TextFileProcessor(textBasedFormatDetectors, compositeTextFormatDecoder), 
-                settings.TextFileParsingSettings
-            ),
-            streamFactory
+            new FileDiscoverer(fileDiscovererSettings), 
+            formatDecoder,
+            streamFactory,
+            fileDiscovererSettings
         );
     }
 
