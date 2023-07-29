@@ -13,7 +13,7 @@ public class CLIRunnerTests : TestBase
     {
         var output = ShellRunner.RunCommand("dotnet", $"FormatParser.CLI.dll {TestDir}{Path.DirectorySeparatorChar}for_cli");
 
-        var expected = $"[     3] : Unknown{Environment.NewLine}[     2] : {new TextFileFormatInfo(TextFileProcessor.DefaultTextType, WellKnownEncodingInfos.Utf16LeNoBom).ToPrettyString()}{Environment.NewLine}[     1] : {new TextFileFormatInfo(TextFileProcessor.DefaultTextType, WellKnownEncodingInfos.Utf16BeNoBom).ToPrettyString()}";
+        var expected = $"[     3] : Unknown{Environment.NewLine}[     2] : {new TextFileFormatInfo(TextFileFormatInfo.DefaultTextType, WellKnownEncodingInfos.Utf16LeNoBom).ToPrettyString()}{Environment.NewLine}[     1] : {new TextFileFormatInfo(TextFileFormatInfo.DefaultTextType, WellKnownEncodingInfos.Utf16BeNoBom).ToPrettyString()}";
         output.Should().Contain(expected);
     }
 }

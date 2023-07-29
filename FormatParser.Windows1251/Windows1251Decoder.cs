@@ -15,7 +15,7 @@ public class Windows1251Decoder : NonUtfDecoder
     
     public override IEnumerable<char> GetInvalidCharacters => InvalidCharactersHelper
         .GetForbiddenChars(settings)
-        .Concat((char)152 )
+        .Concat((char)152)
         .ToHashSet();
 
     public override DetectionProbability DefaultDetectionProbability => DetectionProbability.No;
