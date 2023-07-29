@@ -23,9 +23,9 @@ public class MacODetector_Tests : TestBase
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
-        fileInfo!.Architecture.Should().Be(Architecture.Amd64);
-        fileInfo!.Endianness.Should().Be(Endianness.LittleEndian);
-        fileInfo.Signed!.Should().Be(true);
+        fileInfo.Architecture.Should().Be(Architecture.Amd64);
+        fileInfo.Endianness.Should().Be(Endianness.LittleEndian);
+        fileInfo.Signed.Should().Be(true);
     }
     
     [Test]
@@ -35,23 +35,23 @@ public class MacODetector_Tests : TestBase
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
-        fileInfo!.Endianness.Should().Be(Endianness.BigEndian);
+        fileInfo.Endianness.Should().Be(Endianness.BigEndian);
         fileInfo.Datas.Length.Should().Be(3);
         
         fileInfo.Datas[0].Bitness.Should().Be(Bitness.Bitness64);
         fileInfo.Datas[0].Architecture.Should().Be(Architecture.Amd64);
         fileInfo.Datas[0].Endianness.Should().Be(Endianness.LittleEndian);
-        fileInfo.Datas[0].Signed!.Should().Be(true);
+        fileInfo.Datas[0].Signed.Should().Be(true);
 
         fileInfo.Datas[1].Bitness.Should().Be(Bitness.Bitness32);
         fileInfo.Datas[1].Architecture.Should().Be(Architecture.I386);
         fileInfo.Datas[1].Endianness.Should().Be(Endianness.LittleEndian);
-        fileInfo.Datas[1].Signed!.Should().Be(true);
+        fileInfo.Datas[1].Signed.Should().Be(true);
         
         fileInfo.Datas[2].Bitness.Should().Be(Bitness.Bitness32);
         fileInfo.Datas[2].Architecture.Should().Be(Architecture.PowerPC);
         fileInfo.Datas[2].Endianness.Should().Be(Endianness.BigEndian);
-        fileInfo.Datas[2].Signed!.Should().Be(true);
+        fileInfo.Datas[2].Signed.Should().Be(true);
     }
     
     [Test]
@@ -61,9 +61,9 @@ public class MacODetector_Tests : TestBase
     
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
-        fileInfo!.Architecture.Should().Be(Architecture.Amd64);
-        fileInfo!.Endianness.Should().Be(Endianness.LittleEndian);
-        fileInfo.Signed!.Should().Be(true);
+        fileInfo.Architecture.Should().Be(Architecture.Amd64);
+        fileInfo.Endianness.Should().Be(Endianness.LittleEndian);
+        fileInfo.Signed.Should().Be(true);
     }
     
     [Test]
@@ -73,9 +73,9 @@ public class MacODetector_Tests : TestBase
     
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
-        fileInfo!.Architecture.Should().Be(Architecture.Arm);
-        fileInfo!.Endianness.Should().Be(Endianness.LittleEndian);
-        fileInfo.Signed!.Should().Be(true);
+        fileInfo.Architecture.Should().Be(Architecture.Arm);
+        fileInfo.Endianness.Should().Be(Endianness.LittleEndian);
+        fileInfo.Signed.Should().Be(true);
     }
     
     [Test]
@@ -85,11 +85,10 @@ public class MacODetector_Tests : TestBase
     
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
-        fileInfo!.Architecture.Should().Be(Architecture.I386);
-        fileInfo!.Endianness.Should().Be(Endianness.LittleEndian);
-        fileInfo.Signed!.Should().Be(false);
+        fileInfo.Architecture.Should().Be(Architecture.I386);
+        fileInfo.Endianness.Should().Be(Endianness.LittleEndian);
+        fileInfo.Signed.Should().Be(false);
     }
-
     
     private async Task<IFileFormatInfo?> DetectAsync(string filename)
     {

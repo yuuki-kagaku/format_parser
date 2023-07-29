@@ -76,7 +76,6 @@ public class ElfDetector_Tests : TestBase
         fileInfo.Interpreter.Should().Be("/lib/ld-linux-aarch64.so.1");
     }
     
-    
     [Test]
     public async Task ElfDetector_ShouldParse_i386()
     {

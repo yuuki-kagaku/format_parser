@@ -8,7 +8,7 @@ namespace FormatParser.Tests;
 public class Utf8EncodingDecoder_Tests : TestBase
 {
     private Utf8Decoder decoder = null!;
-    private string expectedString= null!;
+    private string expectedString = null!;
 
     [SetUp]
     public void SetUp()
@@ -40,8 +40,8 @@ public class Utf8EncodingDecoder_Tests : TestBase
         var result = decoder.TryDecodeText(bytes);
 
         result.Should().NotBeNull();
-        var str = BuildString(result!.Chars);
-        str.Should().Be(expectedString);
+        var text = BuildString(result!.Chars);
+        text.Should().Be(expectedString);
     }
     
     [Test]

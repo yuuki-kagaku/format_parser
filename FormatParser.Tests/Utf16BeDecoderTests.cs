@@ -24,8 +24,6 @@ public class Utf16BeDecoder_Tests : TestBase
         var filename = GetFile(TestFileCategory.TextUtf16, "loren_utf16_be_nobom");
         var content = File.ReadAllBytes(filename);
     
-        var chars = new char[content.Length];
-        
         var textDecodingResult = decoder.TryDecodeText(content);
         textDecodingResult.Should().NotBeNull();
         

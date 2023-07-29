@@ -19,9 +19,9 @@ public class Windows1251Decoder : NonUtfDecoder
         .ToHashSet();
 
     public override DetectionProbability DefaultDetectionProbability => DetectionProbability.No;
-    public override string[]? RequiredEncodingAnalyzers { get; } = { "ru" } ;
-    
-    protected override EncodingInfo EncodingInfo { get; } = new ("Windows-1251", Endianness.NotAllowed, false);
+    public override string[]? RequiredEncodingAnalyzers { get; } = { "ru" };
+
+    protected override EncodingInfo EncodingInfo { get; } = new("Windows-1251", Endianness.NotAllowed, false);
 
     protected override Decoder GetDecoder(int inputSize) => GetDecoder();
 

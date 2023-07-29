@@ -29,7 +29,7 @@ public class Utf16LeDecoder : DecoderBase, ITextDecoder
     protected override EncodingInfo EncodingWithBom => WellKnownEncodingInfos.Utf16LeBom;
     public override EncodingInfo EncodingWithoutBom => WellKnownEncodingInfos.Utf16LeNoBom;
 
-    public override string[]? RequiredEncodingAnalyzers { get; } = {"UTF-16"};
+    public override string[]? RequiredEncodingAnalyzers { get; } = { "UTF-16" };
     
     public override DetectionProbability DefaultDetectionProbability => DetectionProbability.No;
 }
