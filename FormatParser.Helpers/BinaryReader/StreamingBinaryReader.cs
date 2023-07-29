@@ -44,7 +44,7 @@ public class StreamingBinaryReader
         return array;
     }
     
-    public async Task<ArraySegment<byte>> TryReadArraySegment(int count)
+    public async Task<ArraySegment<byte>> TryReadArraySegmentAsync(int count)
     {
         var array = new byte[count];
         var readBytes = await ReadInternalAsync(count, array, false);
@@ -73,49 +73,49 @@ public class StreamingBinaryReader
         return Encoding.ASCII.GetString(new ArraySegment<byte>(array, 0, array.Length - 1));
     }
     
-    public async Task<short> ReadShort()
+    public async Task<short> ReadShortAsync()
     {
         await ReadInternalAsync(sizeof(short));
         return ConvertShort();
     }
     
-    public async Task<ushort> ReadUShort()
+    public async Task<ushort> ReadUShortAsync()
     {
         await ReadInternalAsync(sizeof(ushort));
         return ConvertUShort();
     }
     
-    public async Task<int> ReadInt()
+    public async Task<int> ReadIntAsync()
     {
         await ReadInternalAsync(sizeof(int));
         return ConvertInt();
     }
     
-    public async Task<uint> ReadUInt()
+    public async Task<uint> ReadUIntAsync()
     {
         await ReadInternalAsync(sizeof(uint));
         return ConvertUInt();
     }
     
-    public async Task<long> ReadLong()
+    public async Task<long> ReadLongAsync()
     {
         await ReadInternalAsync(sizeof(long));
         return ConvertLong();
     }
     
-    public async Task<ulong> ReadULong()
+    public async Task<ulong> ReadULongAsync()
     {
         await ReadInternalAsync(sizeof(ulong));
         return ConvertULong();
     }
     
-    public async Task<ulong> ReadPointer(Bitness bitness)
+    public async Task<ulong> ReadPointerAsync(Bitness bitness)
     {
         return bitness switch
         {
-            Bitness.Bitness16 => await ReadUShort(),
-            Bitness.Bitness32 => await ReadUInt(),
-            Bitness.Bitness64 => await ReadULong(),
+            Bitness.Bitness16 => await ReadUShortAsync(),
+            Bitness.Bitness32 => await ReadUIntAsync(),
+            Bitness.Bitness64 => await ReadULongAsync(),
             _ => throw new ArgumentOutOfRangeException(nameof(bitness))
         };
     }

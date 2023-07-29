@@ -17,7 +17,7 @@ public class ElfDetector : IBinaryFormatDetector
 
         for (var i = 0; i < programHeadersNumber; i++)
         {
-            var (type, offset, size) = await ReadProgramHeader(binaryReader, bitness);
+            var (type, offset, size) = await ReadProgramHeaderAsync(binaryReader, bitness);
             if (type == ELFConstants.PT_INTERP)
             {
                 binaryReader.Offset = (long)offset;
@@ -31,7 +31,7 @@ public class ElfDetector : IBinaryFormatDetector
 
     private static async Task<ElfHeaderInfo?> TryReadElfHeaderAsync(StreamingBinaryReader streamingBinaryReader)
     {
-        var header = await streamingBinaryReader.TryReadArraySegment(16);
+        var header = await streamingBinaryReader.TryReadArraySegmentAsync(16);
         if (header.Count < 16)
             return null;
 
@@ -43,7 +43,7 @@ public class ElfDetector : IBinaryFormatDetector
         streamingBinaryReader.SetEndianness(endianness);
         
         streamingBinaryReader.SkipUShort(); // e_type
-        var architecture = ElfArchitectureConverter.Convert (await streamingBinaryReader.ReadUShort()); // e_machine
+        var architecture = ElfArchitectureConverter.Convert (await streamingBinaryReader.ReadUShortAsync()); // e_machine
         streamingBinaryReader.SkipUInt(); // e_version
         streamingBinaryReader.SkipPointer(bitness); // e_entry
         streamingBinaryReader.SkipPointer(bitness); // e_phoff
@@ -51,7 +51,7 @@ public class ElfDetector : IBinaryFormatDetector
         streamingBinaryReader.SkipUInt(); // e_flags
         streamingBinaryReader.SkipUShort(); // e_ehsize
         streamingBinaryReader.SkipUShort(); // e_phentsize
-        var programHeadersNumber = await streamingBinaryReader.ReadUShort(); // e_phnum
+        var programHeadersNumber = await streamingBinaryReader.ReadUShortAsync(); // e_phnum
         streamingBinaryReader.SkipUShort(); // e_shentsize
         streamingBinaryReader.SkipUShort(); // e_shnum
         streamingBinaryReader.SkipUShort(); // e_shstrndx
@@ -60,17 +60,17 @@ public class ElfDetector : IBinaryFormatDetector
     }
 
 
-    private static async Task<ProgramHeaderInfo> ReadProgramHeader(StreamingBinaryReader streamingBinaryReader, Bitness bitness)
+    private static async Task<ProgramHeaderInfo> ReadProgramHeaderAsync(StreamingBinaryReader streamingBinaryReader, Bitness bitness)
     {
         switch (bitness)
         {
             case Bitness.Bitness32:
             {
-                var type = await streamingBinaryReader.ReadUInt(); // p_type
-                var offset = await streamingBinaryReader.ReadUInt(); // p_offset
+                var type = await streamingBinaryReader.ReadUIntAsync(); // p_type
+                var offset = await streamingBinaryReader.ReadUIntAsync(); // p_offset
                 streamingBinaryReader.SkipUInt(); // p_vaddr
                 streamingBinaryReader.SkipUInt(); // p_paddr
-                var size = await streamingBinaryReader.ReadUInt(); // p_filesz
+                var size = await streamingBinaryReader.ReadUIntAsync(); // p_filesz
                 streamingBinaryReader.SkipUInt(); // p_memsz
                 streamingBinaryReader.SkipUInt(); // p_flags
                 streamingBinaryReader.SkipUInt(); // p_align
@@ -79,12 +79,12 @@ public class ElfDetector : IBinaryFormatDetector
             }
             case Bitness.Bitness64:
             {
-                var type = await streamingBinaryReader.ReadUInt(); // p_type
+                var type = await streamingBinaryReader.ReadUIntAsync(); // p_type
                 streamingBinaryReader.SkipUInt(); // p_flags
-                var offset = await streamingBinaryReader.ReadULong(); // p_offset
+                var offset = await streamingBinaryReader.ReadULongAsync(); // p_offset
                 streamingBinaryReader.SkipUlong(); // p_vaddr
                 streamingBinaryReader.SkipUlong(); // p_paddr
-                var size = await streamingBinaryReader.ReadULong(); // p_filesz
+                var size = await streamingBinaryReader.ReadULongAsync(); // p_filesz
                 streamingBinaryReader.SkipUlong(); // p_memsz
                 streamingBinaryReader.SkipUlong(); // p_align
             

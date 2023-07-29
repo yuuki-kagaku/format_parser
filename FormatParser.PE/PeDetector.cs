@@ -8,7 +8,7 @@ public class PeDetector : IBinaryFormatDetector
     public async Task<IFileFormatInfo?> TryDetectAsync(StreamingBinaryReader binaryReader)
     {
         binaryReader.SetEndianness(Endianness.LittleEndian);
-        var dosHeader = await TryReadDosHeader(binaryReader);
+        var dosHeader = await TryReadDosHeaderAsync(binaryReader);
 
         if (dosHeader == null)
             return null;
@@ -19,31 +19,31 @@ public class PeDetector : IBinaryFormatDetector
         binaryReader.Offset = dosHeader.Value.ExeOffset;
 
         var (architecture, bitness, sizeOfOptionalHeader) = await ReadImageFileHeaderAsync(binaryReader);
-        var isDotNet = await ReadOptionalHeader(binaryReader, sizeOfOptionalHeader, bitness);
+        var isDotNet = await ReadOptionalHeaderAsync(binaryReader, sizeOfOptionalHeader, bitness);
 
         return new PeFileFormatInfo(bitness, architecture, isDotNet);
     }
 
     private static async Task<(Architecture, Bitness, ushort SizeOfOptionalHeader)> ReadImageFileHeaderAsync(StreamingBinaryReader streamingBinaryReader)
     {
-        EnsureCorrectImageHeaderMagicNumber(await streamingBinaryReader.ReadUInt()); // Magic
-        var (architecture, bitness) = PEArchitectureConverter.Convert(await streamingBinaryReader.ReadUShort()); // Machine
+        EnsureCorrectImageHeaderMagicNumber(await streamingBinaryReader.ReadUIntAsync()); // Magic
+        var (architecture, bitness) = PEArchitectureConverter.Convert(await streamingBinaryReader.ReadUShortAsync()); // Machine
         streamingBinaryReader.SkipUShort(); // NumberOfSections
         streamingBinaryReader.SkipUInt(); //  TimeDateStamp
         streamingBinaryReader.SkipUInt(); //  PointerToSymbolTable
         streamingBinaryReader.SkipUInt(); //  NumberOfSymbols
-        var sizeOfOptionalHeader = await streamingBinaryReader.ReadUShort(); // SizeOfOptionalHeader
+        var sizeOfOptionalHeader = await streamingBinaryReader.ReadUShortAsync(); // SizeOfOptionalHeader
         streamingBinaryReader.SkipUShort(); // Characteristics
 
         return (architecture, bitness, sizeOfOptionalHeader);
     }
 
-    private async Task<bool> ReadOptionalHeader(StreamingBinaryReader streamingBinaryReader, ushort size, Bitness bitness)
+    private async Task<bool> ReadOptionalHeaderAsync(StreamingBinaryReader streamingBinaryReader, ushort size, Bitness bitness)
     {
         if (size < PEConstants.OptionalHeaderMinSuze)
             return false;
         
-        var magicNumber = await streamingBinaryReader.ReadUShort(); // Magic
+        var magicNumber = await streamingBinaryReader.ReadUShortAsync(); // Magic
         EnsureCorrectOptionalHeaderMagicNumber(magicNumber, bitness);
 
         streamingBinaryReader.SkipByte(); // MajorLinkerVersion
@@ -110,9 +110,9 @@ public class PeDetector : IBinaryFormatDetector
     private static bool CheckDosHeaderMagicNumber(byte[] magicNumbers) => PEConstants.DosMagicNumbers.SequenceEqual(magicNumbers);
 
     private async Task<(uint VirtualAddress, uint Size)> ReadDataDirectoryAsync(StreamingBinaryReader streamingBinaryReader) 
-        => (await streamingBinaryReader.ReadUInt(), await streamingBinaryReader.ReadUInt());
+        => (await streamingBinaryReader.ReadUIntAsync(), await streamingBinaryReader.ReadUIntAsync());
 
-    private static async Task<DosHeaderInfo?> TryReadDosHeader(StreamingBinaryReader streamingBinaryReader)
+    private static async Task<DosHeaderInfo?> TryReadDosHeaderAsync(StreamingBinaryReader streamingBinaryReader)
     {
         if (streamingBinaryReader.Length < 44)
             return null;
@@ -139,7 +139,7 @@ public class PeDetector : IBinaryFormatDetector
         streamingBinaryReader.SkipUShort(); // e_oemid
         streamingBinaryReader.SkipUShort(); // e_oeminfo
         streamingBinaryReader.SkipBytes(sizeof(ushort) * 10); // e_res2
-        var exeOffset = await streamingBinaryReader.ReadUInt();
+        var exeOffset = await streamingBinaryReader.ReadUIntAsync();
 
         return new DosHeaderInfo {ExeOffset = exeOffset};
     }
