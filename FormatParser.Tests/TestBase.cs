@@ -37,35 +37,17 @@ public class TestBase
 
     protected string TestDir = "TestData";
 
-    protected string BuildString(ArraySegment<char> chars) => new StringBuilder().Append(chars.ToMemory()).ToString();
+    protected static string BuildString(ArraySegment<char> chars) => new StringBuilder().Append(chars.ToMemory()).ToString();
     
-    protected static string ReadFileAsUtf8(string file)
-    {
-        return File.ReadAllText(file);
-    }
-    
-    protected static string ReadFileAsUtf16Le(string file)
-    {
-        return Encoding.Unicode.GetString(File.ReadAllBytes(file));
-    }
-    
-    protected static string ReadFileAsUtf16Be(string file)
-    {
-        return Encoding.BigEndianUnicode.GetString(File.ReadAllBytes(file));
-    }
-    
-    protected static string ReadFileAsUtf32Be(string file)
-    {
-        return File.ReadAllText(file, new UTF32Encoding(true, true));
-    }
-    
-    protected static string ReadFileAsUtf32Le(string file)
-    {
-        return File.ReadAllText(file, new UTF32Encoding(false, true));
-    }
-    
-    protected static string ReadFileAsWindows1251(string file)
-    {
-        return File.ReadAllText(file, Encoding.GetEncoding("windows-1251"));
-    }
+    protected static string ReadFileAsUtf8(string file) => File.ReadAllText(file);
+
+    protected static string ReadFileAsUtf16Le(string file) => Encoding.Unicode.GetString(File.ReadAllBytes(file));
+
+    protected static string ReadFileAsUtf16Be(string file) => Encoding.BigEndianUnicode.GetString(File.ReadAllBytes(file));
+
+    protected static string ReadFileAsUtf32Be(string file) => File.ReadAllText(file, new UTF32Encoding(true, true));
+
+    protected static string ReadFileAsUtf32Le(string file) => File.ReadAllText(file, new UTF32Encoding(false, true));
+
+    protected static string ReadFileAsWindows1251(string file) => File.ReadAllText(file, Encoding.GetEncoding("windows-1251"));
 }

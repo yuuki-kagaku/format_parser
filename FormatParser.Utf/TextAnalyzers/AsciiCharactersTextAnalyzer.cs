@@ -9,16 +9,14 @@ public class AsciiCharactersTextAnalyzer : ITextAnalyzer
     {
         clarifiedEncoding = null;
         
-        foreach (var c in text)
-        {
-            if (c > (char)127)
-                return DetectionProbability.No;
-        }
+        if (text.Any(c => c > (char)127))
+            return DetectionProbability.No;
         
         if (IsUtf8(encoding))
         {
             if (!encoding.ContainsBom)
-                clarifiedEncoding = encoding with { Name = WellKnownEncodings.Ascii };
+                clarifiedEncoding = WellKnownEncodingInfos.Ascii ;
+            
             return DetectionProbability.High;
         }
             
@@ -27,5 +25,5 @@ public class AsciiCharactersTextAnalyzer : ITextAnalyzer
 
     private static bool IsUtf8(EncodingInfo encoding) => encoding.Name == WellKnownEncodings.Utf8;
 
-    public string[] RequiredAnalyzers { get; } = {"ASCII"};
+    public string[] RequiredAnalyzers { get; } = { "ASCII" };
 }

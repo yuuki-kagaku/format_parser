@@ -20,8 +20,7 @@ public class Utf8Decoder : DecoderBase, ITextDecoder
         return encoding.GetDecoder();
     }
 
-    public override IEnumerable<char> GetInvalidCharacters => InvalidCharactersHelper
-        .GetForbiddenChars(settings);
+    public override IEnumerable<char> GetInvalidCharacters => InvalidCharactersHelper.GetForbiddenChars(settings);
 
     protected override int MinimalSizeOfInput => 0;
 
@@ -29,7 +28,7 @@ public class Utf8Decoder : DecoderBase, ITextDecoder
     protected override EncodingInfo EncodingWithBom => WellKnownEncodingInfos.Utf8Bom;
     public override EncodingInfo EncodingWithoutBom => WellKnownEncodingInfos.Utf8NoBom;
 
-    public override string[]? RequiredEncodingAnalyzers { get; } = {"ASCII"};
+    public override string[]? RequiredEncodingAnalyzers { get; } = { "ASCII" };
     
     public override DetectionProbability DefaultDetectionProbability => DetectionProbability.Lowest;
 }

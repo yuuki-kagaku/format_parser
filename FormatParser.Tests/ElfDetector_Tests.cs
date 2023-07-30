@@ -17,9 +17,9 @@ public class ElfDetector_Tests : TestBase
     }
     
     [Test]
-    public async Task ElfDecoder_ShouldParseAmd64LinuxExecutable()
+    public async Task ElfDecoder_ShouldDetect_Amd64()
     {
-        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.LinuxAmd64, "vlc"));
+        var fileInfo = await DetectAsync(GetFile(TestFileCategory.LinuxAmd64, "vlc"));
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
@@ -29,9 +29,9 @@ public class ElfDetector_Tests : TestBase
     }
     
     [Test]
-    public async Task ElfDecoder_ShouldParse_armel()
+    public async Task ElfDetector_ShouldDetect_armel()
     {
-        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.LinuxArmEl, "vlc-cache-gen"));
+        var fileInfo = await DetectAsync(GetFile(TestFileCategory.LinuxArmEl, "vlc-cache-gen"));
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
@@ -41,9 +41,9 @@ public class ElfDetector_Tests : TestBase
     }
     
     [Test]
-    public async Task ElfDecoder_ShouldParse_armhf()
+    public async Task ElfDetector_ShouldDetect_armhf()
     {
-        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.LinuxArmHf, "vlc-cache-gen"));
+        var fileInfo = await DetectAsync(GetFile(TestFileCategory.LinuxArmHf, "vlc-cache-gen"));
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
@@ -53,9 +53,9 @@ public class ElfDetector_Tests : TestBase
     }
     
     [Test]
-    public async Task ElfDecoder_ShouldParse_s390x()
+    public async Task ElfDetector_ShouldDetect_s390x()
     {
-        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.LinuxS390X, "vlc-cache-gen"));
+        var fileInfo = await DetectAsync(GetFile(TestFileCategory.LinuxS390X, "vlc-cache-gen"));
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
@@ -65,9 +65,9 @@ public class ElfDetector_Tests : TestBase
     }
     
     [Test]
-    public async Task ElfDecoder_ShouldParse_arm64()
+    public async Task ElfDetector_ShouldDetect_arm64()
     {
-        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.LinuxArm64, "vlc-cache-gen"));
+        var fileInfo = await DetectAsync(GetFile(TestFileCategory.LinuxArm64, "vlc-cache-gen"));
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
@@ -76,11 +76,10 @@ public class ElfDetector_Tests : TestBase
         fileInfo.Interpreter.Should().Be("/lib/ld-linux-aarch64.so.1");
     }
     
-    
     [Test]
-    public async Task ElfDecoder_ShouldParse_i386()
+    public async Task ElfDetector_ShouldDetect_i386()
     {
-        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.LinuxI386, "vlc-cache-gen"));
+        var fileInfo = await DetectAsync(GetFile(TestFileCategory.LinuxI386, "vlc-cache-gen"));
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
@@ -90,9 +89,9 @@ public class ElfDetector_Tests : TestBase
     }
     
     [Test]
-    public async Task ElfDecoder_ShouldParse_mips()
+    public async Task ElfDetector_ShouldDetect_mips()
     {
-        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.LinuxMips, "vlc-cache-gen"));
+        var fileInfo = await DetectAsync(GetFile(TestFileCategory.LinuxMips, "vlc-cache-gen"));
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
@@ -102,9 +101,9 @@ public class ElfDetector_Tests : TestBase
     }
     
     [Test]
-    public async Task ElfDecoder_ShouldParse_mipsel()
+    public async Task ElfDetector_ShouldDetect_mipsel()
     {
-        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.LinuxMipsEl, "vlc-cache-gen"));
+        var fileInfo = await DetectAsync(GetFile(TestFileCategory.LinuxMipsEl, "vlc-cache-gen"));
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
@@ -114,9 +113,9 @@ public class ElfDetector_Tests : TestBase
     }
     
     [Test]
-    public async Task ElfDecoder_ShouldParse_mips64el()
+    public async Task ElfDetector_ShouldDetect_mips64el()
     {
-        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.LinuxMips64El, "vlc-cache-gen"));
+        var fileInfo = await DetectAsync(GetFile(TestFileCategory.LinuxMips64El, "vlc-cache-gen"));
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
@@ -126,9 +125,9 @@ public class ElfDetector_Tests : TestBase
     }
     
     [Test]
-    public async Task ElfDecoder_ShouldParse_ppc64el()
+    public async Task ElfDetector_ShouldDetect_ppc64el()
     {
-        var fileInfo = await DecodeAsync(GetFile(TestFileCategory.LinuxPPC64El, "vlc-cache-gen"));
+        var fileInfo = await DetectAsync(GetFile(TestFileCategory.LinuxPPC64El, "vlc-cache-gen"));
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
@@ -136,8 +135,20 @@ public class ElfDetector_Tests : TestBase
         fileInfo.Endianness.Should().Be(Endianness.LittleEndian);
         fileInfo.Interpreter.Should().Be("/lib64/ld64.so.2");
     }
+    
+    [Test]
+    public async Task ElfDetector_ShouldDetect_so_without_interpreter()
+    {
+        var fileInfo = await DetectAsync(GetFile(TestFileCategory.LinuxAmd64, "libvlc.so.5.6.0"));
 
-    private async Task<ElfFileFormatInfo?> DecodeAsync(string filename)
+        fileInfo.Should().NotBeNull();
+        fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
+        fileInfo.Architecture.Should().Be(Architecture.Amd64);
+        fileInfo.Endianness.Should().Be(Endianness.LittleEndian);
+        fileInfo.Interpreter.Should().Be(null);
+    }
+
+    private async Task<ElfFileFormatInfo?> DetectAsync(string filename)
     {
         await using var stream = new FileStream(filename, FileMode.Open, FileAccess.Read);
         var binaryReader = new StreamingBinaryReader(stream, Endianness.BigEndian);

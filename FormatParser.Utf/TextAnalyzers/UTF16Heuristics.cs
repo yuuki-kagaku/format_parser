@@ -61,14 +61,14 @@ public class UTF16Heuristics : ITextAnalyzer
         if (nonBmpCharsFrequency + commonAsciiCharsFrequency > NonBmpAndCommonCharactersFrequencyThreshold)
             return DetectionProbability.Low;
 
-        if (unusualCjkBmpCharsFrequency > unusualCjkBmpCharsFrequencyThreshold)
+        if (unusualCjkBmpCharsFrequency > UnusualCjkBmpCharsFrequencyThreshold)
             return DetectionProbability.No;
         
         return DetectionProbability.Low;
     }
 
-    private double NonBmpAndCommonCharactersFrequencyThreshold => 0.50;
-    private double unusualCjkBmpCharsFrequencyThreshold => 0.10;
+    private static double NonBmpAndCommonCharactersFrequencyThreshold => 0.50;
+    private static double UnusualCjkBmpCharsFrequencyThreshold => 0.10;
     
     private bool IsUnusualCJKCharacter(char c)
     {
@@ -81,7 +81,7 @@ public class UTF16Heuristics : ITextAnalyzer
         return false;
     }
 
-    public string[] RequiredAnalyzers { get; } = {"UTF-16"};
+    public string[] RequiredAnalyzers { get; } = { "UTF-16" };
     
     private static readonly HashSet<char> CommonChars = CommonlyUsedCharacters.EnglishChars
         .Concat(CommonlyUsedCharacters.CommonSpecialCharacters)

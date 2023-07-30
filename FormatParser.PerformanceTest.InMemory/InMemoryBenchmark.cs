@@ -17,7 +17,7 @@ namespace FormatParser.PerformanceTest;
 public class InMemoryBenchmark
 {
     private List<Stream> streams = null!;
-    private FormatDecoder decoder = null!;
+    private FormatDetector detector = null!;
 
     [GlobalSetup]
     public void Setup()
@@ -67,8 +67,9 @@ public class InMemoryBenchmark
             new XmlDecoder()
         };
 
-         decoder = new FormatDecoder(binaryFormatDetectors,
-             new TextFileProcessor(textBasedFormatDetectors, compositeTextFormatDecoder),
+         detector = new FormatDetector(binaryFormatDetectors,
+             textBasedFormatDetectors, 
+             compositeTextFormatDecoder,
              new TextFileParsingSettings()
          );
     }
@@ -85,7 +86,7 @@ public class InMemoryBenchmark
         {
             foreach (var stream in streams)
             {
-                await decoder.Decode(stream);
+                await detector.DetectAsync(stream);
             }
         }
     }
