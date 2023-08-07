@@ -89,12 +89,12 @@ public static class EntryPoint
         var textBasedFormatDetectors = GetAllInstancesOf<ITextBasedFormatDetector>().ToArray();
 
         var compositeTextFormatDecoder = new CompositeTextFormatDecoder(
-            textDecoders, 
+            textDecoders,
             textAnalyzers);
 
         var streamFactory = new StreamFactory(settings.BufferSize);
         var formatDecoder = new FormatDetector(binaryFormatDetectors,
-            textBasedFormatDetectors, 
+            textBasedFormatDetectors,
             compositeTextFormatDecoder,
             settings.TextFileParsingSettings
         );

@@ -30,5 +30,5 @@ public class Utf8Decoder : DecoderBase, ITextDecoder
 
     public override string[]? RequiredEncodingAnalyzers { get; } = { "ASCII" };
     
-    public override DetectionProbability DefaultDetectionProbability => DetectionProbability.Lowest;
+    public override DetectionProbability DefaultDetectionProbability => DetectionProbability.Low;
 }

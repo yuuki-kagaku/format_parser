@@ -4,17 +4,18 @@ namespace FormatParser.Text.Helpers;
 
 public static class ControlCharacters
 {
-    public static readonly char EscapeCharCodepoint = (char)0x1B;
-    public static readonly char FormFeedCharCodepoint = (char)0x0C;
-    public static readonly char CR = (char)0x0D;
-    public static readonly char LF = (char)0x0A;
-    public static readonly char Tab = (char)0x09;
-    public static readonly char Delete = (char)0x7F;
+    public const char EscapeCharCodepoint = (char)0x1B;
+    public const char FormFeedCharCodepoint = (char)0x0C;
+    public const char CR = (char)0x0D;
+    public const char LF = (char)0x0A;
+    public const char NEL = (char)0x85;
+    public const char Tab = (char)0x09;
+    public const char Delete = (char)0x7F;
     
     public static readonly IReadOnlySet<char> NonTextC0Controls =
         Enumerable.Range(0, 32)
             .Select(x => (char)x)
-            .Except(new char[]
+            .Except(new []
             {
                 CR,
                 LF,

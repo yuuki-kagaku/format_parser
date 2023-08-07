@@ -24,8 +24,6 @@ public class FileDiscoverer
                 if (ShouldSkipFile(file))
                     continue;
                 
-                
-
                 await channelWriter.WriteAsync(file);
             }
         }, settings);

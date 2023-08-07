@@ -17,7 +17,7 @@ public class CompositeTextFormatDecoder
     {
         this.decoders = decoders;
         var encodingAnalyzersById = textAnalyzers
-            .SelectMany(analyzer => analyzer.RequiredAnalyzers.Select(lang => (Language: lang, Analyzer: analyzer)))
+            .SelectMany(analyzer => analyzer.AnalyzerIds.Select(lang => (Language: lang, Analyzer: analyzer)))
             .ToDictionary(x => x.Language, x => x.Analyzer);
 
         encodingAnalyzersDictionary = decoders.ToDictionary(x => x, x => GetEncodingAnalyzers(x, encodingAnalyzersById));

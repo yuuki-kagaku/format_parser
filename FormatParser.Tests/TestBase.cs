@@ -28,6 +28,7 @@ public class TestBase
             TestFileCategory.TextUtf32 => "text_utf32",
             TestFileCategory.TextUtf8 => "text_utf8",
             TestFileCategory.Xml => "xml",
+            TestFileCategory.Ebcdic => "text_ebcdic",
             TestFileCategory.PseudoText => "text_pseudo_utf16",
             _ => throw new ArgumentOutOfRangeException(nameof(testFileCategory), testFileCategory, null)
         };
