@@ -38,6 +38,9 @@ internal static class PEConstants
     public const ushort IMAGE_FILE_MACHINE_IA64 = 0x0200;
     public const ushort IMAGE_FILE_MACHINE_AMD64 = 0x8664;
     public const ushort IMAGE_FILE_MACHINE_ARM64 = 0xAA64;
+    public const ushort IMAGE_FILE_MACHINE_ARM = 0x01c0;
+    public const ushort IMAGE_FILE_MACHINE_THUMB = 0x01c2;
+    public const ushort IMAGE_FILE_MACHINE_ARMNT = 0x01c4;
     
     #endregion
     
