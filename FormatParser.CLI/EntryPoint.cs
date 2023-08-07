@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Text.Json;
 using FormatParser.ArgumentParser;
+using FormatParser.Helpers;
 using FormatParser.Text;
 using FormatParser.Text.Decoders;
 
@@ -67,9 +68,9 @@ public static class EntryPoint
     
     private static CLIRunner CreateRunner(FormatParserCliSettings settings, OverrideSettings overrideSettings)
     {
-        var binaryFormatDetectors = GetAllInstancesOf<IBinaryFormatDetector>().ToArray();
+        var binaryFormatDetectors = ClassDiscoveryHelper.GetAllInstancesOf<IBinaryFormatDetector>().ToArray();
 
-        var textAnalyzers = GetAllInstancesOf<ITextAnalyzer>()
+        var textAnalyzers = ClassDiscoveryHelper.GetAllInstancesOf<ITextAnalyzer>()
             .Where(x => !overrideSettings.DisabledAnalyzers.Any(a => string.Equals(a, x.GetType().FullName, StringComparison.InvariantCultureIgnoreCase)))
             .ToArray();
         
@@ -84,9 +85,9 @@ public static class EntryPoint
             FailOnIOException = settings.FailOnIOException
         };
         
-        var textDecoders = GetAllInstancesOf<ITextDecoder, TextFileParsingSettings>(textFileParsingSettings).ToArray();
+        var textDecoders = ClassDiscoveryHelper.GetAllInstancesOf<ITextDecoder, TextFileParsingSettings>(textFileParsingSettings).ToArray();
 
-        var textBasedFormatDetectors = GetAllInstancesOf<ITextBasedFormatDetector>().ToArray();
+        var textBasedFormatDetectors = ClassDiscoveryHelper.GetAllInstancesOf<ITextBasedFormatDetector>().ToArray();
 
         var compositeTextFormatDecoder = new CompositeTextFormatDecoder(
             textDecoders, 
@@ -139,32 +140,5 @@ public static class EntryPoint
                 }
             }
         }
-    }
-
-    private static IEnumerable<T> GetAllInstancesOf<T>()
-    {
-        var types = GetAllTypes<T>();
-
-        foreach (var t in types.OrderBy(t => t.Name))
-            yield return (T)Activator.CreateInstance(t)!;
-    }
-    
-    private static IEnumerable<T> GetAllInstancesOf<T, TParam>(TParam param)
-    {
-        var types = GetAllTypes<T>();
-        foreach (var t in types.OrderBy(t => t.Name))
-            yield return (T)Activator.CreateInstance(t, param)!;
-    }
-
-    private static IEnumerable<Type> GetAllTypes<T>()
-    {
-        var type = typeof(T);
-        
-        return AppDomain
-            .CurrentDomain
-            .GetAssemblies()
-            .SelectMany(s => s.GetTypes())
-            .Where(t => type.IsAssignableFrom(t))
-            .Where(t => t is { IsInterface: false, IsAbstract: false });
     }
 }

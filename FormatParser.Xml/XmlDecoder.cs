@@ -19,9 +19,12 @@ public class XmlDecoder : ITextBasedFormatDetector
         var encodingAttributeMatch = EncodingPattern.Match(header[..match.Length]);
         
         return encodingAttributeMatch.Success
-            ? new TextFileFormatInfo(MimeType, encodingInfo with { Name = encodingAttributeMatch.Groups["encoding"].Value }) // todo: remove bom if unsopported
-            : new TextFileFormatInfo(MimeType, encodingInfo );
+            ? new TextFileFormatInfo(MimeType, GetEncodingInfo(encodingInfo, encodingAttributeMatch.Groups["encoding"].Value))
+            : new TextFileFormatInfo(MimeType, encodingInfo);
+
+        static EncodingInfo GetEncodingInfo(EncodingInfo encodingInfo, string encodingName)
+            => encodingInfo with { Name = encodingName, ContainsBom = encodingInfo.ContainsBom && EncodingHelper.SupportBom(encodingName)};
     }
 
-    public static string MimeType => "text/xml";
+    private static string MimeType => "text/xml";
 }
