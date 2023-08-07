@@ -13,15 +13,15 @@ public class Windows1251Decoder : NonUtfDecoder
     public Windows1251Decoder(TextFileParsingSettings settings) => 
         this.settings = new CharacterValidatorSettings(settings.AllowEscapeChar, settings.AllowFormFeed, true, false);
     
-    public override IEnumerable<char> GetInvalidCharacters => InvalidCharactersHelper
+    protected override IReadOnlySet<char> InvalidCharacters => InvalidCharactersHelper
         .GetForbiddenChars(settings)
         .Concat((char)152)
         .ToHashSet();
 
     public override DetectionProbability DefaultDetectionProbability => DetectionProbability.No;
     public override string[]? RequiredEncodingAnalyzers { get; } = { "ru" };
-
-    protected override EncodingInfo EncodingInfo { get; } = new("Windows-1251", Endianness.NotAllowed, false);
+    
+    public override string EncodingName { get; } = "Windows-1251";
 
     protected override Decoder GetDecoder(int inputSize) => GetDecoder();
 
