@@ -7,14 +7,12 @@ namespace FormatParser;
 public class FormatDetector
 {
     private readonly IBinaryFormatDetector[] binaryDetectors;
-    private readonly ITextBasedFormatDetector[] textBasedFormatDetectors;
     private readonly CompositeTextFormatDecoder compositeTextFormatDecoder;
     private readonly TextFileParsingSettings settings;
 
-    public FormatDetector(IBinaryFormatDetector[] binaryDetectors, ITextBasedFormatDetector[] textBasedFormatDetectors, CompositeTextFormatDecoder compositeTextFormatDecoder, TextFileParsingSettings settings)
+    public FormatDetector(IBinaryFormatDetector[] binaryDetectors, CompositeTextFormatDecoder compositeTextFormatDecoder, TextFileParsingSettings settings)
     {
         this.binaryDetectors = binaryDetectors;
-        this.textBasedFormatDetectors = textBasedFormatDetectors;
         this.compositeTextFormatDecoder = compositeTextFormatDecoder;
         this.settings = settings;
     }
@@ -59,31 +57,9 @@ public class FormatDetector
     
     private IFileFormatInfo? TryDetectTextBasedFormat(ArraySegment<byte> buffer)
     {
-        if (!compositeTextFormatDecoder.TryDecode(buffer, out var encoding, out var textSample))
+        if (!compositeTextFormatDecoder.TryDecode(buffer, out var textFileFormatInfo))
             return null;
 
-        var detectionResult = TryMatchTextBasedFormat(textSample, encoding);
-        
-        return detectionResult ?? new TextFileFormatInfo(TextFileFormatInfo.DefaultTextType, encoding);
-    }
-    
-    private IFileFormatInfo? TryMatchTextBasedFormat(string header, EncodingInfo encoding)
-    {
-        foreach (var detector in textBasedFormatDetectors)
-        {
-            try
-            {
-                var detectionResult = detector.TryMatchFormat(header, encoding);
-                
-                if (detectionResult != null)
-                    return detectionResult;
-            }
-            catch
-            {
-                // ignored
-            }
-        }
-
-        return null;
+        return textFileFormatInfo;
     }
 }

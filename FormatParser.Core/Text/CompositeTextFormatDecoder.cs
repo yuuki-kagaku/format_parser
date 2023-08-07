@@ -10,12 +10,15 @@ namespace FormatParser.Text;
 public class CompositeTextFormatDecoder
 {
     private readonly ITextDecoder[] decoders;
+    private readonly ITextBasedFormatDetector[] textBasedFormatDetectors;
     private readonly Dictionary<ITextDecoder, IEnumerable<ITextAnalyzer>> encodingAnalyzersDictionary;
     private readonly Dictionary<ITextDecoder, CharacterValidator> invalidCharactersCheckers;
 
-    public CompositeTextFormatDecoder(ITextDecoder[] decoders, ITextAnalyzer[] textAnalyzers)
+    public CompositeTextFormatDecoder(ITextDecoder[] decoders, ITextAnalyzer[] textAnalyzers, ITextBasedFormatDetector[] textBasedFormatDetectors)
     {
         this.decoders = decoders;
+        this.textBasedFormatDetectors = textBasedFormatDetectors;
+        
         var encodingAnalyzersById = textAnalyzers
             .SelectMany(analyzer => analyzer.RequiredAnalyzers.Select(lang => (Language: lang, Analyzer: analyzer)))
             .ToDictionary(x => x.Language, x => x.Analyzer);
@@ -24,11 +27,10 @@ public class CompositeTextFormatDecoder
         invalidCharactersCheckers = decoders.ToDictionary(x => x, x => new CharacterValidator(x.GetInvalidCharacters));
     }
 
-    public bool TryDecode(ArraySegment<byte> bytes, [NotNullWhen(true)] out EncodingInfo? resultEncoding, [NotNullWhen(true)] out string? resultTextSample)
+    public bool TryDecode(ArraySegment<byte> bytes, [NotNullWhen(true)] out TextFileFormatInfo? resultFormatInfo)
     {
-        var bestMatchProbability = DetectionProbability.No;
-        resultEncoding = null;
-        resultTextSample = null;
+        var bestMatchProbability = new MatchQuality(DetectionProbability.No, false);
+        resultFormatInfo = null;
         
         foreach (var decoder in decoders)
         {
@@ -38,25 +40,52 @@ public class CompositeTextFormatDecoder
                 if (decodeResult == null) 
                     continue;
                 
+                
                 if (!invalidCharactersCheckers[decoder].AllCharactersIsValid(decodeResult.Chars))
                     continue;
 
                 var text = decodeResult.Chars.AsString();
+                var matchedTextBasedFormat = false;
 
-                var defaultDetectionProbability = decoder.DefaultDetectionProbability;
+                var defaultDetectionProbability = new MatchQuality(decoder.DefaultDetectionProbability, matchedTextBasedFormat);
                 if (defaultDetectionProbability > bestMatchProbability)
-                    (bestMatchProbability, resultEncoding, resultTextSample) = (defaultDetectionProbability, decodeResult.Encoding, text);
+                    (bestMatchProbability, resultFormatInfo) = (defaultDetectionProbability, CreatePlainTextFileFormat(decodeResult.Encoding));
 
+                var textFileFormatInfo = null as TextFileFormatInfo;
+                
+                foreach (var textBasedFormatDetector in textBasedFormatDetectors)
+                {
+                    textFileFormatInfo = MatchTextBasedFormat(textBasedFormatDetector, text, decodeResult.Encoding);
+
+                    if (textFileFormatInfo == null)
+                        continue;
+
+                    if (textFileFormatInfo.Encoding != decodeResult.Encoding)
+                    {
+                        resultFormatInfo = textFileFormatInfo;
+                        return true;
+                    }
+
+                    matchedTextBasedFormat = true;
+                    defaultDetectionProbability =defaultDetectionProbability with { MatchedTextBasedFormat = true };
+                        
+                    if (defaultDetectionProbability > bestMatchProbability)
+                        (bestMatchProbability, resultFormatInfo) = (defaultDetectionProbability, textFileFormatInfo);
+                }
+                
                 foreach (var textAnalyzer in encodingAnalyzersDictionary[decoder])
                 {
-                    var detectionProbability = textAnalyzer.AnalyzeProbability(text, decodeResult.Encoding, out var clarifiedEncoding);
+                    var detectionProbability = new MatchQuality(textAnalyzer.AnalyzeProbability(text, decodeResult.Encoding, out var clarifiedEncoding), matchedTextBasedFormat);
 
-                    if (detectionProbability <= bestMatchProbability)
+                    if (detectionProbability < bestMatchProbability)
                         continue;
+
+                    bestMatchProbability = detectionProbability;
+                    var encoding = clarifiedEncoding ?? decodeResult.Encoding;
+                    resultFormatInfo = textFileFormatInfo == null ? CreatePlainTextFileFormat(encoding) : textFileFormatInfo with {Encoding = encoding};
                     
-                    (bestMatchProbability, resultEncoding, resultTextSample) = (detectionProbability, clarifiedEncoding ?? decodeResult.Encoding, text);
-                            
-                    if (bestMatchProbability >= DetectionProbability.High)
+                    
+                    if (bestMatchProbability is { MatchedTextBasedFormat: true, DetectionProbability: >= DetectionProbability.High })
                         return true;
                 }
             }
@@ -64,10 +93,21 @@ public class CompositeTextFormatDecoder
             {
             }
         }
-        
-        return bestMatchProbability > DetectionProbability.No;
+
+        return bestMatchProbability > new MatchQuality(DetectionProbability.No, false);
     }
-    
+
+    private static TextFileFormatInfo? MatchTextBasedFormat(ITextBasedFormatDetector textBasedFormatDetector, string text, EncodingInfo encoding)
+    {
+        try
+        {
+            return textBasedFormatDetector.TryMatchFormat(text, encoding);
+        }
+        catch
+        {
+            return null;
+        }
+    }
     
     private static IEnumerable<ITextAnalyzer> GetEncodingAnalyzers(ITextDecoder decoder, Dictionary<string, ITextAnalyzer> encodingAnalyzersByLanguage)
     {
@@ -81,5 +121,24 @@ public class CompositeTextFormatDecoder
 
             yield return analyzer;
         }
+    }
+
+    private static TextFileFormatInfo CreatePlainTextFileFormat(EncodingInfo encoding) => new(TextFileFormatInfo.DefaultTextType, encoding);
+
+    private readonly record struct MatchQuality(DetectionProbability DetectionProbability, bool MatchedTextBasedFormat) : IComparable<MatchQuality>
+    {
+        public int CompareTo(MatchQuality other)
+        {
+            var compareMatchedTextBasedFormat = MatchedTextBasedFormat.CompareTo(other.MatchedTextBasedFormat);
+            
+            if (compareMatchedTextBasedFormat != 0)
+                return compareMatchedTextBasedFormat;
+
+            return DetectionProbability.CompareTo(other.DetectionProbability);
+        }
+        
+        public static bool operator > (MatchQuality item, MatchQuality other) => item.CompareTo(other) > 0;
+
+        public static bool operator < (MatchQuality item, MatchQuality other) => item.CompareTo(other) < 0;
     }
 }

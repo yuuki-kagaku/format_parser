@@ -22,7 +22,7 @@ public class CompositeTextFormatDecoder_Tests : TestBase
         {
             new AsciiCharactersTextAnalyzer(),
             new UTF16Heuristics(),
-            new RuDictionaryTextAnalyzer()
+            new RuFrequencyTextAnalyzer()
         };
 
         var textDecoders = new ITextDecoder[]
@@ -34,8 +34,12 @@ public class CompositeTextFormatDecoder_Tests : TestBase
             new Utf32BeDecoder(textParserSettings),
             new Windows1251Decoder(textParserSettings),
         };
+        
+        var textBasedFormatDetectors = new ITextBasedFormatDetector[]
+        {
+        };
 
-        decoder = new CompositeTextFormatDecoder(textDecoders, textAnalyzers);
+        decoder = new CompositeTextFormatDecoder(textDecoders, textAnalyzers, textBasedFormatDetectors);
     }
   
     private static IEnumerable<TestCaseData> TestData()
@@ -81,18 +85,17 @@ public class CompositeTextFormatDecoder_Tests : TestBase
         static TestCaseData CreateTestCase(TestFileCategory testFileCategory, string file, Func<string, string> getContent, EncodingInfo expectedEncoding, string name) => 
             new TestCaseData(testFileCategory, file, new Func<string, string>(getContent), expectedEncoding).SetName(name);
     }
-
+    
     [TestCaseSource(nameof(TestData))]
     public async Task Should_correctly_read_text_and_identify_encoding(TestFileCategory testFileCategory, string file, Func<string, string> getContent, EncodingInfo expectedEncoding)
     {
         var filename = GetFile(testFileCategory, file);
         var buffer = await GetBufferAsync(filename);
 
-        var isSuccessful = decoder.TryDecode(buffer, out var encoding, out var text);
+        var isSuccessful = decoder.TryDecode(buffer, out var encoding);
 
         isSuccessful.Should().BeTrue();
-        text.Should().Be(getContent(filename));
-        encoding.Should().BeEquivalentTo(expectedEncoding);
+        encoding.Should().BeEquivalentTo(new TextFileFormatInfo("text/plain", expectedEncoding));
     }
 
     [TestCase(TestFileCategory.PseudoText, "be_tasks.svgz", TestName = "Should_not_read_pseudo_utf16be_file_when_there_is_a_lot_of_uncommon_cjk_chars_and_no_chars_outside_bmp")]
@@ -101,11 +104,10 @@ public class CompositeTextFormatDecoder_Tests : TestBase
     {
         var buffer = await GetBufferAsync(GetFile(testFileCategory, filename));
     
-        var isSuccessful = decoder.TryDecode(buffer, out var encoding, out var text);
+        var isSuccessful = decoder.TryDecode(buffer, out var encoding);
 
         isSuccessful.Should().BeFalse();
         encoding.Should().Be(null);
-        text.Should().Be(null);
     }
 
     private static async Task<ArraySegment<byte>> GetBufferAsync(string filename)
