@@ -43,7 +43,7 @@ public class ElfDetector : IBinaryFormatDetector
         streamingBinaryReader.SetEndianness(endianness);
         
         streamingBinaryReader.SkipUShort(); // e_type
-        var architecture = ElfArchitectureConverter.Convert (await streamingBinaryReader.ReadUShortAsync()); // e_machine
+        var architecture = ElfArchitectureConverter.Convert(await streamingBinaryReader.ReadUShortAsync(), bitness, endianness); // e_machine
         streamingBinaryReader.SkipUInt(); // e_version
         streamingBinaryReader.SkipPointer(bitness); // e_entry
         streamingBinaryReader.SkipPointer(bitness); // e_phoff
