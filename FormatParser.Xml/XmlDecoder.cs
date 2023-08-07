@@ -6,17 +6,21 @@ namespace FormatParser.Xml;
 
 public class XmlDecoder : ITextBasedFormatDetector
 {
-    private static readonly Regex Pattern = new(@"^<\?xml([^>]+)encoding=""(?<encoding>[^""]+)""",
-        RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+    private static readonly Regex XmlHeaderPattern = new(@"^<\?xml([^>]+)/?>",RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+    private static readonly Regex EncodingPattern = new(@"encoding=""(?<encoding>[^""]+)""",RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
     
     public IFileFormatInfo? TryMatchFormat(string header, EncodingInfo encodingInfo)
     {
-        var match = Pattern.Match(header);
+        var match = XmlHeaderPattern.Match(header);
 
-        if (match.Success)
-            return new TextFileFormatInfo(MimeType, encodingInfo with { Name = match.Groups["encoding"].Value });
+        if (!match.Success)
+            return null;
+
+        var encodingAttributeMatch = EncodingPattern.Match(header[..match.Length]);
         
-        return null;
+        return encodingAttributeMatch.Success
+            ? new TextFileFormatInfo(MimeType, encodingInfo with { Name = encodingAttributeMatch.Groups["encoding"].Value }) // todo: remove bom if unsopported
+            : new TextFileFormatInfo(MimeType, encodingInfo );
     }
 
     public static string MimeType => "text/xml";
