@@ -16,6 +16,7 @@ public static class MachOArchitectureConverter
             _ => throw new ArgumentOutOfRangeException(nameof(endianness))
         },
         MachOConstants.CPU_TYPE_ARM => Architecture.Arm,
+        MachOConstants.CPU_TYPE_ARM64 => Architecture.Arm64,
         MachOConstants.CPU_TYPE_SPARC => Architecture.Sparc,
         MachOConstants.CPU_TYPE_POWERPC => endianness switch
     {
