@@ -11,7 +11,8 @@ public static class EncodingHelper
     {
         var textDecoders = ClassDiscoveryHelper.GetAllInstancesOf<ITextDecoder, TextFileParsingSettings>(new TextFileParsingSettings()).ToArray();
 
-        var encodingsWithBom = new HashSet<string>();
+        var encodingsWithBom = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+
         foreach (var textDecoder in textDecoders)
         {
             if (textDecoder.SupportBom)

@@ -20,7 +20,7 @@ public class Utf16LeDecoder : DecoderBase, ITextDecoder
         return encoding.GetDecoder();
     }
 
-    protected override IReadOnlySet<char> InvalidCharacters =>  InvalidCharactersHelper.GetForbiddenChars(settings).ToHashSet();
+    protected override IReadOnlySet<char> InvalidCharacters => InvalidCharactersHelper.GetForbiddenChars(settings).ToHashSet();
 
     protected override int MinimalSizeOfInput => 8;
 
