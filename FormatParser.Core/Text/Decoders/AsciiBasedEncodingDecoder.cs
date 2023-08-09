@@ -4,7 +4,7 @@ using FormatParser.Text.Helpers;
 namespace FormatParser.Text.Decoders;
 
 /// <summary>
-/// Decoder for that allows every C0 and C1 control symbols, except \0 and replaces them with ?.
+/// Decoder that allows every C0 and C1 control symbols, except \0 and replaces them with ?.
 /// Used for some legacy code pages, like DOS codepage 437.
 /// And for files, that incorrectly mix UTF-8 and Windows-1252.
 /// </summary>
