@@ -7,6 +7,12 @@ namespace FormatParser.Ebcdic;
 public class EBCDICDecoder : NonUtfDecoder
 {
     private readonly HashSet<char> invalidChars;
+
+    static EBCDICDecoder()
+    {
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+    }
+    
     public EBCDICDecoder(TextFileParsingSettings settings)
     {
         var characterValidationSettings = new CharacterValidationSettings(settings.AllowEscapeChar, settings.AllowFormFeed, true, false);
@@ -24,7 +30,6 @@ public class EBCDICDecoder : NonUtfDecoder
 
     protected override Decoder GetDecoder(int inputSize)
     {
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         var encoding = (Encoding)Encoding.GetEncoding("IBM037").Clone();
         var decoder = encoding.GetDecoder();
         decoder.Fallback = DecoderFallback.ExceptionFallback;

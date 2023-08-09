@@ -22,7 +22,7 @@ public class CompositeTextFormatDecoder_Tests : TestBase
         {
             new AsciiCharactersTextAnalyzer(),
             new UTF16Heuristics(),
-            new RuFrequencyTextAnalyzer()
+            new RuDictionaryTextAnalyzer()
         };
 
         var textDecoders = new ITextDecoder[]

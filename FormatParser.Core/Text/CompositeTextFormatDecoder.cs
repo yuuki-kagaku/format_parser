@@ -80,12 +80,12 @@ public class CompositeTextFormatDecoder
                 {
                     var detectionProbability = new MatchQuality(textAnalyzer.AnalyzeProbability(text, decodeResult.Encoding, out var clarifiedEncoding), matchedTextBasedFormat);
 
-                    if (detectionProbability < bestMatchProbability)
+                    if (detectionProbability <= bestMatchProbability)
                         continue;
 
                     bestMatchProbability = detectionProbability;
                     var encoding = clarifiedEncoding ?? decodeResult.Encoding;
-                    resultFormatInfo = textFileFormatInfo == null ? CreatePlainTextFileFormat(encoding) : textFileFormatInfo with {Encoding = encoding};
+                    resultFormatInfo = resultFormatInfo == null ? CreatePlainTextFileFormat(encoding) : resultFormatInfo with { Encoding = encoding };
                     
                     if (bestMatchProbability is { MatchedTextBasedFormat: true, DetectionProbability: >= DetectionProbability.High })
                         return true;
@@ -111,14 +111,14 @@ public class CompositeTextFormatDecoder
         }
     }
     
-    private static IEnumerable<ITextAnalyzer> GetEncodingAnalyzers(ITextDecoder decoder, Dictionary<string, ITextAnalyzer[]> encodingAnalyzersByLanguage)
+    private static IEnumerable<ITextAnalyzer> GetEncodingAnalyzers(ITextDecoder decoder, Dictionary<string, ITextAnalyzer[]> encodingAnalyzersById)
     {
         if (decoder.RequiredEncodingAnalyzers == null)
             yield break;
 
         foreach (var encodingAnalyzerId in decoder.RequiredEncodingAnalyzers)
         {
-            if (!encodingAnalyzersByLanguage.TryGetValue(encodingAnalyzerId, out var analyzers))
+            if (!encodingAnalyzersById.TryGetValue(encodingAnalyzerId, out var analyzers))
                 throw new Exception($"Could not find analyzer for id: {encodingAnalyzerId}.");
             
             foreach (var analyzer in analyzers)
@@ -141,7 +141,9 @@ public class CompositeTextFormatDecoder
         }
         
         public static bool operator > (MatchQuality item, MatchQuality other) => item.CompareTo(other) > 0;
-
         public static bool operator < (MatchQuality item, MatchQuality other) => item.CompareTo(other) < 0;
+        public static bool operator <= (MatchQuality item, MatchQuality other) => item.CompareTo(other) < 0 || item.Equals(other);
+        public static bool operator >= (MatchQuality item, MatchQuality other) => item.CompareTo(other) > 0 || item.Equals(other);
+
     }
 }

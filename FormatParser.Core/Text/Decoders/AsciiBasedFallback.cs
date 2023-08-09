@@ -6,10 +6,8 @@ namespace FormatParser.Text.Decoders;
 
 public class AsciiBasedFallbackDecoder : DecoderBase, ITextDecoder
 {
-    private readonly HashSet<char> invalidChars;
-
     public AsciiBasedFallbackDecoder(TextFileParsingSettings settings)
-    {;
+    {
     }
 
     protected override Decoder GetDecoder(int inputSize)
@@ -34,5 +32,5 @@ public class AsciiBasedFallbackDecoder : DecoderBase, ITextDecoder
 
     public override string[]? RequiredEncodingAnalyzers { get; } = { "header_analyzer" };
     
-    public override DetectionProbability DefaultDetectionProbability => DetectionProbability.Low;
+    public override DetectionProbability DefaultDetectionProbability => DetectionProbability.No;
 }
