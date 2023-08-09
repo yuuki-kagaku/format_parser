@@ -40,21 +40,27 @@ public class RuFrequencyTextAnalyzer : IFrequencyTextAnalyzer
             previousIsBasicLatin = BasicLatin.Contains(c);
         }
 
-        if ((double)russianCharsAfterBasicLatinCount / (double)russianCharsCount > 0.05)
+        if ((double)russianCharsAfterBasicLatinCount / (double)russianCharsCount > RussianCharsAfterBasicLatinCountThreshold)
             return DetectionProbability.No;
         
         if (russianCharsCount < 30)
             return DetectionProbability.No;
 
-        if (((double)mostFrequentLettersCount / (double)russianCharsCount) < 0.30)
+        if (((double)mostFrequentLettersCount / (double)russianCharsCount) < MostFrequentRussianLettersThreshold)
             return DetectionProbability.No;
 
-        if ((double)(basicLatinAndPunctuationCount + russianCharsCount) / (double)totalCount > 0.98)
+        if ((double)(basicLatinAndPunctuationCount + russianCharsCount) / (double)totalCount > BasicLatinPunctuationAndRussianLettersThreshold)
             return DetectionProbability.Low;
 
         return DetectionProbability.No;
     }
 
+    public string[] AnalyzerIds { get; } = {"ru"};
+
+    private double RussianCharsAfterBasicLatinCountThreshold => 0.05; 
+    private double MostFrequentRussianLettersThreshold => 0.30; 
+    private double BasicLatinPunctuationAndRussianLettersThreshold => 0.98; 
+    
     private static bool IsRussianLetter(char c)
     {
         if (c is >= 'а' and <= 'я')
@@ -68,8 +74,6 @@ public class RuFrequencyTextAnalyzer : IFrequencyTextAnalyzer
 
         return false;
     }
-
-    public string[] AnalyzerIds { get; } = {"ru"};
 
     private static readonly IReadOnlySet<char> BasicLatinAndPunctuation = new HashSet<char>
     {
