@@ -2,7 +2,6 @@ using System.Text;
 using FormatParser.Domain;
 using FormatParser.Helpers;
 using FormatParser.Text;
-using EncodingInfo = FormatParser.Domain.EncodingInfo;
 
 namespace FormatParser.Windows1251;
 
@@ -13,7 +12,7 @@ public class Windows1251Decoder : NonUtfDecoder
     public Windows1251Decoder(TextFileParsingSettings settings)
     {
         var characterValidationSettings = new CharacterValidationSettings(settings.AllowEscapeChar, settings.AllowFormFeed, true, false);
-        invalidChars = InvalidCharactersHelper.GetForbiddenChars(characterValidationSettings).ToHashSet();
+        invalidChars = InvalidCharactersHelper.GetForbiddenChars(characterValidationSettings).Concat((char)152).ToHashSet();
     }
 
     protected override IReadOnlySet<char> InvalidCharacters => invalidChars;

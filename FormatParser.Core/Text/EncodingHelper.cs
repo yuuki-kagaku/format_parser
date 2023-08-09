@@ -13,18 +13,18 @@ public static class EncodingHelper
         var textDecoders = ClassDiscoveryHelper.GetAllInstancesOf<ITextDecoder, TextFileParsingSettings>(new TextFileParsingSettings()).ToArray();
 
         var encodingsWithBom = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
-        var knownEncodings = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+        var canonicalEncodingNames = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
 
         foreach (var textDecoder in textDecoders)
         {
             if (textDecoder.SupportBom)
                 encodingsWithBom.Add(textDecoder.EncodingName);
 
-            knownEncodings.TryAdd(textDecoder.EncodingName, textDecoder.EncodingName);
+            canonicalEncodingNames.TryAdd(textDecoder.EncodingName, textDecoder.EncodingName);
         }
 
         EncodingsWithBom = encodingsWithBom;
-        CanonicalEncodingNames = knownEncodings;
+        CanonicalEncodingNames = canonicalEncodingNames;
     }
     
     public static bool SupportBom(string name) => EncodingsWithBom.Contains(name);

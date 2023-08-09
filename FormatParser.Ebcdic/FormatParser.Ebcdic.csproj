@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
@@ -6,10 +6,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <OutputType>Library</OutputType>
     </PropertyGroup>
-
-    <ItemGroup>
-      <None Remove="Properties\launchSettings.json" />
-    </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\FormatParser.Core\FormatParser.Core.csproj" />
