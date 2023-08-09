@@ -51,6 +51,7 @@ public static class EntryPoint
             .WithPositionalArgument((settings, arg) => settings.Directory = arg)
             .OnNamedParameter("parallel", (settings, arg) => settings.DegreeOfParallelism = arg, false)
             .OnNamedParameter("show-elapsed", settings => settings.ShowElapsedTime = true, false)
+            .OnNamedParameter("allow-frequency-analyzers", settings => settings.AllowFrequencyAnalyzers = true, false)
             .OnNamedParameter("buffer-size", (settings, arg) => settings.BufferSize = arg, false);
 
         return argsParser.Parse(args);
@@ -72,6 +73,9 @@ public static class EntryPoint
         var textAnalyzers = ClassDiscoveryHelper.GetAllInstancesOf<ITextAnalyzer>()
             .Where(x => !overrideSettings.DisabledAnalyzers.Any(a => string.Equals(a, x.GetType().FullName, StringComparison.InvariantCultureIgnoreCase)))
             .ToArray();
+
+        if (!settings.AllowFrequencyAnalyzers)
+            textAnalyzers = textAnalyzers.Where(x => x is not IFrequencyTextAnalyzer).ToArray();
         
         var textFileParsingSettings = new TextFileParsingSettings
         {
@@ -106,6 +110,4 @@ public static class EntryPoint
             fileDiscovererSettings
         );
     }
-
-  
 }

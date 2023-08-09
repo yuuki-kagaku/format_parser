@@ -10,6 +10,7 @@ public class FormatParserCliSettings
     
     public bool FailOnUnauthorizedAccessException { get; set; } = false;
     public bool ShowElapsedTime { get; set; } = false;
+    public bool AllowFrequencyAnalyzers { get; set; } = false;
     public bool FailOnIOException { get; set; } = true;
 
     public TextFileParsingSettings TextFileParsingSettings { get; set; } = new();

@@ -78,8 +78,8 @@ public class CompositeTextFormatDecoder
         foreach (var encodingAnalyzerId in decoder.RequiredEncodingAnalyzers)
         {
             if (!encodingAnalyzersByLanguage.TryGetValue(encodingAnalyzerId, out var analyzers))
-                throw new Exception($"Could not find analyzer for {decoder.RequiredEncodingAnalyzers}");
-
+                throw new Exception($"Could not find analyzer for id: {encodingAnalyzerId}.");
+            
             foreach (var analyzer in analyzers)
                 yield return analyzer;
         }
