@@ -19,8 +19,8 @@ public static class EncodingHelper
         {
             if (textDecoder.SupportBom)
                 encodingsWithBom.Add(textDecoder.EncodingName);
-            
-            knownEncodings.Add(textDecoder.EncodingName, textDecoder.EncodingName);
+
+            knownEncodings.TryAdd(textDecoder.EncodingName, textDecoder.EncodingName);
         }
 
         EncodingsWithBom = encodingsWithBom;
