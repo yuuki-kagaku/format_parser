@@ -17,7 +17,7 @@ public class RuFrequencyTextAnalyzer : IFrequencyTextAnalyzer
         var mostFrequentLettersCount = 0;
         var totalCount = 0;
 
-        var previousIsBacicLatin = false;
+        var previousIsBasicLatin = false;
         
         foreach (var c in text)
         {
@@ -30,14 +30,14 @@ public class RuFrequencyTextAnalyzer : IFrequencyTextAnalyzer
             {
                 russianCharsCount++;
 
-                if (previousIsBacicLatin)
+                if (previousIsBasicLatin)
                     russianCharsAfterBasicLatinCount++;
             }
 
             if (BasicLatinAndPunctuation.Contains(c))
                 basicLatinAndPunctuationCount++;
             
-            previousIsBacicLatin = BasicLatin.Contains(c);
+            previousIsBasicLatin = BasicLatin.Contains(c);
         }
 
         if ((double)russianCharsAfterBasicLatinCount / (double)russianCharsCount > 0.05)
