@@ -31,5 +31,5 @@ public class Utf32LeDecoder : DecoderBase, ITextDecoder
     public override string[]? RequiredEncodingAnalyzers => null;
     protected override int MinimalSizeOfInput => 8;
 
-    public override DetectionProbability DefaultDetectionProbability => DetectionProbability.Lowest;
+    public override DetectionProbability DefaultDetectionProbability => DetectionProbability.Low;
 }

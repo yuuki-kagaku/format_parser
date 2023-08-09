@@ -6,5 +6,5 @@ public interface ITextAnalyzer
 {
     DetectionProbability AnalyzeProbability(string text, EncodingInfo encoding, out EncodingInfo? clarifiedEncoding);
     
-    string[] RequiredAnalyzers { get; }
+    string[] AnalyzerIds { get; }
 }

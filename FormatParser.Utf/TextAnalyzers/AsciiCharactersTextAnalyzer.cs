@@ -25,5 +25,5 @@ public class AsciiCharactersTextAnalyzer : ITextAnalyzer
 
     private static bool IsUtf8(EncodingInfo encoding) => encoding.Name == WellKnownEncodings.Utf8;
 
-    public string[] RequiredAnalyzers { get; } = { "ASCII" };
+    public string[] AnalyzerIds { get; } = { "ASCII" };
 }

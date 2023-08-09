@@ -81,7 +81,7 @@ public class UTF16Heuristics : ITextAnalyzer
         return false;
     }
 
-    public string[] RequiredAnalyzers { get; } = { "UTF-16" };
+    public string[] AnalyzerIds { get; } = { "UTF-16" };
     
     private static readonly HashSet<char> CommonChars = CommonlyUsedCharacters.EnglishChars
         .Concat(CommonlyUsedCharacters.CommonSpecialCharacters)

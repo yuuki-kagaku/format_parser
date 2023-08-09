@@ -32,5 +32,5 @@ public class Utf32BeDecoder : DecoderBase, ITextDecoder
 
     public override string[]? RequiredEncodingAnalyzers => null;
 
-    public override DetectionProbability DefaultDetectionProbability => DetectionProbability.Lowest;
+    public override DetectionProbability DefaultDetectionProbability => DetectionProbability.Low;
 }

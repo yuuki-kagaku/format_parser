@@ -22,6 +22,7 @@ public class FormatDetector_Tests : TestBase
         {
             new AsciiCharactersTextAnalyzer(),
             new UTF16Heuristics(),
+            new HeaderTextAnalyzer(),
             new RuDictionaryTextAnalyzer()
         };
 
@@ -32,7 +33,8 @@ public class FormatDetector_Tests : TestBase
             new Utf16BeDecoder(textParserSettings),
             new Utf32LeDecoder(textParserSettings),
             new Utf32BeDecoder(textParserSettings),
-            new Windows1251Decoder(textParserSettings)
+            new Windows1251Decoder(textParserSettings),
+            new EBCDICDecoder(textParserSettings)
         };
 
         var decoder = new CompositeTextFormatDecoder(textDecoders, textAnalyzers);
@@ -55,6 +57,19 @@ public class FormatDetector_Tests : TestBase
         result.MimeType.Should().Be("text/xml");
     }
     
+    [Test]
+    public async Task Should_read_ebcdic_xml()
+    {
+        var file = GetFile(TestFileCategory.Ebcdic, "ebcdic.xml");
+
+        await using var stream =  new FileStream(file, FileMode.Open, FileAccess.ReadWrite);
+        var result = (await formatDetector.DetectAsync(stream)) as TextFileFormatInfo;
+
+        result.Should().NotBeNull();
+        result!.Encoding.Should().Be(new EncodingInfo("IBM037", Endianness.NotAllowed, false));
+        result.MimeType.Should().Be("text/xml");
+    }
+
     [Test]
     public async Task Should_read_utf16be_xml()
     {

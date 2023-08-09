@@ -19,5 +19,5 @@ public class RuDictionaryTextAnalyzer : ITextAnalyzer
         return pattern.IsMatch(text.ToLower()) ? DetectionProbability.High : DetectionProbability.No;
     }
 
-    public string[] RequiredAnalyzers { get; } = {"ru"};
+    public string[] AnalyzerIds { get; } = {"ru"};
 }

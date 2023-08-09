@@ -26,7 +26,7 @@
         </ItemGroup>
 
         <ItemGroup>
-            <PluginWin1251 Include="$(SolutionDir)\FormatParser.Win1251\bin\$(Configuration)\$(TargetFramework)\*" />
+            <PluginWin1251 Include="$(SolutionDir)\FormatParser.Windows1251\bin\$(Configuration)\$(TargetFramework)\*" />
         </ItemGroup>
         
         <Copy SourceFiles="@(PluginElf)" DestinationFiles="@(PluginElf->'$(OutputPath)\plugins\ELF\%(RecursiveDir)%(Filename)%(Extension)')"
