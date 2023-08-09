@@ -1,4 +1,6 @@
+
 using FluentAssertions;
+using FormatParser.Domain;
 using FormatParser.Text;
 using FormatParser.Windows1251;
 using NUnit.Framework;
@@ -26,7 +28,7 @@ public class Windows1251Detector_Tests : TestBase
         var textDecodingResult = decoder.TryDecodeText(content);
         textDecodingResult.Should().NotBeNull();
         
-        textDecodingResult!.Encoding.Should().BeEquivalentTo(decoder.EncodingWithoutBom);
+        textDecodingResult!.Encoding.Should().BeEquivalentTo(new EncodingInfo(decoder.EncodingName, Endianness.NotAllowed, false));
         BuildString(textDecodingResult.Chars).Should().Be(ReadFileAsWindows1251(filename));
     }
 }

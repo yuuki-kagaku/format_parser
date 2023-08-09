@@ -10,19 +10,22 @@ public enum Architecture
     I386,
     Amd64,
     
-    Arm, // AARCH32
+    Arm,
     Arm64,
     
     Ia64,
     M68K,
 
-    PowerPC,
+    PowerPcBigEndian,
+    PowerPcLittleEndian,
     Ppc64,
     
     Sparc,
         
-    Mips,
-    S390, // IBM System Z
+    MipsLittleEndian,
+    MipsBigEndian,
+    S390,
+    S390x,
     
     RiscV,
 }

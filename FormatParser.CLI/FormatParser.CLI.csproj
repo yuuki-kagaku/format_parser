@@ -27,6 +27,9 @@
       <ProjectReference Include="..\FormatParser.Windows1251\FormatParser.Windows1251.csproj">
           <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       </ProjectReference>
+        <ProjectReference Include="..\FormatParser.Ebcdic\FormatParser.Ebcdic.csproj">
+            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+        </ProjectReference>
       <ProjectReference Include="..\FormatParser.Xml\FormatParser.Xml.csproj">
           <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       </ProjectReference>

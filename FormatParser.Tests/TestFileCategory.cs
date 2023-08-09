@@ -19,6 +19,7 @@ public enum TestFileCategory
     Text,
     TextUtf32,
     Xml,
+    Ebcdic,
     PseudoText,
     TextUtf16,
     TextUtf8,

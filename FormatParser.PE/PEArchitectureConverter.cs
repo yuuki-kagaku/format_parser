@@ -4,19 +4,16 @@ namespace FormatParser.PE;
 
 public static class PEArchitectureConverter
 {
-    public static (Architecture, Bitness) Convert(uint i)
-    {
-        var bitness = (i & 0x00FF) == 0x64 ? Bitness.Bitness64: Bitness.Bitness32;
-
-        return (GetArchitecture(), bitness);
-        
-        Architecture GetArchitecture() => i switch
+    public static (Architecture, Bitness) Convert(uint i) =>
+        i switch
         {
-            PEConstants.IMAGE_FILE_MACHINE_I386 => Architecture.I386,
-            PEConstants.IMAGE_FILE_MACHINE_AMD64 => Architecture.Amd64,
-            PEConstants.IMAGE_FILE_MACHINE_IA64 => Architecture.Ia64,
-            PEConstants.IMAGE_FILE_MACHINE_ARM64 => Architecture.Arm64,
-            _ => Architecture.Unknown
+            PEConstants.IMAGE_FILE_MACHINE_I386 => (Architecture.I386, Bitness.Bitness32),
+            PEConstants.IMAGE_FILE_MACHINE_AMD64 => (Architecture.Amd64, Bitness.Bitness64),
+            PEConstants.IMAGE_FILE_MACHINE_IA64 => (Architecture.Ia64, Bitness.Bitness64),
+            PEConstants.IMAGE_FILE_MACHINE_ARM64 => (Architecture.Arm64, Bitness.Bitness64),
+            PEConstants.IMAGE_FILE_MACHINE_ARM => (Architecture.Arm, Bitness.Bitness32),
+            PEConstants.IMAGE_FILE_MACHINE_THUMB => (Architecture.Arm, Bitness.Bitness32),
+            PEConstants.IMAGE_FILE_MACHINE_ARMNT => (Architecture.Arm, Bitness.Bitness32),
+            _ => throw new FormatParserException("Unknown architecture")
         };
-    }
 }

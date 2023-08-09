@@ -6,11 +6,12 @@ namespace FormatParser.Text.Decoders;
 
 public class Utf32BeDecoder : DecoderBase, ITextDecoder
 {
-    private readonly CharacterValidatorSettings settings;
+    private readonly HashSet<char> invalidChars;
 
     public Utf32BeDecoder(TextFileParsingSettings settings)
     {
-        this.settings = new CharacterValidatorSettings(settings.AllowEscapeChar, settings.AllowFormFeed, settings.AllowC1ControlsForUtf, false);
+        var characterValidationSettings = new CharacterValidationSettings(settings.AllowEscapeChar, settings.AllowFormFeed, settings.AllowC1ControlsForUtf, false);
+        invalidChars = InvalidCharactersHelper.GetForbiddenChars(characterValidationSettings).ToHashSet();
     }
     
     protected override Decoder GetDecoder(int inputSize)
@@ -20,15 +21,17 @@ public class Utf32BeDecoder : DecoderBase, ITextDecoder
         return encoding.GetDecoder();
     }
 
-    public override IEnumerable<char> GetInvalidCharacters => InvalidCharactersHelper.GetForbiddenChars(settings);
+    protected override IReadOnlySet<char> InvalidCharacters => invalidChars;
 
     protected override int MinimalSizeOfInput => 8;
 
-    protected override bool SupportBom => true;
+    public override bool SupportBom => true;
+
+    public override string EncodingName => WellKnownEncodings.Utf32;
     protected override EncodingInfo EncodingWithBom => WellKnownEncodingInfos.Utf32BeBom;
-    public override EncodingInfo EncodingWithoutBom => WellKnownEncodingInfos.Utf32BeNoBom;
+    protected override EncodingInfo EncodingWithoutBom => WellKnownEncodingInfos.Utf32BeNoBom;
 
     public override string[]? RequiredEncodingAnalyzers => null;
 
-    public override DetectionProbability DefaultDetectionProbability => DetectionProbability.Lowest;
+    public override DetectionProbability DefaultDetectionProbability => DetectionProbability.Low;
 }

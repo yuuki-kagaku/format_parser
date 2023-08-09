@@ -12,7 +12,7 @@ public class CompositeTextFormatDecoder
     private readonly ITextDecoder[] decoders;
     private readonly ITextBasedFormatDetector[] textBasedFormatDetectors;
     private readonly Dictionary<ITextDecoder, IEnumerable<ITextAnalyzer>> encodingAnalyzersDictionary;
-    private readonly Dictionary<ITextDecoder, CharacterValidator> invalidCharactersCheckers;
+    private readonly Dictionary<ITextDecoder, Func<char, bool>> validCharactersCheckers;
 
     public CompositeTextFormatDecoder(ITextDecoder[] decoders, ITextAnalyzer[] textAnalyzers, ITextBasedFormatDetector[] textBasedFormatDetectors)
     {
@@ -20,11 +20,12 @@ public class CompositeTextFormatDecoder
         this.textBasedFormatDetectors = textBasedFormatDetectors;
         
         var encodingAnalyzersById = textAnalyzers
-            .SelectMany(analyzer => analyzer.RequiredAnalyzers.Select(lang => (Language: lang, Analyzer: analyzer)))
-            .ToDictionary(x => x.Language, x => x.Analyzer);
+            .SelectMany(analyzer => analyzer.AnalyzerIds.Select(id => (Id: id, Analyzer: analyzer)))
+            .GroupBy(x => x.Id)
+            .ToDictionary(x => x.Key, x => x.Select(y => y.Analyzer).ToArray());
 
         encodingAnalyzersDictionary = decoders.ToDictionary(x => x, x => GetEncodingAnalyzers(x, encodingAnalyzersById));
-        invalidCharactersCheckers = decoders.ToDictionary(x => x, x => new CharacterValidator(x.GetInvalidCharacters));
+        validCharactersCheckers = decoders.ToDictionary(x => x, x => new Func<char, bool>(x.IsCharacterValid));
     }
 
     public bool TryDecode(ArraySegment<byte> bytes, [NotNullWhen(true)] out TextFileFormatInfo? resultFormatInfo)
@@ -40,8 +41,7 @@ public class CompositeTextFormatDecoder
                 if (decodeResult == null) 
                     continue;
                 
-                
-                if (!invalidCharactersCheckers[decoder].AllCharactersIsValid(decodeResult.Chars))
+                if (!decodeResult.Chars.All(validCharactersCheckers[decoder]))
                     continue;
 
                 var text = decodeResult.Chars.AsString();
@@ -109,17 +109,18 @@ public class CompositeTextFormatDecoder
         }
     }
     
-    private static IEnumerable<ITextAnalyzer> GetEncodingAnalyzers(ITextDecoder decoder, Dictionary<string, ITextAnalyzer> encodingAnalyzersByLanguage)
+    private static IEnumerable<ITextAnalyzer> GetEncodingAnalyzers(ITextDecoder decoder, Dictionary<string, ITextAnalyzer[]> encodingAnalyzersByLanguage)
     {
         if (decoder.RequiredEncodingAnalyzers == null)
             yield break;
 
         foreach (var encodingAnalyzerId in decoder.RequiredEncodingAnalyzers)
         {
-            if (!encodingAnalyzersByLanguage.TryGetValue(encodingAnalyzerId, out var analyzer))
-                throw new Exception($"Could not find analyzer for {decoder.RequiredEncodingAnalyzers}");
-
-            yield return analyzer;
+            if (!encodingAnalyzersByLanguage.TryGetValue(encodingAnalyzerId, out var analyzers))
+                throw new Exception($"Could not find analyzer for id: {encodingAnalyzerId}.");
+            
+            foreach (var analyzer in analyzers)
+                yield return analyzer;
         }
     }
 

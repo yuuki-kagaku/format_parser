@@ -6,12 +6,12 @@ namespace FormatParser.Text.Decoders;
 
 public class Utf16BeDecoder : DecoderBase, ITextDecoder
 {
-    private readonly CharacterValidatorSettings settings;
+    private readonly HashSet<char> invalidChars;
 
     public Utf16BeDecoder(TextFileParsingSettings settings)
     {
-        this.settings = new CharacterValidatorSettings(settings.AllowEscapeChar, settings.AllowFormFeed,
-            settings.AllowC1ControlsForUtf, false);
+        var characterValidationSettings = new CharacterValidationSettings(settings.AllowEscapeChar, settings.AllowFormFeed, settings.AllowC1ControlsForUtf, false);
+        invalidChars = InvalidCharactersHelper.GetForbiddenChars(characterValidationSettings).ToHashSet();
     }
 
     protected override Decoder GetDecoder(int inputSize)
@@ -21,13 +21,15 @@ public class Utf16BeDecoder : DecoderBase, ITextDecoder
         return encoding.GetDecoder();
     }
 
-    public override IEnumerable<char> GetInvalidCharacters => InvalidCharactersHelper.GetForbiddenChars(settings);
+    protected override IReadOnlySet<char> InvalidCharacters => invalidChars;
 
     protected override int MinimalSizeOfInput => 8;
+    
+    public override string EncodingName => WellKnownEncodings.Utf16;
 
-    protected override bool SupportBom => true;
+    public override bool SupportBom => true;
     protected override EncodingInfo EncodingWithBom => WellKnownEncodingInfos.Utf16BeBom;
-    public override EncodingInfo EncodingWithoutBom => WellKnownEncodingInfos.Utf16BeNoBom;
+    protected override EncodingInfo EncodingWithoutBom => WellKnownEncodingInfos.Utf16BeNoBom;
 
     public override string[]? RequiredEncodingAnalyzers { get; } = { "UTF-16" };
 

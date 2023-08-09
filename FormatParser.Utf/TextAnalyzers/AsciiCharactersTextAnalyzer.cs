@@ -20,10 +20,10 @@ public class AsciiCharactersTextAnalyzer : ITextAnalyzer
             return DetectionProbability.High;
         }
             
-        return DetectionProbability.MediumLow;
+        return DetectionProbability.Medium;
     }
 
     private static bool IsUtf8(EncodingInfo encoding) => encoding.Name == WellKnownEncodings.Utf8;
 
-    public string[] RequiredAnalyzers { get; } = { "ASCII" };
+    public string[] AnalyzerIds { get; } = { "ASCII" };
 }

@@ -6,11 +6,12 @@ namespace FormatParser.Text.Decoders;
 
 public class Utf8Decoder : DecoderBase, ITextDecoder
 {
-    private readonly CharacterValidatorSettings settings;
+    private readonly HashSet<char> invalidChars;
 
     public Utf8Decoder(TextFileParsingSettings settings)
     {
-        this.settings = new CharacterValidatorSettings(settings.AllowEscapeChar, settings.AllowFormFeed, settings.AllowC1ControlsForUtf, false);
+        var characterValidationSettings = new CharacterValidationSettings(settings.AllowEscapeChar, settings.AllowFormFeed, settings.AllowC1ControlsForUtf, false);
+        invalidChars = InvalidCharactersHelper.GetForbiddenChars(characterValidationSettings).ToHashSet();
     }
 
     protected override Decoder GetDecoder(int inputSize)
@@ -20,15 +21,17 @@ public class Utf8Decoder : DecoderBase, ITextDecoder
         return encoding.GetDecoder();
     }
 
-    public override IEnumerable<char> GetInvalidCharacters => InvalidCharactersHelper.GetForbiddenChars(settings);
+    protected override IReadOnlySet<char> InvalidCharacters => invalidChars;
 
     protected override int MinimalSizeOfInput => 0;
+    
+    public override string EncodingName => WellKnownEncodings.Utf8;
 
-    protected override bool SupportBom => true;
+    public override bool SupportBom => true;
     protected override EncodingInfo EncodingWithBom => WellKnownEncodingInfos.Utf8Bom;
-    public override EncodingInfo EncodingWithoutBom => WellKnownEncodingInfos.Utf8NoBom;
+    protected override EncodingInfo EncodingWithoutBom => WellKnownEncodingInfos.Utf8NoBom;
 
     public override string[]? RequiredEncodingAnalyzers { get; } = { "ASCII" };
     
-    public override DetectionProbability DefaultDetectionProbability => DetectionProbability.Lowest;
+    public override DetectionProbability DefaultDetectionProbability => DetectionProbability.Low;
 }
