@@ -28,12 +28,12 @@ public class AsciiBasedEncodingDecoder : Decoder
     public override int GetChars(byte[] bytes, int byteIndex, int byteCount, char[] chars, int charIndex)
     {
         var result = decoder.GetChars(bytes, byteIndex, byteCount, chars, charIndex);
-        for (var i = 0; i < result; i++)
+        for (var i = charIndex; i < result; i++)
         {
             if (CharacterHelper.IsAscii(chars[i]) && !ControlCharacters.IsNonTextC0Control(chars[i])) 
                 continue;
             
-            if (i == 0 && chars[i] == CharacterHelper.Bom)
+            if (i == charIndex && chars[i] == CharacterHelper.Bom)
                 continue;
                 
             chars[i] = '?';
