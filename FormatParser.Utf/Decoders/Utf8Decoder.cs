@@ -28,6 +28,9 @@ public class Utf8Decoder : DecoderBase, ITextDecoder
     public override string EncodingName => WellKnownEncodings.Utf8;
 
     public override bool SupportBom => true;
+    
+    public override bool RequireTextBasedFormatMatch { get; } = false;
+
     protected override EncodingInfo EncodingWithBom => WellKnownEncodingInfos.Utf8Bom;
     protected override EncodingInfo EncodingWithoutBom => WellKnownEncodingInfos.Utf8NoBom;
 

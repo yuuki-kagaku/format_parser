@@ -24,6 +24,9 @@ public class Utf32LeDecoder : DecoderBase, ITextDecoder
     protected override IReadOnlySet<char> InvalidCharacters => invalidChars;
 
     public override bool SupportBom => true;
+    
+    public override bool RequireTextBasedFormatMatch { get; } = false;
+
     protected override EncodingInfo EncodingWithBom => WellKnownEncodingInfos.Utf32LeBom;
     protected override EncodingInfo EncodingWithoutBom => WellKnownEncodingInfos.Utf32LeNoBom;
     

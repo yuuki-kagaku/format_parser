@@ -14,4 +14,6 @@ public interface ITextDecoder
     bool SupportBom { get; }
     
     string EncodingName { get; }
+    
+    bool RequireTextBasedFormatMatch { get; }
 }

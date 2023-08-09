@@ -4,6 +4,7 @@ using FormatParser.Text;
 using FormatParser.Text.Decoders;
 using FormatParser.Text.TextAnalyzers;
 using FormatParser.Windows1251;
+using FormatParser.Xml;
 
 namespace FormatParser.QualityChecker;
 
@@ -17,7 +18,8 @@ public static class EntryPoint
         {
             new AsciiCharactersTextAnalyzer(),
             new UTF16Heuristics(),
-            new RuDictionaryTextAnalyzer()
+            new RuDictionaryTextAnalyzer(),
+            new HeaderTextAnalyzer()
         };
 
         var textFileParsingSettings = new TextFileParsingSettings();
@@ -31,10 +33,11 @@ public static class EntryPoint
             new Utf32BeDecoder(textFileParsingSettings),
             new Windows1251Decoder(settings.TextFileParsingSettings)
         };
-        
+
         var compositeTextFormatDecoder = new CompositeTextFormatDecoder(
-            decoders, 
-            textAnalyzers);
+            decoders,
+            textAnalyzers,
+            new ITextBasedFormatDetector[] { new XmlDecoder() });
         
         var textDetectionComparer = new TextDetectionComparer(compositeTextFormatDecoder, settings);
         

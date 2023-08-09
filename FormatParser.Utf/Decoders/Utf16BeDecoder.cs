@@ -26,6 +26,8 @@ public class Utf16BeDecoder : DecoderBase, ITextDecoder
     protected override int MinimalSizeOfInput => 8;
     
     public override string EncodingName => WellKnownEncodings.Utf16;
+    
+    public override bool RequireTextBasedFormatMatch { get; } = false;
 
     public override bool SupportBom => true;
     protected override EncodingInfo EncodingWithBom => WellKnownEncodingInfos.Utf16BeBom;

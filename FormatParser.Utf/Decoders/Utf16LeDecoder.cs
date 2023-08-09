@@ -27,6 +27,8 @@ public class Utf16LeDecoder : DecoderBase, ITextDecoder
 
     public override bool SupportBom => true;
     
+    public override bool RequireTextBasedFormatMatch { get; } = false;
+    
     public override string EncodingName => WellKnownEncodings.Utf16;
     protected override EncodingInfo EncodingWithBom => WellKnownEncodingInfos.Utf16LeBom;
     protected override EncodingInfo EncodingWithoutBom => WellKnownEncodingInfos.Utf16LeNoBom;

@@ -13,6 +13,7 @@
       <ProjectReference Include="..\FormatParser.Utf\FormatParser.Utf.csproj" />
       <ProjectReference Include="..\FormatParser.Windows1251\FormatParser.Windows1251.csproj" />
       <ProjectReference Include="..\FormatParser.Core\FormatParser.Core.csproj" />
+      <ProjectReference Include="..\FormatParser.Xml\FormatParser.Xml.csproj" />
     </ItemGroup>
 
 </Project>

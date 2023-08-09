@@ -48,7 +48,7 @@ public class CompositeTextFormatDecoder
                 var matchedTextBasedFormat = false;
 
                 var defaultDetectionProbability = new MatchQuality(decoder.DefaultDetectionProbability, matchedTextBasedFormat);
-                if (defaultDetectionProbability > bestMatchProbability)
+                if (defaultDetectionProbability > bestMatchProbability && !decoder.RequireTextBasedFormatMatch)
                     (bestMatchProbability, resultFormatInfo) = (defaultDetectionProbability, CreatePlainTextFileFormat(decodeResult.Encoding));
 
                 var textFileFormatInfo = null as TextFileFormatInfo;
@@ -67,11 +67,14 @@ public class CompositeTextFormatDecoder
                     }
 
                     matchedTextBasedFormat = true;
-                    defaultDetectionProbability =defaultDetectionProbability with { MatchedTextBasedFormat = true };
+                    defaultDetectionProbability = defaultDetectionProbability with { MatchedTextBasedFormat = true };
                         
                     if (defaultDetectionProbability > bestMatchProbability)
                         (bestMatchProbability, resultFormatInfo) = (defaultDetectionProbability, textFileFormatInfo);
                 }
+                
+                if (decoder.RequireTextBasedFormatMatch && !matchedTextBasedFormat)
+                    continue;
                 
                 foreach (var textAnalyzer in encodingAnalyzersDictionary[decoder])
                 {
@@ -83,7 +86,6 @@ public class CompositeTextFormatDecoder
                     bestMatchProbability = detectionProbability;
                     var encoding = clarifiedEncoding ?? decodeResult.Encoding;
                     resultFormatInfo = textFileFormatInfo == null ? CreatePlainTextFileFormat(encoding) : textFileFormatInfo with {Encoding = encoding};
-                    
                     
                     if (bestMatchProbability is { MatchedTextBasedFormat: true, DetectionProbability: >= DetectionProbability.High })
                         return true;

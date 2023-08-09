@@ -20,7 +20,7 @@ public class XmlDecoder : ITextBasedFormatDetector
         
         return encodingAttributeMatch.Success
             ? new XmlFileFormatInfo(MimeType, encodingInfo with { Name = encodingAttributeMatch.Groups["encoding"].Value})
-            : new XmlFileFormatInfo(MimeType, encodingInfo);
+            : new XmlFileFormatInfo(MimeType, encodingInfo with { Name = WellKnownEncodings.Utf8});
     }
 
     private static string MimeType => "text/xml";

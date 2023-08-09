@@ -32,7 +32,9 @@ public abstract class DecoderBase : ITextDecoder
     public abstract bool SupportBom { get; }
 
     public abstract string EncodingName { get; }
-
+    
+    public abstract bool RequireTextBasedFormatMatch { get; }
+    
     public bool IsCharacterValid(char c) => !InvalidCharacters.Contains(c);
 
     protected abstract IReadOnlySet<char> InvalidCharacters { get; }

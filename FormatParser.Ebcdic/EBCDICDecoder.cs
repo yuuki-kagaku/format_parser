@@ -19,6 +19,8 @@ public class EBCDICDecoder : NonUtfDecoder
     public override DetectionProbability DefaultDetectionProbability => DetectionProbability.No;
     protected override int MinimalSizeOfInput { get; } = 0;
     public override string EncodingName { get; } = "IBM037";
+    
+    public override bool RequireTextBasedFormatMatch { get; } = false;
 
     protected override Decoder GetDecoder(int inputSize)
     {

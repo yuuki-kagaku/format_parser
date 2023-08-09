@@ -20,6 +20,8 @@ public class Windows1251Decoder : NonUtfDecoder
     public override DetectionProbability DefaultDetectionProbability => DetectionProbability.No;
     public override string[]? RequiredEncodingAnalyzers { get; } = { "ru" };
     
+    public override bool RequireTextBasedFormatMatch { get; } = false;
+    
     public override string EncodingName { get; } = "Windows-1251";
 
     protected override Decoder GetDecoder(int inputSize) => GetDecoder();

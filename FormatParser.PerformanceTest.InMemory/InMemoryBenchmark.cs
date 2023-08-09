@@ -59,16 +59,15 @@ public class InMemoryBenchmark
             new Utf32BeDecoder(textParserSettings),
             new Windows1251Decoder(textParserSettings),
         };
-
-        var compositeTextFormatDecoder = new CompositeTextFormatDecoder(textDecoders, textAnalyzers);
         
         var textBasedFormatDetectors = new ITextBasedFormatDetector[]
         {
             new XmlDecoder()
         };
 
+        var compositeTextFormatDecoder = new CompositeTextFormatDecoder(textDecoders, textAnalyzers, textBasedFormatDetectors);
+        
          detector = new FormatDetector(binaryFormatDetectors,
-             textBasedFormatDetectors, 
              compositeTextFormatDecoder,
              new TextFileParsingSettings()
          );

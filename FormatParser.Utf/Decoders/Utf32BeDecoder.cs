@@ -32,6 +32,8 @@ public class Utf32BeDecoder : DecoderBase, ITextDecoder
     protected override EncodingInfo EncodingWithoutBom => WellKnownEncodingInfos.Utf32BeNoBom;
 
     public override string[]? RequiredEncodingAnalyzers => null;
+    
+    public override bool RequireTextBasedFormatMatch { get; } = false;
 
     public override DetectionProbability DefaultDetectionProbability => DetectionProbability.Low;
 }
