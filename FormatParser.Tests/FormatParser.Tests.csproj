@@ -266,6 +266,9 @@
       <None Update="TestData\xml\ebcidic-de.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="TestData\pe\windows\Notepad2_arm32.exe">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

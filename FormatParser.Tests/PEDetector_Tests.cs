@@ -39,13 +39,24 @@ public class PEDetector_Tests : TestBase
     }
     
     [Test]
-    public async Task PeDetector_ShouldDetect_Arm_Exe()
+    public async Task PeDetector_ShouldDetect_Arm64_Exe()
     {
         var fileInfo = await DetectAsync(GetFile(TestFileCategory.PeWindows, "procexp64a.exe"));
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
         fileInfo.Architecture.Should().Be(Architecture.Arm64);
+        fileInfo.IsManaged.Should().Be(false);
+    }
+    
+    [Test]
+    public async Task PeDetector_ShouldDetect_Arm32_Exe()
+    {
+        var fileInfo = await DetectAsync(GetFile(TestFileCategory.PeWindows, "Notepad2_arm32.exe"));
+
+        fileInfo.Should().NotBeNull();
+        fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
+        fileInfo.Architecture.Should().Be(Architecture.Arm);
         fileInfo.IsManaged.Should().Be(false);
     }
     
