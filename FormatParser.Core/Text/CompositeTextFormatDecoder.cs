@@ -51,16 +51,14 @@ public class CompositeTextFormatDecoder
                 if (defaultDetectionProbability > bestMatchProbability && !decoder.RequireTextBasedFormatMatch)
                     (bestMatchProbability, resultFormatInfo) = (defaultDetectionProbability, CreatePlainTextFileFormat(decodeResult.Encoding));
 
-                var textFileFormatInfo = null as TextFileFormatInfo;
-                
                 foreach (var textBasedFormatDetector in textBasedFormatDetectors)
                 {
-                    textFileFormatInfo = MatchTextBasedFormat(textBasedFormatDetector, text, decodeResult.Encoding);
+                    var textFileFormatInfo = MatchTextBasedFormat(textBasedFormatDetector, text, decodeResult.Encoding, out var encodingIsConclusive);
 
                     if (textFileFormatInfo == null)
                         continue;
 
-                    if (textFileFormatInfo.Encoding != decodeResult.Encoding)
+                    if (encodingIsConclusive)
                     {
                         resultFormatInfo = textFileFormatInfo;
                         return true;
@@ -68,12 +66,18 @@ public class CompositeTextFormatDecoder
 
                     matchedTextBasedFormat = true;
                     defaultDetectionProbability = defaultDetectionProbability with { MatchedTextBasedFormat = true };
-                        
+
                     if (defaultDetectionProbability > bestMatchProbability)
+                    {
                         (bestMatchProbability, resultFormatInfo) = (defaultDetectionProbability, textFileFormatInfo);
+                        break;
+                    }
                 }
                 
                 if (decoder.RequireTextBasedFormatMatch && !matchedTextBasedFormat)
+                    continue;
+                
+                if (!matchedTextBasedFormat && bestMatchProbability.MatchedTextBasedFormat)
                     continue;
                 
                 foreach (var textAnalyzer in encodingAnalyzersDictionary[decoder])
@@ -99,14 +103,15 @@ public class CompositeTextFormatDecoder
         return bestMatchProbability > new MatchQuality(DetectionProbability.No, false);
     }
 
-    private static TextFileFormatInfo? MatchTextBasedFormat(ITextBasedFormatDetector textBasedFormatDetector, string text, EncodingInfo encoding)
+    private static TextFileFormatInfo? MatchTextBasedFormat(ITextBasedFormatDetector textBasedFormatDetector, string text, EncodingInfo encoding, out bool encodingIsConclusive)
     {
         try
         {
-            return textBasedFormatDetector.TryMatchFormat(text, encoding);
+            return textBasedFormatDetector.TryMatchFormat(text, encoding, out encodingIsConclusive);
         }
         catch
         {
+            encodingIsConclusive = false;
             return null;
         }
     }

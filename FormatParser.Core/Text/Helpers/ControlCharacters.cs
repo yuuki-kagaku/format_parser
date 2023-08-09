@@ -28,4 +28,6 @@ public static class ControlCharacters
         Enumerable.Range(128, 32)
             .Select(x => (char)x)
             .ToHashSet();
+
+    public static bool IsNonTextC0Control(char c) => NonTextC0Controls.Contains(c);
 }

@@ -14,7 +14,7 @@ public class HeaderTextAnalyzer : ITextAnalyzer
         if (firstNewLine == -1 || firstNewLine < 2)
             return DetectionProbability.No;
 
-        if (!text.Take(firstNewLine - 1).All(IsAscii))
+        if (!text.Take(firstNewLine - 1).All(CharacterHelper.IsAscii))
             return DetectionProbability.No;
 
         foreach (var (first, last) in Patterns)
@@ -25,9 +25,7 @@ public class HeaderTextAnalyzer : ITextAnalyzer
 
         return DetectionProbability.No;
     }
-
-    private static bool IsAscii(char c) => c < ControlCharacters.Delete;
-
+    
     private static (char Firts, char Last)[] Patterns = { ('<', '>'), ('[', ']') };
     public string[] AnalyzerIds { get; } = { "header_analyzer" };
 }

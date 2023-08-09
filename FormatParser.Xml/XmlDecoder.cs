@@ -14,16 +14,20 @@ public class XmlDecoder : ITextBasedFormatDetector
 
     private static string MimeType => "text/xml";
     
-    public TextFileFormatInfo? TryMatchFormat(string header, EncodingInfo
-        encodingInfo)
+    public TextFileFormatInfo? TryMatchFormat(string header, EncodingInfo encodingInfo, out bool encodingIsConclusive)
     {
+        
         var match = XmlHeaderPattern.Match(header);
 
         if (!match.Success)
+        {
+            encodingIsConclusive = false;
             return null;
+        }
 
         var encodingAttributeMatch = EncodingPattern.Match(header[..match.Length]);
-
+        encodingIsConclusive = true;
+        
         return encodingAttributeMatch.Success
             ? new XmlFileFormatInfo(MimeType, encodingInfo with { Name = encodingAttributeMatch.Groups["encoding"].Value })
             : new XmlFileFormatInfo(MimeType, encodingInfo with { Name = GetName(encodingInfo.Name) });

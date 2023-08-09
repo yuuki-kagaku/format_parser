@@ -4,5 +4,5 @@ namespace FormatParser.Text;
 
 public interface ITextBasedFormatDetector
 {
-    TextFileFormatInfo? TryMatchFormat(string text, EncodingInfo encodingInfo);
+    TextFileFormatInfo? TryMatchFormat(string text, EncodingInfo encodingInfo, out bool encodingIsConclusive);
 }

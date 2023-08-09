@@ -36,7 +36,7 @@ public class FormatDetector_Tests : TestBase
             new Utf32BeDecoder(textParserSettings),
             new Windows1251Decoder(textParserSettings),
             new EBCDICDecoder(textParserSettings),
-            new AsciiBasedFallbackDecoder(textParserSettings),
+            new UnknownAsciiBasedEncodingDecoder(textParserSettings),
         };
         
         var textBasedFormatDetectors = new ITextBasedFormatDetector[]

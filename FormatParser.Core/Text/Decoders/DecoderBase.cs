@@ -14,8 +14,8 @@ public abstract class DecoderBase : ITextDecoder
         {
             var chars = new char[bytes.Count];
             var numberOfChars = decoder.GetChars(bytes, chars, true);
-
-            if (SupportBom && chars[0] == UnicodeHelper.Bom)
+            
+            if (SupportBom && chars[0] == CharacterHelper.Bom)
                 return new TextDecodingResult(new ArraySegment<char>(chars, 1, numberOfChars - 1), EncodingWithBom);
            
             if (bytes.Count < MinimalSizeOfInput)

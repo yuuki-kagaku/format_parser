@@ -22,7 +22,7 @@ public static class EntryPoint
             new HeaderTextAnalyzer()
         };
 
-        var textFileParsingSettings = new TextFileParsingSettings();
+        var textFileParsingSettings = new TextFileParsingSettings() {AllowC1ControlsForUtf = false};
         
         var decoders = new ITextDecoder[]
         {
