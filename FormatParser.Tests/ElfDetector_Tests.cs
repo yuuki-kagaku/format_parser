@@ -59,7 +59,7 @@ public class ElfDetector_Tests : TestBase
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
-        fileInfo.Architecture.Should().Be(Architecture.S390);
+        fileInfo.Architecture.Should().Be(Architecture.S390x);
         fileInfo.Endianness.Should().Be(Endianness.BigEndian);
         fileInfo.Interpreter.Should().Be("/lib/ld64.so.1");
     }
@@ -95,7 +95,7 @@ public class ElfDetector_Tests : TestBase
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
-        fileInfo.Architecture.Should().Be(Architecture.Mips);
+        fileInfo.Architecture.Should().Be(Architecture.MipsBigEndian);
         fileInfo.Endianness.Should().Be(Endianness.BigEndian);
         fileInfo.Interpreter.Should().Be("/lib/ld.so.1");
     }
@@ -107,7 +107,7 @@ public class ElfDetector_Tests : TestBase
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness32);
-        fileInfo.Architecture.Should().Be(Architecture.Mips);
+        fileInfo.Architecture.Should().Be(Architecture.MipsLittleEndian);
         fileInfo.Endianness.Should().Be(Endianness.LittleEndian);
         fileInfo.Interpreter.Should().Be("/lib/ld.so.1");
     }
@@ -119,7 +119,7 @@ public class ElfDetector_Tests : TestBase
 
         fileInfo.Should().NotBeNull();
         fileInfo!.Bitness.Should().Be(Bitness.Bitness64);
-        fileInfo.Architecture.Should().Be(Architecture.Mips);
+        fileInfo.Architecture.Should().Be(Architecture.MipsLittleEndian);
         fileInfo.Endianness.Should().Be(Endianness.LittleEndian);
         fileInfo.Interpreter.Should().Be("/lib64/ld.so.1");
     }

@@ -9,5 +9,9 @@ public interface ITextDecoder
     string[]? RequiredEncodingAnalyzers { get; }
     DetectionProbability DefaultDetectionProbability { get; }
 
-    IEnumerable<char> GetInvalidCharacters { get; }
+    bool IsCharacterValid(char c);
+    
+    bool SupportBom { get; }
+    
+    string EncodingName { get; }
 }

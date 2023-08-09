@@ -37,7 +37,7 @@ public class MacODetector_Tests : TestBase
         fileInfo.Datas[1].Signed.Should().Be(true);
         
         fileInfo.Datas[2].Bitness.Should().Be(Bitness.Bitness32);
-        fileInfo.Datas[2].Architecture.Should().Be(Architecture.PowerPC);
+        fileInfo.Datas[2].Architecture.Should().Be(Architecture.PowerPcBigEndian);
         fileInfo.Datas[2].Endianness.Should().Be(Endianness.BigEndian);
         fileInfo.Datas[2].Signed.Should().Be(true);
     }

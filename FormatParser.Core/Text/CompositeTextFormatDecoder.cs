@@ -11,7 +11,7 @@ public class CompositeTextFormatDecoder
 {
     private readonly ITextDecoder[] decoders;
     private readonly Dictionary<ITextDecoder, IEnumerable<ITextAnalyzer>> encodingAnalyzersDictionary;
-    private readonly Dictionary<ITextDecoder, CharacterValidator> invalidCharactersCheckers;
+    private readonly Dictionary<ITextDecoder, Func<char, bool>> validCharactersCheckers;
 
     public CompositeTextFormatDecoder(ITextDecoder[] decoders, ITextAnalyzer[] textAnalyzers)
     {
@@ -21,7 +21,7 @@ public class CompositeTextFormatDecoder
             .ToDictionary(x => x.Language, x => x.Analyzer);
 
         encodingAnalyzersDictionary = decoders.ToDictionary(x => x, x => GetEncodingAnalyzers(x, encodingAnalyzersById));
-        invalidCharactersCheckers = decoders.ToDictionary(x => x, x => new CharacterValidator(x.GetInvalidCharacters));
+        validCharactersCheckers = decoders.ToDictionary(x => x, x => new Func<char, bool>(x.IsCharacterValid));
     }
 
     public bool TryDecode(ArraySegment<byte> bytes, [NotNullWhen(true)] out EncodingInfo? resultEncoding, [NotNullWhen(true)] out string? resultTextSample)
@@ -38,7 +38,7 @@ public class CompositeTextFormatDecoder
                 if (decodeResult == null) 
                     continue;
                 
-                if (!invalidCharactersCheckers[decoder].AllCharactersIsValid(decodeResult.Chars))
+                if (!decodeResult.Chars.All(validCharactersCheckers[decoder]))
                     continue;
 
                 var text = decodeResult.Chars.AsString();

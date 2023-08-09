@@ -1,4 +1,5 @@
 using FormatParser.Domain;
+using FormatParser.Text.Helpers;
 
 namespace FormatParser.Text;
 

@@ -31,7 +31,7 @@ public class MachODetector : IBinaryFormatDetector
         var headers = new List<(Architecture, ulong Offset)>(numberOfArchitectures);
         
         for (var i = 0; i < numberOfArchitectures; i++)
-            headers.Add(await ReadArchitecturesOfFatFileAsync(binaryReader, bitness));
+            headers.Add(await ReadArchitecturesOfFatFileAsync(binaryReader, endianness, bitness));
 
         var result = new List<MachOFileFormatInfo>(numberOfArchitectures);
         foreach (var (architecture, offset) in headers)
@@ -52,7 +52,7 @@ public class MachODetector : IBinaryFormatDetector
     private static async Task<MachOFileFormatInfo> ReadNonFatFormatInfoAsync(StreamingBinaryReader binaryReader, Bitness bitness, Endianness endianness)
     {
         binaryReader.SetEndianness(endianness);
-        var (numberOfCommands, architecture) = await ReadNonFatHeaderAsync(binaryReader, bitness);
+        var (numberOfCommands, architecture) = await ReadNonFatHeaderAsync(binaryReader, endianness, bitness);
 
         for (var i = 0; i < numberOfCommands; i++)
         {
@@ -68,9 +68,9 @@ public class MachODetector : IBinaryFormatDetector
         return new MachOFileFormatInfo(endianness, bitness, architecture, false);
     }
 
-    private static async Task<(Architecture, ulong Offset)> ReadArchitecturesOfFatFileAsync(StreamingBinaryReader streamingBinaryReader, Bitness bitness)
+    private static async Task<(Architecture, ulong Offset)> ReadArchitecturesOfFatFileAsync(StreamingBinaryReader streamingBinaryReader, Endianness endianness, Bitness bitness)
     {
-        var architecture = MachOArchitectureConverter.Convert(await streamingBinaryReader.ReadIntAsync()); // cputype
+        var architecture = MachOArchitectureConverter.Convert(await streamingBinaryReader.ReadIntAsync(), endianness); // cputype
         streamingBinaryReader.SkipInt(); // cpusubtype
         var offset = await streamingBinaryReader.ReadPointerAsync(bitness); // offset
         streamingBinaryReader.SkipPointer(bitness); // size
@@ -82,9 +82,9 @@ public class MachODetector : IBinaryFormatDetector
         return (architecture, offset);
     }
     
-    private static async Task<NonFatHeader> ReadNonFatHeaderAsync(StreamingBinaryReader streamingBinaryReader, Bitness bitness)
+    private static async Task<NonFatHeader> ReadNonFatHeaderAsync(StreamingBinaryReader streamingBinaryReader, Endianness endianness, Bitness bitness)
     {
-        var architecture = MachOArchitectureConverter.Convert(await streamingBinaryReader.ReadIntAsync()); // cputype
+        var architecture = MachOArchitectureConverter.Convert(await streamingBinaryReader.ReadIntAsync(), endianness); // cputype
         streamingBinaryReader.SkipInt(); // cpusubtype
         streamingBinaryReader.SkipUInt(); // filetype
         var numberOfCommands = await streamingBinaryReader.ReadUIntAsync(); // ncmds

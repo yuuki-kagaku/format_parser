@@ -20,14 +20,15 @@ public class Utf16LeDecoder : DecoderBase, ITextDecoder
         return encoding.GetDecoder();
     }
 
-    public override IEnumerable<char> GetInvalidCharacters => InvalidCharactersHelper
-        .GetForbiddenChars(settings);
+    protected override IReadOnlySet<char> InvalidCharacters => InvalidCharactersHelper.GetForbiddenChars(settings).ToHashSet();
 
     protected override int MinimalSizeOfInput => 8;
 
-    protected override bool SupportBom => true;
+    public override bool SupportBom => true;
+    
+    public override string EncodingName => WellKnownEncodings.Utf16;
     protected override EncodingInfo EncodingWithBom => WellKnownEncodingInfos.Utf16LeBom;
-    public override EncodingInfo EncodingWithoutBom => WellKnownEncodingInfos.Utf16LeNoBom;
+    protected override EncodingInfo EncodingWithoutBom => WellKnownEncodingInfos.Utf16LeNoBom;
 
     public override string[]? RequiredEncodingAnalyzers { get; } = { "UTF-16" };
     

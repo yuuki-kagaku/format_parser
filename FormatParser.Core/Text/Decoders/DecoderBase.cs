@@ -29,10 +29,14 @@ public abstract class DecoderBase : ITextDecoder
         }
     }
     
-    public abstract EncodingInfo EncodingWithoutBom { get; }
+    public abstract bool SupportBom { get; }
 
-    public abstract IEnumerable<char> GetInvalidCharacters { get; }
+    public abstract string EncodingName { get; }
 
+    public bool IsCharacterValid(char c) => !InvalidCharacters.Contains(c);
+
+    protected abstract IReadOnlySet<char> InvalidCharacters { get; }
+    
     public abstract string[]? RequiredEncodingAnalyzers { get; }
     
     public abstract DetectionProbability DefaultDetectionProbability { get; }
@@ -41,7 +45,7 @@ public abstract class DecoderBase : ITextDecoder
 
     protected abstract int MinimalSizeOfInput { get; }
 
-    protected abstract bool SupportBom { get; }
-
     protected abstract EncodingInfo EncodingWithBom { get; }
+    
+    protected abstract EncodingInfo EncodingWithoutBom { get; }
 }
