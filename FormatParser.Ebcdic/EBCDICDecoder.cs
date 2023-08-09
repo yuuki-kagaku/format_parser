@@ -1,7 +1,8 @@
 using System.Text;
 using FormatParser.Domain;
+using FormatParser.Text;
 
-namespace FormatParser.Text;
+namespace FormatParser.Ebcdic;
 
 public class EBCDICDecoder : NonUtfDecoder
 {

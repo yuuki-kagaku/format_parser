@@ -29,6 +29,10 @@
             <PluginWin1251 Include="$(SolutionDir)\FormatParser.Windows1251\bin\$(Configuration)\$(TargetFramework)\*" />
         </ItemGroup>
         
+        <ItemGroup>
+            <PluginEbcdic Include="$(SolutionDir)\FormatParser.Ebcdic\bin\$(Configuration)\$(TargetFramework)\*" />
+        </ItemGroup>
+        
         <Copy SourceFiles="@(PluginElf)" DestinationFiles="@(PluginElf->'$(OutputPath)\plugins\ELF\%(RecursiveDir)%(Filename)%(Extension)')"
               ContinueOnError="false"
               OverwriteReadOnlyFiles="true"/>
@@ -46,6 +50,9 @@
               ContinueOnError="false"
               OverwriteReadOnlyFiles="true"/>
         <Copy SourceFiles="@(PluginWin1251)" DestinationFiles="@(PluginWin1251->'$(OutputPath)\plugins\Win1251\%(RecursiveDir)%(Filename)%(Extension)')"
+              ContinueOnError="false"
+              OverwriteReadOnlyFiles="true"/>
+        <Copy SourceFiles="@(PluginEbcdic)" DestinationFiles="@(PluginEbcdic->'$(OutputPath)\plugins\Ebcdic\%(RecursiveDir)%(Filename)%(Extension)')"
               ContinueOnError="false"
               OverwriteReadOnlyFiles="true"/>
         <Copy SourceFiles="@(PluginUTF)" DestinationFiles="@(PluginUTF->'$(OutputPath)\plugins\UTF\%(RecursiveDir)%(Filename)%(Extension)')"
