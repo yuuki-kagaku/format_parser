@@ -106,7 +106,7 @@ public class TextDetectionComparer
     
     private bool IsTextAccordingToFormatParser(ArraySegment<byte> buffer)
     {
-        return compositeTextFormatDecoder.TryDecode(buffer, out _, out _);
+        return compositeTextFormatDecoder.TryDecode(buffer, out _);
     }
 
     private static bool IsTextFile(string commandFileOutput, string file)
