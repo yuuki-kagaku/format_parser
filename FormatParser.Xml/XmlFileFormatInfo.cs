@@ -3,11 +3,7 @@ using FormatParser.Text;
 
 namespace FormatParser.Xml;
 
-public record XmlFileFormatInfo : TextFileFormatInfo
+public record XmlFileFormatInfo(string MimeType, EncodingInfo Encoding) : TextFileFormatInfo(MimeType, Encoding)
 {
-    public XmlFileFormatInfo(string MimeType, EncodingInfo Encoding) : base(MimeType, Encoding)
-    {
-    }
-
     protected override bool AlwaysPrintBom { get; } = true;
 }
