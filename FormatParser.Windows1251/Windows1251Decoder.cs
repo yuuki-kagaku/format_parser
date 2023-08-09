@@ -8,15 +8,15 @@ namespace FormatParser.Windows1251;
 
 public class Windows1251Decoder : NonUtfDecoder
 {
-    private readonly CharacterValidatorSettings settings;
+    private readonly HashSet<char> invalidChars;
 
-    public Windows1251Decoder(TextFileParsingSettings settings) => 
-        this.settings = new CharacterValidatorSettings(settings.AllowEscapeChar, settings.AllowFormFeed, true, false);
-    
-    protected override IReadOnlySet<char> InvalidCharacters => InvalidCharactersHelper
-        .GetForbiddenChars(settings)
-        .Concat((char)152)
-        .ToHashSet();
+    public Windows1251Decoder(TextFileParsingSettings settings)
+    {
+        var characterValidationSettings = new CharacterValidationSettings(settings.AllowEscapeChar, settings.AllowFormFeed, true, false);
+        invalidChars = InvalidCharactersHelper.GetForbiddenChars(characterValidationSettings).ToHashSet();
+    }
+
+    protected override IReadOnlySet<char> InvalidCharacters => invalidChars;
 
     public override DetectionProbability DefaultDetectionProbability => DetectionProbability.No;
     public override string[]? RequiredEncodingAnalyzers { get; } = { "ru" };

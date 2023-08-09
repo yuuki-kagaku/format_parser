@@ -5,13 +5,14 @@ namespace FormatParser.Text;
 
 public class EBCDICDecoder : NonUtfDecoder
 {
-    private readonly CharacterValidatorSettings settings;
-    public EBCDICDecoder(TextFileParsingSettings settings)  => 
-        this.settings = new CharacterValidatorSettings(settings.AllowEscapeChar, settings.AllowFormFeed, true, false);
+    private readonly HashSet<char> invalidChars;
+    public EBCDICDecoder(TextFileParsingSettings settings)
+    {
+        var characterValidationSettings = new CharacterValidationSettings(settings.AllowEscapeChar, settings.AllowFormFeed, true, false);
+        invalidChars = InvalidCharactersHelper.GetForbiddenChars(characterValidationSettings).ToHashSet();
+    }
 
-    protected override IReadOnlySet<char> InvalidCharacters => InvalidCharactersHelper
-        .GetForbiddenChars(settings)
-        .ToHashSet();
+    protected override IReadOnlySet<char> InvalidCharacters => invalidChars;
     
     public override string[]? RequiredEncodingAnalyzers { get; } = { "header_analyzer" };
     public override DetectionProbability DefaultDetectionProbability => DetectionProbability.No;

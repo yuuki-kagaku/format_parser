@@ -17,8 +17,9 @@ public class CompositeTextFormatDecoder
     {
         this.decoders = decoders;
         var encodingAnalyzersById = textAnalyzers
-            .SelectMany(analyzer => analyzer.AnalyzerIds.Select(lang => (Language: lang, Analyzer: analyzer)))
-            .ToDictionary(x => x.Language, x => x.Analyzer);
+            .SelectMany(analyzer => analyzer.AnalyzerIds.Select(id => (Id: id, Analyzer: analyzer)))
+            .GroupBy(x => x.Id)
+            .ToDictionary(x => x.Key, x => x.Select(y => y.Analyzer).ToArray());
 
         encodingAnalyzersDictionary = decoders.ToDictionary(x => x, x => GetEncodingAnalyzers(x, encodingAnalyzersById));
         validCharactersCheckers = decoders.ToDictionary(x => x, x => new Func<char, bool>(x.IsCharacterValid));
@@ -69,17 +70,18 @@ public class CompositeTextFormatDecoder
     }
     
     
-    private static IEnumerable<ITextAnalyzer> GetEncodingAnalyzers(ITextDecoder decoder, Dictionary<string, ITextAnalyzer> encodingAnalyzersByLanguage)
+    private static IEnumerable<ITextAnalyzer> GetEncodingAnalyzers(ITextDecoder decoder, Dictionary<string, ITextAnalyzer[]> encodingAnalyzersByLanguage)
     {
         if (decoder.RequiredEncodingAnalyzers == null)
             yield break;
 
         foreach (var encodingAnalyzerId in decoder.RequiredEncodingAnalyzers)
         {
-            if (!encodingAnalyzersByLanguage.TryGetValue(encodingAnalyzerId, out var analyzer))
+            if (!encodingAnalyzersByLanguage.TryGetValue(encodingAnalyzerId, out var analyzers))
                 throw new Exception($"Could not find analyzer for {decoder.RequiredEncodingAnalyzers}");
 
-            yield return analyzer;
+            foreach (var analyzer in analyzers)
+                yield return analyzer;
         }
     }
 }
