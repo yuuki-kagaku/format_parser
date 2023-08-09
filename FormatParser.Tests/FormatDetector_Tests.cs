@@ -56,19 +56,6 @@ public class FormatDetector_Tests : TestBase
         result!.Encoding.Should().Be(WellKnownEncodingInfos.Utf8NoBom);
         result.MimeType.Should().Be("text/xml");
     }
-    
-    [Test]
-    public async Task Should_read_ebcdic_xml()
-    {
-        var file = GetFile(TestFileCategory.Ebcdic, "ebcdic.xml");
-
-        await using var stream =  new FileStream(file, FileMode.Open, FileAccess.ReadWrite);
-        var result = (await formatDetector.DetectAsync(stream)) as TextFileFormatInfo;
-
-        result.Should().NotBeNull();
-        result!.Encoding.Should().Be(new EncodingInfo("IBM037", Endianness.NotAllowed, false));
-        result.MimeType.Should().Be("text/xml");
-    }
 
     [Test]
     public async Task Should_read_utf16be_xml()
@@ -129,7 +116,26 @@ public class FormatDetector_Tests : TestBase
         result!.Encoding.Should().Be(WellKnownEncodingInfos.Utf16LeNoBom);
         result.MimeType.Should().Be("text/xml");
     }
+    
+    [Test]
+    public async Task Should_read_ebcdic_xml()
+    {
+        var result = await DetectFileAsync(TestFileCategory.Xml, "ebcdic.xml");
 
+        result.Should().NotBeNull();
+        result!.Encoding.Should().Be(new EncodingInfo("IBM037", Endianness.NotAllowed, false));
+        result.MimeType.Should().Be("text/xml");
+    }
+    
+    [Test]
+    public async Task Should_read_ebcdic_xml_with_german_encoding()
+    {
+        var result = await DetectFileAsync(TestFileCategory.Xml, "ebcidic-de.xml");
+
+        result.Should().NotBeNull();
+        result!.Encoding.Should().Be(new EncodingInfo("IBM273", Endianness.NotAllowed, false));
+        result.MimeType.Should().Be("text/xml");
+    }
 
     private async Task<TextFileFormatInfo?> DetectFileAsync(TestFileCategory testFileCategory, string filename)
     {

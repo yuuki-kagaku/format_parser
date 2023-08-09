@@ -1,6 +1,5 @@
 using System.Text;
 using FormatParser.Domain;
-using EncodingInfo = FormatParser.Domain.EncodingInfo;
 
 namespace FormatParser.Text;
 
@@ -10,14 +9,14 @@ public class EBCDICDecoder : NonUtfDecoder
     public EBCDICDecoder(TextFileParsingSettings settings)  => 
         this.settings = new CharacterValidatorSettings(settings.AllowEscapeChar, settings.AllowFormFeed, true, false);
 
-    public override IEnumerable<char> GetInvalidCharacters => InvalidCharactersHelper
+    protected override IReadOnlySet<char> InvalidCharacters => InvalidCharactersHelper
         .GetForbiddenChars(settings)
         .ToHashSet();
     
     public override string[]? RequiredEncodingAnalyzers { get; } = { "header_analyzer" };
     public override DetectionProbability DefaultDetectionProbability => DetectionProbability.No;
     protected override int MinimalSizeOfInput { get; } = 0;
-    protected override EncodingInfo EncodingInfo { get; } = new ("IBM037", Endianness.NotAllowed, false);
+    public override string EncodingName { get; } = "IBM037";
 
     protected override Decoder GetDecoder(int inputSize)
     {
