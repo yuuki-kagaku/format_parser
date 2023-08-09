@@ -10,6 +10,10 @@ public record TextFileFormatInfo(string MimeType, EncodingInfo Encoding) : IFile
     {
         if (ReferenceEquals(null, other)) 
             return false;
+
+        if (GetType() != other.GetType())
+            return false;
+        
         if (ReferenceEquals(this, other)) 
             return true;
         
@@ -23,7 +27,9 @@ public record TextFileFormatInfo(string MimeType, EncodingInfo Encoding) : IFile
 
     public virtual bool Equals(IFileFormatInfo? other) => other is TextFileFormatInfo textFileFormatInfo && Equals(textFileFormatInfo);
 
-    public string ToPrettyString() => $"{MimeType} ; {Encoding.ToPrettyString()}";
+    public virtual string ToPrettyString() => $"{MimeType} ; {Encoding.ToPrettyString(AlwaysPrintBom)}";
+
+    protected virtual bool AlwaysPrintBom { get; } = false;
     
     public static string DefaultTextType => "text/plain";
 }

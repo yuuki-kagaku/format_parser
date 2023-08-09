@@ -19,8 +19,8 @@ public class XmlDecoder : ITextBasedFormatDetector
         var encodingAttributeMatch = EncodingPattern.Match(header[..match.Length]);
         
         return encodingAttributeMatch.Success
-            ? new TextFileFormatInfo(MimeType, encodingInfo with { Name = encodingAttributeMatch.Groups["encoding"].Value})
-            : new TextFileFormatInfo(MimeType, encodingInfo);
+            ? new XmlFileFormatInfo(MimeType, encodingInfo with { Name = encodingAttributeMatch.Groups["encoding"].Value})
+            : new XmlFileFormatInfo(MimeType, encodingInfo);
     }
 
     private static string MimeType => "text/xml";

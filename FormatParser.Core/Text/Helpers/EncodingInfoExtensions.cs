@@ -4,12 +4,12 @@ namespace FormatParser.Text.Helpers;
 
 public static class EncodingInfoExtensions
 {
-    public static string ToPrettyString(this EncodingInfo encodingInfo) => 
-        $"{encodingInfo.Name}{EndiannessInfo(encodingInfo)}{BomInfo(encodingInfo)}";
+    public static string ToPrettyString(this EncodingInfo encodingInfo, bool alwaysPrintBom) => 
+        $"{encodingInfo.Name}{EndiannessInfo(encodingInfo)}{BomInfo(encodingInfo, alwaysPrintBom)}";
 
-    private static string BomInfo(EncodingInfo encodingInfo)
+    private static string BomInfo(EncodingInfo encodingInfo, bool alwaysPrintBom)
     {
-        if (!EncodingHelper.SupportBom(encodingInfo.Name))
+        if (!alwaysPrintBom && !EncodingHelper.SupportBom(encodingInfo.Name))
             return String.Empty;
 
         return encodingInfo.ContainsBom ? " BOM" : " No BOM";

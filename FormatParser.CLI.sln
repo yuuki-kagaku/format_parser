@@ -32,6 +32,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.Xml", "FormatP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.ArgumentParser", "FormatParser.ArgumentParser\FormatParser.ArgumentParser.csproj", "{D81440C9-3C86-4E93-989C-8E60F0BCCF82}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatParser.Ebcdic", "FormatParser.Ebcdic\FormatParser.Ebcdic.csproj", "{19202BCA-E455-42A8-A3B0-DD56539BFFE4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -102,5 +104,9 @@ Global
 		{D81440C9-3C86-4E93-989C-8E60F0BCCF82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D81440C9-3C86-4E93-989C-8E60F0BCCF82}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D81440C9-3C86-4E93-989C-8E60F0BCCF82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19202BCA-E455-42A8-A3B0-DD56539BFFE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19202BCA-E455-42A8-A3B0-DD56539BFFE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19202BCA-E455-42A8-A3B0-DD56539BFFE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19202BCA-E455-42A8-A3B0-DD56539BFFE4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
